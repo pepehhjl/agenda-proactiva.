@@ -24,6 +24,11 @@ export default async function handler(req, res) {
   const due = []; // {keys, payload}
   for (const r of items) {
     const t = r.data;
+    // A reminder the user postponed with "Posponer".
+    if (r.kind === "task" && !t.done && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
+      const key = `${r.id}@snooze@${t.snooze}`;
+      due.push({ check: key, keys: [key], payload: { title: `Recordatorio: ${t.title}`, body: t.tip || `Era a las ${t.time}.`, tag: r.id, taskId: r.id } });
+    }
     if (r.kind === "task" && !t.done && t.start) {
       const mins = (Date.parse(t.start) - now) / 60000;
       if (mins <= 0 || mins > 60) continue;
@@ -33,7 +38,7 @@ export default async function handler(req, res) {
       due.push({
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
-        payload: { title: `${label}: ${t.title}`, body: t.tip || `A las ${t.time}.`, tag: r.id },
+        payload: { title: `${label}: ${t.title}`, body: t.tip || `A las ${t.time}.`, tag: r.id, taskId: r.id },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
@@ -48,8 +53,8 @@ export default async function handler(req, res) {
       due.push({
         check: key, keys: [key],
         payload: days === 2
-          ? { title: `En 2 días cumple ${t.name}`, body: "Abre la agenda para ver ideas de regalo y un mensaje.", tag: r.id }
-          : { title: `Hoy cumple ${t.name}`, body: "No olvides escribirle.", tag: r.id },
+          ? { title: `En 2 días cumple ${t.name} 🎂`, body: "¿Elegimos un regalo? Toca para ver ideas.", tag: r.id, url: "/?tab=chat" }
+          : { title: `Hoy cumple ${t.name} 🎉`, body: "Toca para ver un mensaje listo para enviarle.", tag: r.id, url: "/?tab=chat" },
       });
     }
   }

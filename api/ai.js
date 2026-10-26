@@ -1,34 +1,56 @@
-// Asks Gemini and returns its answer parsed as JSON.
+// Asks Gemini. Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
+// or {audio:{mime, data}} (base64) to transcribe a voice note. Returns {data}.
 import { env, authed, deny, readBody } from "./_lib.js";
+
+async function gemini(key, body) {
+  const model = env("GEMINI_MODEL") || "gemini-flash-latest";
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify(body),
+  });
+  const data = await r.json().catch(() => ({}));
+  const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("");
+  return { ok: r.ok, status: r.status, text, message: data.error && data.error.message };
+}
+
+function parseJson(text) {
+  try { return JSON.parse(text); } catch {}
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) { try { return JSON.parse(fenced[1]); } catch {} }
+  const m = text.match(/[\[{][\s\S]*[\]}]/);
+  return JSON.parse(m ? m[0] : "");
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   if (!authed(req)) return deny(res);
   const key = env("GEMINI_API_KEY");
   if (!key) return res.status(503).json({ error: "no_ai", message: "Falta configurar GEMINI_API_KEY en Vercel." });
+  const { input, search, audio } = await readBody(req);
 
-  const { input } = await readBody(req);
+  if (audio && audio.data) {
+    const out = await gemini(key, { contents: [{ role: "user", parts: [
+      { inline_data: { mime_type: String(audio.mime || "audio/webm").split(";")[0], data: audio.data } },
+      { text: "Transcribe este audio en español, tal como se dijo, sin agregar nada. Si no se entiende nada, responde vacío." },
+    ] }] });
+    if (!out.ok) return res.status(out.status === 429 ? 429 : 502).json({ error: out.status === 429 ? "rate_limited" : "ai_error", message: out.message || "No pude transcribir." });
+    return res.json({ data: { texto: out.text.trim() } });
+  }
+
   const turns = typeof input === "string" ? [{ role: "user", content: input }] : Array.isArray(input) ? input : [];
   if (!turns.length) return res.status(400).json({ error: "bad_request" });
   const contents = turns.slice(-12).map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: String(t.content).slice(0, 20000) }] }));
 
-  const model = env("GEMINI_MODEL") || "gemini-flash-latest";
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({ contents, generationConfig: { responseMimeType: "application/json", temperature: 0.6 } }),
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) {
-    const limited = r.status === 429;
-    return res.status(limited ? 429 : 502).json({ error: limited ? "rate_limited" : "ai_error", message: data.error && data.error.message || "Error de la IA." });
+  // Google Search grounding cannot be combined with a forced JSON reply, so it asks for JSON in the prompt instead.
+  let out = search
+    ? await gemini(key, { contents, tools: [{ google_search: {} }], generationConfig: { temperature: 0.7 } })
+    : null;
+  if (!out || !out.ok) out = await gemini(key, { contents, generationConfig: { responseMimeType: "application/json", temperature: 0.6 } });
+  if (!out.ok) {
+    const limited = out.status === 429;
+    return res.status(limited ? 429 : 502).json({ error: limited ? "rate_limited" : "ai_error", message: out.message || "Error de la IA." });
   }
-  const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("");
-  try {
-    res.json({ data: JSON.parse(text) });
-  } catch {
-    const m = text.match(/[\[{][\s\S]*[\]}]/);
-    try { res.json({ data: JSON.parse(m ? m[0] : "") }); }
-    catch { res.status(502).json({ error: "invalid_json", message: "La IA respondió algo que no entendí.", text }); }
-  }
+  try { res.json({ data: parseJson(out.text) }); }
+  catch { res.status(502).json({ error: "invalid_json", message: "La IA respondió algo que no entendí.", text: out.text }); }
 }

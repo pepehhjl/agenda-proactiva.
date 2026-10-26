@@ -142,6 +142,19 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .toast .meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
 .toast b { display: block; font-size: 15px; }
 .toast p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
+.toast { position: relative; overflow: hidden; }
+.toast .acts { grid-column: 1 / -1; display: flex; gap: 6px; }
+.toast .acts button { flex: 1; border: 0; background: var(--fill); color: var(--accent); border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.toast .life { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--accent); opacity: .55; transform-origin: left; animation: life var(--life, 10s) linear forwards; }
+.toast.hold .life { animation-play-state: paused; }
+@keyframes life { to { transform: scaleX(0); } }
+.mic { border: 0; background: var(--fill); color: var(--accent); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
+.mic.rec { background: var(--red); color: #fff; }
+@media (prefers-reduced-motion: no-preference) { .mic.rec { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--red) 25%, transparent); } } }
+.msg.ai { white-space: normal; }
+.msg.ai p { margin: 0 0 6px; }
+.msg.ai ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.msg.ai li { padding-left: 2px; }
 @media (prefers-reduced-motion: no-preference) {
   .toast { animation: drop .45s cubic-bezier(.2, .9, .25, 1.15); }
   @keyframes drop { from { transform: translateY(-120%); opacity: .2; } }
@@ -200,6 +213,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
         <p class="muted">Escribe o dicta todo lo que tienes pendiente. Te propongo horarios y tú eliges.</p>
         <textarea id="dump" class="field" placeholder="Ej: mañana tengo que ir al banco, grabar un video de ASMR, llamar a mamá y estudiar inglés una hora"></textarea>
         <div class="row">
+          <button type="button" class="mic" data-mic="dump" aria-label="Dictar"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
           <input id="dumpDate" class="field" type="date" style="width:auto" aria-label="Día">
           <button id="organize" class="btn primary">Organizar mi día</button>
         </div>
@@ -221,6 +235,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
         </div>
         <div id="chatlog" class="chatlog" aria-live="polite"></div>
         <form id="chatForm" class="row">
+          <button type="button" class="mic" data-mic="chatIn" aria-label="Dictar"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
           <input id="chatIn" class="field" placeholder="Ej: mueve el banco a las 4 de la tarde" autocomplete="off" style="flex:1">
           <button class="btn primary" id="chatSend">Enviar</button>
         </form>
@@ -313,7 +328,10 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
     if (!r.ok) throw { status: r.status, ...j };
     return j;
   }
-  const ai = { json: (input) => call("/api/ai", { input }).then((j) => j.data) };
+  const ai = {
+    json: (input, search) => call("/api/ai", { input, search: !!search }).then((j) => j.data),
+    transcribe: (audio) => call("/api/ai", { audio }).then((j) => String((j.data && j.data.texto) || "")),
+  };
   function errText(e) {
     if (e && e.error === "rate_limited") return "La IA gratis llegó a su límite por ahora. Intenta en un minuto.";
     if (e && e.error === "no_ai") return "Falta conectar Gemini (mira Ajustes).";
@@ -529,7 +547,8 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     state.chat.push({ role: "user", content: q });
     const thinking = { role: "assistant", content: "Pensando...", temp: true }; state.chat.push(thinking); renderChat();
     $("chatSend").disabled = true;
-    const rules = `Eres el asistente de un calendario personal. Responde en español, breve y amable (máximo 5 frases).
+    const rules = `Eres el asistente de un calendario personal. Responde en español, breve, amable y fácil de leer.
+Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Agenda de los próximos 7 días (cada evento tiene un id):
 ${agendaText(ymd(new Date()), 7)}
@@ -575,9 +594,56 @@ Si no hay acciones, usa "acciones":[].`;
         m.applied ? null : el("div", { class: "row" },
           el("button", { class: "btn small primary", onclick: () => applyActions(m) }, "Sí, hazlo"),
           el("button", { class: "btn small", onclick: () => { state.chat.splice(state.chat.indexOf(m), 1); renderChat(); } }, "No"))));
-      else log.append(el("div", { class: "msg " + (m.role === "user" ? "me" : "ai") }, m.content));
+      else if (m.role === "user") log.append(el("div", { class: "msg me" }, m.content));
+      else if (m.content) log.append(el("div", { class: "msg ai" }, md(m.content)));
+      if (m.chips && !m.used) log.append(el("div", { class: "chips" }, m.chips.map((c) => el("button", { class: "chip", onclick: () => { m.used = true; c.run(); } }, c.label))));
+      if (m.gift) log.append(m.gift);
     }
     log.lastElementChild && log.lastElementChild.scrollIntoView({ block: "nearest" });
+  }
+  // Safe mini-markdown: **bold**, "- " / "• " bullet lines, paragraphs. Builds DOM nodes, never HTML strings.
+  function inline(s) {
+    return s.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map((p) => (/^\*\*[^*]+\*\*$/.test(p) ? el("b", {}, p.slice(2, -2)) : p));
+  }
+  function md(text) {
+    const frag = document.createDocumentFragment();
+    let ul = null;
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim();
+      if (!line) { ul = null; continue; }
+      const b = line.match(/^(?:[-*•]|\d+[.)])\s+(.*)$/);
+      if (b) { if (!ul) frag.append((ul = el("ul"))); ul.append(el("li", {}, inline(b[1]))); }
+      else { ul = null; frag.append(el("p", {}, inline(line))); }
+    }
+    return frag;
+  }
+
+  // Proactive birthday prompt in the chat, once a day per upcoming birthday.
+  function bdayNudges() {
+    const today = ymd(new Date()), seen = ls.get("nudged", {});
+    let added = false;
+    for (const b of state.bdays) {
+      const n = nextBday(b);
+      if (n.days > 2 || seen[b.id] === today) continue;
+      seen[b.id] = today; added = true;
+      const when = n.days === 0 ? "hoy" : n.days === 1 ? "mañana" : "pasado mañana";
+      const msg = { role: "assistant", content: `🎂 **${when[0].toUpperCase() + when.slice(1)}** es el cumpleaños de **${b.name}**.\n¿Quieres que escojamos un regalo juntos? Te busco lo que está de moda.` };
+      msg.chips = [
+        { label: "🎁 Sí, ideas de regalo", run: () => giftInChat(b) },
+        { label: "💌 Solo el mensaje", run: () => giftInChat(b, true) },
+        { label: "Ahora no", run: () => renderChat() },
+      ];
+      state.chat.push(msg);
+    }
+    if (added) { ls.set("nudged", seen); renderChat(); }
+    return added;
+  }
+  function giftInChat(b, onlyMsg) {
+    const out = el("div", { class: "card" });
+    state.chat.push({ role: "user", content: onlyMsg ? `Escríbeme un mensaje para ${b.name}` : `Sí, ideas de regalo para ${b.name}` });
+    state.chat.push({ role: "assistant", content: "", gift: out, temp: true });
+    renderChat();
+    giftIdeas(b, out, null, onlyMsg).then(renderChat);
   }
 
   // ---------- birthdays ----------
@@ -587,22 +653,28 @@ Si no hay acciones, usa "acciones":[].`;
     if (d < now) d = new Date(now.getFullYear() + 1, b.month - 1, b.day);
     return { date: d, days: Math.round((d - now) / 86400000) };
   }
-  async function giftIdeas(b, out, btn) {
-    btn.disabled = true; out.replaceChildren(el("div", { class: "muted" }, "Buscando ideas..."));
+  async function giftIdeas(b, out, btn, onlyMsg) {
+    if (btn) btn.disabled = true;
+    out.replaceChildren(el("div", { class: "muted" }, onlyMsg ? "✍️ Escribiendo el mensaje..." : "🔎 Buscando qué está de moda..."));
     const nb = nextBday(b);
-    const prompt = `Responde en español. ${nowLine()} En ${nb.days} días es el cumpleaños de ${b.name}.
+    const when = nb.days === 0 ? "hoy" : nb.days === 1 ? "mañana" : `en ${nb.days} días`;
+    const prompt = `Responde en español. ${nowLine()} ${when[0].toUpperCase() + when.slice(1)} es el cumpleaños de ${b.name}.
 Lo que sé de esta persona: ${b.notes || "nada en especial"}.
-Dame 4 ideas de regalo variadas (una económica, una cómica o divertida, una experiencia, una hecha a mano), cada una en una frase, y un mensaje de cumpleaños cálido y corto.
-Responde solo JSON: {"ideas":["..."],"mensaje":"..."}`;
+${onlyMsg ? "No hacen falta ideas de regalo (\"ideas\":[])." : `Busca qué regalos están de moda o son tendencia ahora mismo (redes sociales, tiendas) y dame 5 ideas variadas: una tendencia del momento, una económica, una divertida, una experiencia y una hecha a mano. Ten en cuenta sus gustos y que haya tiempo de conseguirla ${when}.`}
+Escribe también un mensaje de cumpleaños cálido y corto, listo para mandar por WhatsApp, con un emoji.
+Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos","porque":"están en tendencia y le gusta la música"}],"mensaje":"..."}`;
     try {
-      const r = await ai.json(prompt);
+      const r = await ai.json(prompt, !onlyMsg);
       const msg = String(r.mensaje || "");
-      const copy = el("button", { class: "btn small", onclick: async () => { try { await navigator.clipboard.writeText(msg); copy.textContent = "Copiado"; } catch { copy.textContent = "Selecciona y copia"; } } }, "Copiar mensaje");
-      out.replaceChildren(el("div", { class: "tipbox" }, el("b", {}, "Ideas de regalo"),
-        el("ul", { style: "margin:4px 0;padding-left:18px" }, (r.ideas || []).slice(0, 5).map((x) => el("li", {}, String(x)))),
-        el("b", {}, "Mensaje"), el("p", { style: "margin:4px 0" }, msg), copy));
+      const ideas = (Array.isArray(r.ideas) ? r.ideas : []).slice(0, 6).map((x) => (typeof x === "string" ? { idea: x } : x || {}));
+      const copy = el("button", { class: "btn small", onclick: async () => { try { await navigator.clipboard.writeText(msg); copy.textContent = "Copiado ✓"; } catch { copy.textContent = "Selecciona y copia"; } } }, "Copiar mensaje");
+      out.replaceChildren(el("div", { class: "tipbox", style: "display:grid;gap:6px" },
+        ideas.length ? el("b", {}, `🎁 Ideas para ${b.name}`) : null,
+        ideas.length ? el("ul", { style: "margin:0;padding:0;list-style:none;display:grid;gap:6px" }, ideas.map((x) =>
+          el("li", {}, `${x.emoji || "🎁"} `, el("b", {}, String(x.idea || "")), x.porque ? el("div", { class: "muted" }, String(x.porque)) : null))) : null,
+        el("b", {}, "💌 Mensaje"), el("p", { style: "margin:0" }, msg), el("div", { class: "row" }, copy)));
     } catch (e) { out.replaceChildren(el("div", { class: "status err" }, errText(e))); }
-    finally { btn.disabled = false; }
+    finally { if (btn) btn.disabled = false; }
   }
   function renderBdays() {
     const box = $("bdays"); box.replaceChildren();
@@ -633,25 +705,111 @@ Responde solo JSON: {"ideas":["..."],"mensaje":"..."}`;
       });
     } catch {}
   }
+  // Banner that leaves on its own after 10 s (a bar shows the time left; it pauses while you touch it). At most 3 at once.
+  const TOAST_MS = 10000;
   function toast(t, mins, test) {
-    const label = mins >= 60 ? "En 1 hora" : `En ${mins} minutos`;
-    const box = el("div", { class: "toast", role: "alert", onclick: () => box.remove() },
+    const label = mins === "snooze" ? "Recordatorio" : mins >= 60 ? "En 1 hora" : `En ${mins} minutos`;
+    let left = TOAST_MS, since = Date.now(), timer = null;
+    const close = () => { clearTimeout(timer); box.remove(); };
+    const run = () => { since = Date.now(); timer = setTimeout(close, left); };
+    const hold = () => { if (box.classList.contains("hold")) return; clearTimeout(timer); left -= Date.now() - since; box.classList.add("hold"); };
+    const resume = () => { if (!box.classList.contains("hold")) return; box.classList.remove("hold"); run(); };
+    const real = !test && state.tasks.some((x) => x.id === t.id);
+    const act = (txt, fn) => el("button", { onclick: (e) => { e.stopPropagation(); fn(); close(); } }, txt);
+    const box = el("div", { class: "toast", role: "alert", style: `--life:${TOAST_MS}ms`,
+        onclick: () => { close(); if (real) openSheet(state.tasks.find((x) => x.id === t.id)); },
+        onpointerenter: (e) => e.pointerType === "mouse" && hold(), onpointerleave: (e) => e.pointerType === "mouse" && resume(), ontouchstart: hold, ontouchend: resume, ontouchcancel: resume },
       el("img", { src: "/icon-192.png", alt: "" }),
       el("div", {}, el("div", { class: "meta" }, el("span", {}, "AGENDA" + (test ? " · vista previa" : "")), el("span", {}, "ahora")),
-        el("b", {}, `${label}: ${t.title}`), el("p", {}, t.tip || `A las ${t.time}.`)));
-    $("toasts").prepend(box); chime();
-    setTimeout(() => box.remove(), 30000);
+        el("b", {}, `${label}: ${t.title}`), el("p", {}, t.tip || `A las ${t.time}.`)),
+      el("div", { class: "acts" },
+        act("Posponer 10 min", () => { if (real) snooze(t.id, 10); }),
+        act("Hecho", () => { if (real) markDone(t.id); }),
+        act("Cerrar", () => {})),
+      el("span", { class: "life" }));
+    const stack = $("toasts"); stack.prepend(box);
+    while (stack.children.length > 3) stack.lastElementChild.remove();
+    chime(); run();
+  }
+  function snooze(id, mins) {
+    const t = state.tasks.find((x) => x.id === id); if (!t) return;
+    put({ ...t, snooze: new Date(Date.now() + mins * 60000).toISOString() });
+  }
+  function markDone(id) {
+    const t = state.tasks.find((x) => x.id === id); if (!t) return;
+    put({ ...t, done: true, snooze: null });
   }
   function checkReminders() {
     const now = Date.now();
     for (const t of state.tasks) {
       if (t.done) continue;
+      if (t.snooze) {
+        const s = Date.parse(t.snooze), key = t.id + "@snooze@" + t.snooze;
+        if (s <= now && now - s < 30 * 60000 && !fired.has(key)) { fired.add(key); ls.set("fired", [...fired].slice(-300)); toast(t, "snooze", false); }
+      }
       const m = (at(t.date, t.time).getTime() - now) / 60000;
       if (m <= 0 || m > 60) continue;
       const due = [60, 30, 10].filter((th) => m <= th), smallest = due[due.length - 1];
       const key = t.id + "@" + t.date + t.time + "#";
       if (!fired.has(key + smallest)) { due.forEach((th) => fired.add(key + th)); ls.set("fired", [...fired].slice(-300)); toast(t, smallest, false); }
     }
+  }
+
+  // ---------- dictation ----------
+  // Tap to start, tap again to stop. Uses the browser's live dictation when it has one; otherwise records and Gemini transcribes.
+  let dictating = null;
+  function toggleMic(btn) {
+    if (dictating) { const d = dictating; dictating = null; d.stop(); return; }
+    const field = $(btn.dataset.mic), base = field.value ? field.value.replace(/\s*$/, " ") : "";
+    const setRec = (on) => { btn.classList.toggle("rec", on); btn.setAttribute("aria-label", on ? "Detener dictado" : "Dictar"); };
+    const write = (txt) => { field.value = base + txt; };
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const record = async () => {
+      if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = "Este navegador no permite dictar."; return; }
+      let stream;
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { field.placeholder = "No diste permiso al micrófono."; return; }
+      const rec = new MediaRecorder(stream), parts = [];
+      rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop()); setRec(false);
+        const blob = new Blob(parts, { type: rec.mimeType || "audio/webm" });
+        if (!blob.size) return;
+        btn.disabled = true; const ph = field.placeholder; field.placeholder = "Transcribiendo...";
+        try {
+          const data = await new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = ko; r.readAsDataURL(blob); });
+          const txt = await ai.transcribe({ mime: blob.type, data });
+          if (txt) write(txt); field.placeholder = ph;
+        } catch (e) { field.placeholder = errText(e); }
+        finally { btn.disabled = false; field.focus(); }
+      };
+      rec.start(); setRec(true);
+      dictating = { stop: () => rec.state !== "inactive" && rec.stop() };
+    };
+    if (!SR) return record();
+    const r = new SR(); let finalText = "", failed = false;
+    r.lang = "es-ES"; r.interimResults = true; r.continuous = true;
+    r.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) { const s = e.results[i][0].transcript; if (e.results[i].isFinal) finalText += s; else interim += s; }
+      write((finalText + interim).trim());
+    };
+    r.onerror = (e) => { if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error)) failed = true; };
+    // If live dictation is blocked (common in installed iPhone apps), fall back to recording.
+    r.onend = () => { setRec(false); dictating = null; if (failed && !finalText) record(); };
+    try { r.start(); setRec(true); dictating = { stop: () => r.stop() }; } catch { record(); }
+  }
+  document.querySelectorAll("[data-mic]").forEach((b) => b.addEventListener("click", () => toggleMic(b)));
+
+  // Taps on a notification open the app with ?accion=snooze|done&id=... or ?tab=chat.
+  function handleUrl() {
+    const q = new URLSearchParams(location.search);
+    const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab");
+    if (!accion && !tab) return false;
+    history.replaceState(null, "", location.pathname);
+    if (accion === "snooze" && id) snooze(id, 10);
+    else if (accion === "done" && id) markDone(id);
+    if (tab) { showTab(tab); return true; }
+    return false;
   }
 
   // ---------- push notifications ----------
@@ -742,6 +900,8 @@ Responde solo JSON: {"ideas":["..."],"mensaje":"..."}`;
     $("sound").checked = state.settings.sound !== false;
     render(); renderChat(); renderSetup(); renderPush();
     showTab(isPhone() ? "cal" : "organize");
+    const fromUrl = handleUrl();
+    if (bdayNudges() && !fromUrl) showTab("chat");
     scrollToNow(); checkReminders();
   }
 
