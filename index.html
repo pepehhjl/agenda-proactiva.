@@ -404,6 +404,14 @@ html.kb .tabbar { display: none; }
 .qrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .qrow input[type="time"] { border: 0; background: var(--fill); border-radius: 10px; padding: 8px 12px; font-size: 16px; min-width: 120px; text-align: center; }
 
+/* Organize: the mic sits inside the writing box, like in the chat. */
+.dumpbox { position: relative; }
+.dumpbox textarea { min-height: 150px; padding-right: 70px; padding-bottom: 16px; resize: vertical; }
+.dumpbox .mic { position: absolute; right: 12px; bottom: 12px; width: 52px; height: 52px; background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); }
+.dumpbox .mic.rec { background: var(--red); color: #fff; box-shadow: none; }
+.dumpbox:has(.mic.rec) textarea { box-shadow: inset 0 0 0 2px var(--red); }
+.dumpbox + .miclabel { margin-top: -8px; text-align: left; padding-left: 4px; font-size: 13px; }
+
 /* Bichos: a word on a tilted yellow highlighter block. */
 .hl { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 0 .2em; transform: skew(-8deg); box-shadow: 4px 4px 0 var(--ink); }
 </style>
@@ -439,9 +447,11 @@ html.kb .tabbar { display: none; }
       <div class="pane" data-pane="organize">
         <h2 data-i18n="orgTitle">Vacía tu cabeza</h2>
         <p class="muted" data-i18n="orgIntro"></p>
-        <button type="button" class="bigmic" data-mic="dump" data-i18n-aria="dictate"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+        <div class="dumpbox">
+          <textarea id="dump" class="field" data-i18n-ph="dumpPh"></textarea>
+          <button type="button" class="mic" data-mic="dump" data-label="dumpMicLabel" data-i18n-aria="dictate"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+        </div>
         <div class="miclabel" id="dumpMicLabel" data-i18n="tapTalk"></div>
-        <textarea id="dump" class="field" data-i18n-ph="dumpPh"></textarea>
         <div class="seg" id="dumpDay" role="group" data-i18n-aria="whichDay"></div>
         <button id="organize" class="btn primary" data-i18n="organizeBtn"></button>
         <div id="dumpStatus" class="status" role="status"></div>
@@ -575,7 +585,7 @@ html.kb .tabbar { display: none; }
       agenda: "Agenda", today: "Hoy", month: "Mes", week: "Semana", prevDay: "Día anterior", nextDay: "Día siguiente", prevMonth: "Mes anterior", nextMonth: "Mes siguiente",
       tabOrganize: "Organizar", tabChat: "Chat", tabBdays: "Cumpleaños", tabBdaysShort: "Cumples", tabSettings: "Ajustes", sections: "Secciones", add: "Agregar",
       orgTitle: "Vacía tu cabeza", orgIntro: "Dime todo lo que tienes pendiente. Te propongo horarios y tú eliges.", dictate: "Dictar", tapTalk: "Toca y habla",
-      dumpPh: "O escríbelo aquí. Ej: mañana tengo que ir al banco, grabar un video de ASMR y llamar a mamá", whichDay: "Para qué día", organizeBtn: "Organizar mi día",
+      dumpPh: "Escribe o dicta con el micrófono. Ej: mañana tengo que ir al banco, grabar un video de ASMR y llamar a mamá", whichDay: "Para qué día", organizeBtn: "Organizar mi día",
       scheduleChosen: "Agendar lo elegido", discard: "Descartar",
       chatTitle: "Habla con tu calendario", chatPh: "Escribe o dicta...", send: "Enviar",
       addBday: "Agregar cumpleaños", bdIntro: "Te aviso 2 días antes y el mismo día, con ideas de regalo. También puedes decírmelo en el chat.", name: "Nombre",
@@ -637,7 +647,7 @@ html.kb .tabbar { display: none; }
       agenda: "Agenda", today: "Today", month: "Month", week: "Week", prevDay: "Previous day", nextDay: "Next day", prevMonth: "Previous month", nextMonth: "Next month",
       tabOrganize: "Organize", tabChat: "Chat", tabBdays: "Birthdays", tabBdaysShort: "Birthdays", tabSettings: "Settings", sections: "Sections", add: "Add",
       orgTitle: "Empty your head", orgIntro: "Tell me everything on your plate. I'll suggest times and you choose.", dictate: "Dictate", tapTalk: "Tap and talk",
-      dumpPh: "Or type it here. E.g.: tomorrow I have to go to the bank, record an ASMR video and call mom", whichDay: "Which day", organizeBtn: "Organize my day",
+      dumpPh: "Type, or dictate with the mic. E.g.: tomorrow I have to go to the bank, record an ASMR video and call mom", whichDay: "Which day", organizeBtn: "Organize my day",
       scheduleChosen: "Schedule selected", discard: "Discard",
       chatTitle: "Talk to your calendar", chatPh: "Type or dictate...", send: "Send",
       addBday: "Add birthday", bdIntro: "I'll remind you 2 days before and on the day, with gift ideas. You can also tell me in the chat.", name: "Name",
@@ -699,7 +709,7 @@ html.kb .tabbar { display: none; }
       agenda: "Agenda", today: "Hoje", month: "Mês", week: "Semana", prevDay: "Dia anterior", nextDay: "Próximo dia", prevMonth: "Mês anterior", nextMonth: "Próximo mês",
       tabOrganize: "Organizar", tabChat: "Chat", tabBdays: "Aniversários", tabBdaysShort: "Aniversários", tabSettings: "Ajustes", sections: "Seções", add: "Adicionar",
       orgTitle: "Esvazie a cabeça", orgIntro: "Me conte tudo o que você tem pendente. Eu sugiro horários e você escolhe.", dictate: "Ditar", tapTalk: "Toque e fale",
-      dumpPh: "Ou escreva aqui. Ex.: amanhã tenho que ir ao banco, gravar um vídeo de ASMR e ligar para a minha mãe", whichDay: "Para qual dia", organizeBtn: "Organizar meu dia",
+      dumpPh: "Escreva ou dite com o microfone. Ex.: amanhã tenho que ir ao banco, gravar um vídeo de ASMR e ligar para a minha mãe", whichDay: "Para qual dia", organizeBtn: "Organizar meu dia",
       scheduleChosen: "Agendar o escolhido", discard: "Descartar",
       chatTitle: "Fale com o seu calendário", chatPh: "Escreva ou dite...", send: "Enviar",
       addBday: "Adicionar aniversário", bdIntro: "Eu aviso 2 dias antes e no próprio dia, com ideias de presente. Você também pode me contar no chat.", name: "Nome",
@@ -761,7 +771,7 @@ html.kb .tabbar { display: none; }
       agenda: "Agenda", today: "Aujourd'hui", month: "Mois", week: "Semaine", prevDay: "Jour précédent", nextDay: "Jour suivant", prevMonth: "Mois précédent", nextMonth: "Mois suivant",
       tabOrganize: "Organiser", tabChat: "Chat", tabBdays: "Anniversaires", tabBdaysShort: "Anniv.", tabSettings: "Réglages", sections: "Sections", add: "Ajouter",
       orgTitle: "Vide ta tête", orgIntro: "Dis-moi tout ce que tu as à faire. Je te propose des horaires et tu choisis.", dictate: "Dicter", tapTalk: "Touche et parle",
-      dumpPh: "Ou écris-le ici. Ex. : demain je dois aller à la banque, tourner une vidéo ASMR et appeler maman", whichDay: "Pour quel jour", organizeBtn: "Organiser ma journée",
+      dumpPh: "Écris ou dicte avec le micro. Ex. : demain je dois aller à la banque, tourner une vidéo ASMR et appeler maman", whichDay: "Pour quel jour", organizeBtn: "Organiser ma journée",
       scheduleChosen: "Planifier la sélection", discard: "Ignorer",
       chatTitle: "Parle à ton calendrier", chatPh: "Écris ou dicte...", send: "Envoyer",
       addBday: "Ajouter un anniversaire", bdIntro: "Je te préviens 2 jours avant et le jour même, avec des idées de cadeau. Tu peux aussi me le dire dans le chat.", name: "Nom",
@@ -1024,7 +1034,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.6.4";
+  const VERSION = "0.6.5";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -2036,10 +2046,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   let dictating = null;
   function toggleMic(btn) {
     if (dictating) { const d = dictating; dictating = null; d.stop(); return; }
-    const field = $(btn.dataset.mic), base = field.value ? field.value.replace(/\s*$/, " ") : "";
-    const lab = btn.nextElementSibling && btn.nextElementSibling.classList.contains("miclabel") ? btn.nextElementSibling : null;
+    const field = $(btn.dataset.mic), lab = btn.dataset.label ? $(btn.dataset.label) : null;
     const setRec = (on) => { btn.classList.toggle("rec", on); btn.setAttribute("aria-label", tr(on ? "stopDictation" : "dictate")); if (lab) lab.textContent = tr(on ? "listening" : "tapTalk"); };
-    const write = (txt) => { field.value = base + txt; };
+    const write = (txt) => { const cur = field.value.replace(/\s+$/, ""); field.value = (cur ? cur + " " : "") + txt; };
     let finished; const done = new Promise((ok) => (finished = ok));
     const record = async () => {
       if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = tr("noDictate"); return finished(); }
@@ -2220,6 +2229,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
 
   // ---------- tabs ----------
   function showTab(name) {
+    if (dictating) { const d = dictating; dictating = null; d.stop(); }
     document.querySelectorAll("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== name));
     document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
     document.querySelectorAll(".tabbar button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
@@ -2361,7 +2371,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     taps = [...taps.filter((x) => Date.now() - x < 3000), Date.now()];
     if (taps.length >= 5) { taps = []; ls.set("admin", !ls.get("admin", false)); renderSetup(); notice(tr(ls.get("admin", false) ? "adminOn" : "adminOff")); }
   };
-  $("organize").onclick = organize;
+  // A recording in progress is finished (and written) before organizing.
+  $("organize").onclick = async () => { if (dictating) { const d = dictating; dictating = null; await d.stop(); } organize(); };
   $("scheduleAll").onclick = scheduleAll;
   $("discard").onclick = () => { const left = (state.proposals || []).filter((p) => !p.sel); state.proposals = left.length && left.length < state.proposals.length ? left : null; renderProposals(); $("dumpStatus").textContent = ""; };
   // Send stops a recording first (and sends what was said); while the AI thinks, the same button stops it.
