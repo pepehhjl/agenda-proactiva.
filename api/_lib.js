@@ -25,11 +25,25 @@ export function supa() {
   return client;
 }
 
+// Cleans a pasted key: drops a "NAME=" prefix, quotes, spaces and line breaks.
+const cleanKey = (k) => env(k).replace(/^[A-Z_]+=/, "").replace(/[^A-Za-z0-9_-]/g, "");
+
+// The two VAPID keys, fixed up if they were pasted swapped. problem says what is wrong, if anything.
+export function vapidKeys() {
+  let pub = cleanKey("VAPID_PUBLIC_KEY"), priv = cleanKey("VAPID_PRIVATE_KEY");
+  if (!pub && !priv) return { problem: "missing" };
+  if (pub.length === 43 && priv.length === 87) [pub, priv] = [priv, pub];
+  if (pub.length !== 87 || priv.length !== 43) return { problem: "invalid" };
+  return { pub, priv };
+}
+
 export function pushReady() {
-  const pub = env("VAPID_PUBLIC_KEY"), priv = env("VAPID_PRIVATE_KEY");
-  if (!pub || !priv) return false;
-  webpush.setVapidDetails("mailto:" + (env("VAPID_EMAIL") || "agenda-proactiva@users.noreply.github.com"), pub, priv);
-  return true;
+  const { pub, priv } = vapidKeys();
+  if (!pub) return false;
+  try {
+    webpush.setVapidDetails("mailto:" + (env("VAPID_EMAIL") || "agenda-proactiva@users.noreply.github.com"), pub, priv);
+    return true;
+  } catch { return false; }
 }
 
 // Sends one notification to every saved device; forgets devices that unsubscribed.

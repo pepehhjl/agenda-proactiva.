@@ -815,7 +815,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // ---------- push notifications ----------
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-  function b64ToBytes(s) { const p = "=".repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(r, (c) => c.charCodeAt(0)); }
+  function b64ToBytes(s) { s = s.replace(/[^A-Za-z0-9_-]/g, ""); const p = "=".repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(r, (c) => c.charCodeAt(0)); }
   async function renderPush() {
     const box = $("pushBox"); box.replaceChildren();
     const st = state.status;
@@ -855,7 +855,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       item(true, "Contraseña de la app"),
       item(st.ai, "Inteligencia artificial (Gemini)", el("div", { class: "muted" }, "Agrega GEMINI_API_KEY en Vercel.")),
       item(st.db, "Guardar en la nube (Supabase)", el("div", { class: "muted" }, "Agrega SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en Vercel. Mientras tanto se guarda solo en este dispositivo.")),
-      item(st.push, "Claves de avisos (VAPID)", st.suggestedVapid ? el("div", { class: "muted" }, "Copia estas dos en Vercel:",
+      item(st.push, "Claves de avisos (VAPID)", st.suggestedVapid ? el("div", { class: "muted" }, st.pushProblem ? "Las claves que pusiste en Vercel no se leen bien. Reemplaza las dos por estas (copia solo el texto del recuadro, cada una en su nombre) y haz Redeploy:" : "Copia estas dos en Vercel:",
         el("div", {}, "VAPID_PUBLIC_KEY"), el("code", { class: "key" }, st.suggestedVapid.publicKey),
         el("div", {}, "VAPID_PRIVATE_KEY"), el("code", { class: "key" }, st.suggestedVapid.privateKey)) : null));
   }
