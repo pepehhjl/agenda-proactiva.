@@ -31,12 +31,21 @@ function isQuiet(q, hm) {
 }
 
 export default async function handler(req, res) {
-  if (!authed(req)) return deny(res);
+  if (!(await authed(req))) return deny(res);
   const sb = supa();
   if (!sb || !pushReady()) return res.json({ skipped: "not_configured" });
 
-  const { data: items, error } = await sb.from("items").select("id, kind, data");
+  const { data: rows, error } = await sb.from("items").select("owner, id, kind, data");
   if (error) return res.status(500).json({ error: error.message });
+  // Each agenda (the main one and every invited person's) has its own settings, reminders and devices.
+  const byOwner = new Map();
+  for (const r of rows) { if (!byOwner.has(r.owner)) byOwner.set(r.owner, []); byOwner.get(r.owner).push(r); }
+  let sent = 0;
+  for (const [owner, items] of byOwner) sent += await remind(sb, owner, items);
+  res.json({ sent });
+}
+
+async function remind(sb, owner, items) {
   const now = Date.now();
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
@@ -45,7 +54,7 @@ export default async function handler(req, res) {
   // Which warnings the user wants (Ajustes > Avisos). Default: all three.
   const wanted = Array.isArray(settings.remind) && settings.remind.length ? THRESHOLDS.filter((x) => settings.remind.includes(x)) : THRESHOLDS;
   const hmNow = localHm(new Date(now), tz);
-  if (isQuiet(settings.quiet, hmNow)) return res.json({ sent: 0, quiet: true });
+  if (isQuiet(settings.quiet, hmNow)) return 0;
   const lp0 = localParts(new Date(now), tz);
   // "YYYY-MM-DD" in the user's time zone, off days from today.
   const dayKey = (off) => new Date(Date.UTC(lp0.y, lp0.m - 1, lp0.d + off)).toISOString().slice(0, 10);
@@ -121,7 +130,9 @@ export default async function handler(req, res) {
   }
   // The number on the app icon: what is left for today.
   for (const x of due) x.payload.badge = open.length;
-  if (!due.length) return res.json({ sent: 0 });
+  if (!due.length) return 0;
+  // Keys of the main agenda stay as they were; other agendas' keys start with their owner.
+  if (owner !== "main") for (const x of due) { x.check = owner + "/" + x.check; x.keys = x.keys.map((k) => owner + "/" + k); }
 
   const { data: already } = await sb.from("sent").select("key").in("key", due.map((x) => x.check));
   const done = new Set((already || []).map((x) => x.key));
@@ -129,7 +140,7 @@ export default async function handler(req, res) {
   for (const x of due) {
     if (done.has(x.check)) continue;
     await sb.from("sent").upsert(x.keys.map((key) => ({ key })));
-    sent += await sendToAll(sb, x.payload);
+    sent += await sendToAll(sb, x.payload, owner);
   }
-  res.json({ sent });
+  return sent;
 }

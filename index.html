@@ -554,6 +554,15 @@ html.kb .tabbar { display: none; }
         </div>
         <input type="file" id="restoreFile" accept="application/json,.json" hidden>
         <p class="foot" data-i18n="backupFoot"></p>
+        <div id="inviteBox" hidden style="display:grid;gap:10px">
+          <h3 class="sub" data-i18n="inviteH"></h3>
+          <p class="foot" data-i18n="inviteFoot"></p>
+          <form id="inviteForm" class="row" style="flex-wrap:nowrap">
+            <input class="field" id="inviteName" autocomplete="off" maxlength="60" style="flex:1" data-i18n-ph="inviteNamePh">
+            <button class="btn primary small" id="inviteGo" data-i18n="inviteGo"></button>
+          </form>
+          <div id="inviteList" class="group"></div>
+        </div>
         <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
           <button class="link" id="logout" style="justify-self:start;color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
@@ -842,7 +851,7 @@ html.kb .tabbar { display: none; }
   };
   // Round 2 texts: repeats, tasks without a time, search, undo, timeline, summaries, photos, celebrations, backup.
   Object.assign(I18N.es, {
-    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", noHeard: "No te escuché bien. Toca el micrófono e intenta otra vez.", quietFromL: "Desde", quietToL: "Hasta", quietSum: "No te llegarán avisos de {a} a {b}.", stop: "Parar", stopped: "Lo detuve. Pregunta otra cosa cuando quieras.", errAi: "La IA no respondió esta vez. Intenta de nuevo.", schedAll: "Agendar todo", schedSel: "Agendar {n} elegidas", schedSel1: "Agendar la elegida", discAll: "Descartar todo", discSel: "Descartar {n} elegidas", discSel1: "Descartar la elegida", tapPick: "Toca las sugerencias para elegir solo algunas.", moreOptions: "Más opciones", edit: "Editar", editTask: "Editar tarea", nameLbl: "Nombre", emojiLbl: "Ícono", durLbl: "Duración", minShort: "min", noteLbl: "Consejo o nota", applyAll: "Aplicar a todas las repeticiones", edited: "Cambios guardados",
+    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", noHeard: "No te escuché bien. Toca el micrófono e intenta otra vez.", quietFromL: "Desde", quietToL: "Hasta", quietSum: "No te llegarán avisos de {a} a {b}.", stop: "Parar", stopped: "Lo detuve. Pregunta otra cosa cuando quieras.", errAi: "La IA no respondió esta vez. Intenta de nuevo.", schedAll: "Agendar todo", schedSel: "Agendar {n} elegidas", schedSel1: "Agendar la elegida", discAll: "Descartar todo", discSel: "Descartar {n} elegidas", discSel1: "Descartar la elegida", tapPick: "Toca las sugerencias para elegir solo algunas.", moreOptions: "Más opciones", inviteH: "Invitar a alguien", inviteFoot: "Crea un enlace para una persona. Al abrirlo entra directo, sin contraseña, a su propia agenda vacía. No ve la tuya.", inviteNamePh: "Nombre (ej: Ana)", inviteGo: "Crear enlace", inviteCopy: "Copiar enlace", inviteShare: "Enviar", inviteCopied: "Enlace copiado", inviteRemove: "Quitar", inviteRemoveQ: "¿Quitar a {n}? Se borra su agenda y su enlace deja de funcionar.", inviteRemoved: "Quitaste a {n}", inviteMsg: "Te invito a probar Pendi, mi agenda con IA. Abre este enlace en Safari (iPhone) o Chrome (Android) y luego agrégala a tu pantalla de inicio:", guestNote: "Agenda de invitado", edit: "Editar", editTask: "Editar tarea", nameLbl: "Nombre", emojiLbl: "Ícono", durLbl: "Duración", minShort: "min", noteLbl: "Consejo o nota", applyAll: "Aplicar a todas las repeticiones", edited: "Cambios guardados",
     deleted: "🗑️ {t}: borrada", deletedSeries: "🗑️ Borré esta y las que siguen", delOne: "Borrar solo esta", delSeries: "Borrar esta y las que siguen",
     repeat: "Repetir", rep_none: "No se repite", rep_daily: "Todos los días", rep_weekdays: "De lunes a viernes", rep_weekly: "Cada semana", rep_monthly: "Cada mes",
     repEvery: "Cada {d}", repMonthDay: "Cada mes, el día {n}", repeats: "Se repite",
@@ -867,7 +876,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "Sin internet: guardo todo y lo subo cuando vuelva", backOnline: "Conexión de vuelta: todo al día",
   });
   Object.assign(I18N.en, {
-    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", noHeard: "I couldn't hear that well. Tap the mic and try again.", quietFromL: "From", quietToL: "Until", quietSum: "No reminders from {a} to {b}.", stop: "Stop", stopped: "Stopped. Ask something else whenever you like.", errAi: "The AI didn't answer this time. Try again.", schedAll: "Schedule all", schedSel: "Schedule {n} selected", schedSel1: "Schedule the selected one", discAll: "Discard all", discSel: "Discard {n} selected", discSel1: "Discard the selected one", tapPick: "Tap suggestions to pick only some.", moreOptions: "More options", edit: "Edit", editTask: "Edit task", nameLbl: "Name", emojiLbl: "Icon", durLbl: "Duration", minShort: "min", noteLbl: "Tip or note", applyAll: "Apply to all repeats", edited: "Changes saved",
+    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", noHeard: "I couldn't hear that well. Tap the mic and try again.", quietFromL: "From", quietToL: "Until", quietSum: "No reminders from {a} to {b}.", stop: "Stop", stopped: "Stopped. Ask something else whenever you like.", errAi: "The AI didn't answer this time. Try again.", schedAll: "Schedule all", schedSel: "Schedule {n} selected", schedSel1: "Schedule the selected one", discAll: "Discard all", discSel: "Discard {n} selected", discSel1: "Discard the selected one", tapPick: "Tap suggestions to pick only some.", moreOptions: "More options", inviteH: "Invite someone", inviteFoot: "Create a link for one person. Opening it takes them straight into their own empty agenda, no password. They can't see yours.", inviteNamePh: "Name (e.g. Ana)", inviteGo: "Create link", inviteCopy: "Copy link", inviteShare: "Send", inviteCopied: "Link copied", inviteRemove: "Remove", inviteRemoveQ: "Remove {n}? Their agenda is deleted and their link stops working.", inviteRemoved: "Removed {n}", inviteMsg: "Try Pendi, my AI agenda. Open this link in Safari (iPhone) or Chrome (Android), then add it to your home screen:", guestNote: "Guest agenda", edit: "Edit", editTask: "Edit task", nameLbl: "Name", emojiLbl: "Icon", durLbl: "Duration", minShort: "min", noteLbl: "Tip or note", applyAll: "Apply to all repeats", edited: "Changes saved",
     deleted: "🗑️ {t}: deleted", deletedSeries: "🗑️ Deleted this one and the ones after", delOne: "Delete only this one", delSeries: "Delete this and the ones after",
     repeat: "Repeat", rep_none: "Doesn't repeat", rep_daily: "Every day", rep_weekdays: "Monday to Friday", rep_weekly: "Every week", rep_monthly: "Every month",
     repEvery: "Every {d}", repMonthDay: "Every month, on day {n}", repeats: "Repeats",
@@ -892,7 +901,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "No internet: I'm saving everything and will upload it when it's back", backOnline: "Back online: all up to date",
   });
   Object.assign(I18N.pt, {
-    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções", edit: "Editar", editTask: "Editar tarefa", nameLbl: "Nome", emojiLbl: "Ícone", durLbl: "Duração", minShort: "min", noteLbl: "Dica ou nota", applyAll: "Aplicar a todas as repetições", edited: "Alterações salvas",
+    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções", inviteH: "Convidar alguém", inviteFoot: "Crie um link para uma pessoa. Ao abrir, ela entra direto, sem senha, na própria agenda vazia. Não vê a sua.", inviteNamePh: "Nome (ex: Ana)", inviteGo: "Criar link", inviteCopy: "Copiar link", inviteShare: "Enviar", inviteCopied: "Link copiado", inviteRemove: "Remover", inviteRemoveQ: "Remover {n}? A agenda dela é apagada e o link para de funcionar.", inviteRemoved: "Você removeu {n}", inviteMsg: "Experimente o Pendi, minha agenda com IA. Abra este link no Safari (iPhone) ou Chrome (Android) e depois adicione à tela de início:", guestNote: "Agenda de convidado", edit: "Editar", editTask: "Editar tarefa", nameLbl: "Nome", emojiLbl: "Ícone", durLbl: "Duração", minShort: "min", noteLbl: "Dica ou nota", applyAll: "Aplicar a todas as repetições", edited: "Alterações salvas",
     deleted: "🗑️ {t}: apagada", deletedSeries: "🗑️ Apaguei esta e as seguintes", delOne: "Apagar só esta", delSeries: "Apagar esta e as seguintes",
     repeat: "Repetir", rep_none: "Não se repete", rep_daily: "Todos os dias", rep_weekdays: "De segunda a sexta", rep_weekly: "Toda semana", rep_monthly: "Todo mês",
     repEvery: "Toda {d}", repMonthDay: "Todo mês, no dia {n}", repeats: "Se repete",
@@ -917,7 +926,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "Sem internet: guardo tudo e envio quando voltar", backOnline: "Conexão de volta: tudo em dia",
   });
   Object.assign(I18N.fr, {
-    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", noHeard: "Je n'ai pas bien entendu. Touche le micro et réessaie.", quietFromL: "De", quietToL: "Jusqu'à", quietSum: "Aucun rappel de {a} à {b}.", stop: "Arrêter", stopped: "J'ai arrêté. Pose une autre question quand tu veux.", errAi: "L'IA n'a pas répondu cette fois. Réessaie.", schedAll: "Tout planifier", schedSel: "Planifier les {n} choisies", schedSel1: "Planifier celle choisie", discAll: "Tout ignorer", discSel: "Ignorer les {n} choisies", discSel1: "Ignorer celle choisie", tapPick: "Touche les suggestions pour n'en choisir que certaines.", moreOptions: "Plus d'options", edit: "Modifier", editTask: "Modifier la tâche", nameLbl: "Nom", emojiLbl: "Icône", durLbl: "Durée", minShort: "min", noteLbl: "Conseil ou note", applyAll: "Appliquer à toutes les répétitions", edited: "Modifications enregistrées",
+    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", noHeard: "Je n'ai pas bien entendu. Touche le micro et réessaie.", quietFromL: "De", quietToL: "Jusqu'à", quietSum: "Aucun rappel de {a} à {b}.", stop: "Arrêter", stopped: "J'ai arrêté. Pose une autre question quand tu veux.", errAi: "L'IA n'a pas répondu cette fois. Réessaie.", schedAll: "Tout planifier", schedSel: "Planifier les {n} choisies", schedSel1: "Planifier celle choisie", discAll: "Tout ignorer", discSel: "Ignorer les {n} choisies", discSel1: "Ignorer celle choisie", tapPick: "Touche les suggestions pour n'en choisir que certaines.", moreOptions: "Plus d'options", inviteH: "Inviter quelqu'un", inviteFoot: "Crée un lien pour une personne. En l'ouvrant, elle entre directement, sans mot de passe, dans son propre agenda vide. Elle ne voit pas le tien.", inviteNamePh: "Nom (ex : Ana)", inviteGo: "Créer le lien", inviteCopy: "Copier le lien", inviteShare: "Envoyer", inviteCopied: "Lien copié", inviteRemove: "Retirer", inviteRemoveQ: "Retirer {n} ? Son agenda est supprimé et son lien ne marche plus.", inviteRemoved: "Tu as retiré {n}", inviteMsg: "Essaie Pendi, mon agenda avec IA. Ouvre ce lien dans Safari (iPhone) ou Chrome (Android), puis ajoute-le à ton écran d'accueil :", guestNote: "Agenda invité", edit: "Modifier", editTask: "Modifier la tâche", nameLbl: "Nom", emojiLbl: "Icône", durLbl: "Durée", minShort: "min", noteLbl: "Conseil ou note", applyAll: "Appliquer à toutes les répétitions", edited: "Modifications enregistrées",
     deleted: "🗑️ {t} : supprimée", deletedSeries: "🗑️ Supprimé celle-ci et les suivantes", delOne: "Supprimer seulement celle-ci", delSeries: "Supprimer celle-ci et les suivantes",
     repeat: "Répéter", rep_none: "Ne se répète pas", rep_daily: "Tous les jours", rep_weekdays: "Du lundi au vendredi", rep_weekly: "Chaque semaine", rep_monthly: "Chaque mois",
     repEvery: "Chaque {d}", repMonthDay: "Chaque mois, le {n}", repeats: "Se répète",
@@ -1025,6 +1034,13 @@ html.kb .tabbar { display: none; }
 
   // ---------- server ----------
   let pass = ls.get("pass", "");
+  // An invite link (?invite=…) opens that person's own agenda without the password. A new key starts
+  // from a clean phone copy, so two agendas never mix. The installed app keeps the key in its start page.
+  const invite = new URLSearchParams(location.search).get("invite");
+  if (invite && /^[A-Za-z0-9_-]{20,64}$/.test(invite)) {
+    if (invite !== pass) { try { localStorage.clear(); } catch {} pass = invite; ls.set("pass", pass); }
+    document.querySelector('link[rel="manifest"]').href = "/api/manifest?invite=" + encodeURIComponent(invite);
+  }
   async function call(path, body, signal) {
     const r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined, signal });
     const j = await r.json().catch(() => ({}));
@@ -1044,7 +1060,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.6.7";
+  const VERSION = "0.7.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -2203,13 +2219,49 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       status);
   }
 
+  // ---------- invites ----------
+  const inviteLink = (p) => location.origin + "/?invite=" + p.token;
+  async function renderInvites() {
+    let people = [];
+    try { people = (await call("/api/invite")).people || []; } catch { return; }
+    $("inviteList").hidden = !people.length;
+    $("inviteList").replaceChildren(...people.map((p) => el("div", { class: "row", style: "justify-content:space-between;padding:10px 16px" },
+      el("b", {}, p.name),
+      el("span", { class: "row", style: "gap:6px" },
+        el("button", { type: "button", class: "btn small", onclick: () => sendInvite(p) }, navigator.share ? tr("inviteShare") : tr("inviteCopy")),
+        el("button", { type: "button", class: "btn small", style: "color:var(--red)", onclick: () => removeInvite(p) }, tr("inviteRemove"))))));
+  }
+  async function sendInvite(p) {
+    const url = inviteLink(p), text = tr("inviteMsg");
+    if (navigator.share) { try { await navigator.share({ title: "Pendi", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    try { await navigator.clipboard.writeText(text + " " + url); notice(tr("inviteCopied")); }
+    catch { prompt(tr("inviteCopy"), url); }
+  }
+  function removeInvite(p) {
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true" }, el("div", { class: "grabber" }),
+      el("h2", {}, tr("inviteRemove")), el("p", {}, tr("inviteRemoveQ", { n: p.name })),
+      el("div", { class: "row" },
+        el("button", { class: "btn primary", style: "background:var(--red);border-color:var(--red)", onclick: async () => { closeSheet(); try { await call("/api/invite", { remove: p.id }); notice(tr("inviteRemoved", { n: p.name })); } catch (e) { notice(errText(e)); } renderInvites(); } }, tr("inviteRemove")),
+        el("button", { class: "btn", onclick: closeSheet }, tr("cancel")))));
+  }
+  $("inviteForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const name = $("inviteName").value.trim(); if (!name) { $("inviteName").focus(); return; }
+    $("inviteGo").disabled = true;
+    try { const { person } = await call("/api/invite", { name }); $("inviteName").value = ""; await renderInvites(); sendInvite(person); }
+    catch (err) { notice(errText(err)); }
+    finally { $("inviteGo").disabled = false; }
+  };
+
   // ---------- setup checklist ----------
   function renderSetup() {
     const st = state.status, box = $("setupBox"); box.replaceChildren();
     const missing = [!st.ai && tr("missAi"), !st.db && tr("missDb"), !st.push && tr("missPush")].filter(Boolean);
     $("setupAlert").replaceChildren(missing.length && !st.offline ? el("div", { class: "card" }, el("b", {}, tr("notReady")),
       el("div", { class: "muted" }, tr("missingX", { x: andList(missing) }))) : "");
-    $("adminBox").hidden = !ls.get("admin", false);
+    $("adminBox").hidden = !ls.get("admin", false) || !!st.guest;
+    $("inviteBox").hidden = !!st.guest || !st.db || !!st.offline;
+    if (!$("inviteBox").hidden) renderInvites();
     $("version").textContent = tr("version") + " " + VERSION + (ls.get("admin", false) ? tr("adminSuffix") : "");
     const item = (ok, label, help) => el("div", { class: "check" }, el("span", { class: ok ? "ok" : "no" }, ok ? "✓" : "✗"), el("div", {}, el("b", {}, label), ok ? null : help));
     box.append(

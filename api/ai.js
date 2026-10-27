@@ -1,7 +1,7 @@
 // Asks Gemini. Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
 // {input, image:{mime, data}} to read a photo (a flyer, an appointment, a screenshot),
 // or {audio:{mime, data}} (base64) to transcribe a voice note. Returns {data}.
-import { env, authed, deny, readBody } from "./_lib.js";
+import { env, who, deny, readBody } from "./_lib.js";
 
 // Google's free models get crowded ("high demand"), so each request tries several in turn:
 // GEMINI_MODEL first (if set), then the list below. With GROQ_API_KEY set, Groq answers text when all of them are busy.
@@ -80,7 +80,7 @@ function parseJson(text) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
-  if (!authed(req)) return deny(res);
+  if (!(await who(req))) return deny(res);
   const key = env("GEMINI_API_KEY");
   if (!key) return res.status(503).json({ error: "no_ai", message: "Falta configurar GEMINI_API_KEY en Vercel." });
   const { input, search, audio, image } = await readBody(req);

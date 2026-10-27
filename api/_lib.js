@@ -5,13 +5,26 @@ import crypto from "node:crypto";
 
 export const env = (k) => (process.env[k] || "").trim();
 
-// Every route except /api/status needs the app password (set APP_PASSWORD in Vercel).
-export function authed(req) {
+// Every route except /api/status needs a key: the app password (set APP_PASSWORD in Vercel) opens the
+// main agenda; an invite link's key opens that person's own agenda. who() says whose agenda it is, or null.
+const guests = new Map(); // key -> { owner, at }
+export async function who(req) {
   const pass = env("APP_PASSWORD");
-  if (!pass) return false;
-  const given = req.headers["x-app-password"] || (req.query && req.query.key) || "";
-  return given === pass;
+  if (!pass) return null;
+  const given = String(req.headers["x-app-password"] || (req.query && req.query.key) || "");
+  if (!given) return null;
+  if (given === pass) return "main";
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(given)) return null;
+  const hit = guests.get(given);
+  if (hit && Date.now() - hit.at < 60000) return hit.owner;
+  const sb = supa();
+  if (!sb) return null;
+  const { data } = await sb.from("people").select("id").eq("token", given).maybeSingle();
+  const owner = data ? data.id : null;
+  guests.set(given, { owner, at: Date.now() });
+  return owner;
 }
+export const authed = async (req) => (await who(req)) === "main";
 
 export function deny(res) {
   const reason = env("APP_PASSWORD") ? "Contraseña incorrecta." : "Falta configurar APP_PASSWORD en Vercel.";
@@ -63,9 +76,9 @@ export function pushReady() {
   } catch { return false; }
 }
 
-// Sends one notification to every saved device; forgets devices that unsubscribed.
-export async function sendToAll(sb, payload) {
-  const { data: subs, error } = await sb.from("push_subs").select("endpoint, sub");
+// Sends one notification to every device of that agenda; forgets devices that unsubscribed.
+export async function sendToAll(sb, payload, owner = "main") {
+  const { data: subs, error } = await sb.from("push_subs").select("endpoint, sub").eq("owner", owner);
   if (error) throw error;
   let sent = 0;
   for (const row of subs || []) {
