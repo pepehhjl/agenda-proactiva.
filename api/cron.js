@@ -34,7 +34,9 @@ export default async function handler(req, res) {
       if (mins <= 0 || mins > 60) continue;
       const hit = THRESHOLDS.filter((th) => mins <= th);
       const smallest = hit[hit.length - 1];
-      const label = smallest === 60 ? "En 1 hora" : `En ${smallest} minutos`;
+      // Say the real time left (a task created 3 minutes ahead says "En 3 minutos", not "En 10").
+      const left = Math.max(1, Math.round(mins));
+      const label = left >= 55 ? "En 1 hora" : left === 1 ? "En 1 minuto" : `En ${left} minutos`;
       due.push({
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),

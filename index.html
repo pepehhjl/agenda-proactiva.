@@ -708,7 +708,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // Banner that leaves on its own after 10 s (a bar shows the time left; it pauses while you touch it). At most 3 at once.
   const TOAST_MS = 10000;
   function toast(t, mins, test) {
-    const label = mins === "snooze" ? "Recordatorio" : mins >= 60 ? "En 1 hora" : `En ${mins} minutos`;
+    const label = mins === "snooze" ? "Recordatorio" : mins >= 55 ? "En 1 hora" : mins === 1 ? "En 1 minuto" : `En ${mins} minutos`;
     let left = TOAST_MS, since = Date.now(), timer = null;
     const close = () => { clearTimeout(timer); box.remove(); };
     const run = () => { since = Date.now(); timer = setTimeout(close, left); };
@@ -751,7 +751,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       if (m <= 0 || m > 60) continue;
       const due = [60, 30, 10].filter((th) => m <= th), smallest = due[due.length - 1];
       const key = t.id + "@" + t.date + t.time + "#";
-      if (!fired.has(key + smallest)) { due.forEach((th) => fired.add(key + th)); ls.set("fired", [...fired].slice(-300)); toast(t, smallest, false); }
+      if (!fired.has(key + smallest)) { due.forEach((th) => fired.add(key + th)); ls.set("fired", [...fired].slice(-300)); toast(t, Math.max(1, Math.round(m)), false); }
     }
   }
 
