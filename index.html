@@ -13,25 +13,25 @@
 <meta name="apple-mobile-web-app-title" content="Pendi">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFFBEA" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15130D" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#0D0D12" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&display=swap">
 <style>
-/* Identity: Pendi, sticky-note style (cream ground, yellow accent, ink outlines). Layout: A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
+/* Identity: Pendi, sticky-note style (cream ground, yellow accent, ink outlines), dressed like Penumbra Visuals at night (near-black, glowing yellow pills, condensed uppercase titles). Layout: A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
 :root {
   --bg: #FFFBEA; --group: #FFF4CC; --cell: #ffffff; --ink: #1E1E1E; --muted: #5F5B4E; --sep: rgba(30, 30, 30, .14);
-  --accent: #FFD23F; --accent-ink: #1E1E1E; --accent-text: #1E1E1E; --line: #1E1E1E; --red: #E5484D; --focus: #1E1E1E; --fill: rgba(30, 30, 30, .07);
+  --accent: #F2C744; --accent-ink: #14141A; --accent-text: #1E1E1E; --line: #1E1E1E; --edge: #1E1E1E; --red: #E5484D; --focus: #1E1E1E; --fill: rgba(30, 30, 30, .07);
   --c-trabajo: #3E8EDE; --c-personal: #9B6BDF; --c-casa: #22A699; --c-salud: #2FA84F; --c-creativo: #F08A24; --c-social: #FF6F91; --c-otro: #8C877A;
-  --banner: rgba(255, 251, 234, .9); --shadow: 4px 4px 0 var(--line); --glow: 0 0 18px rgba(255, 210, 63, .55);
-  --font: "Space Grotesk", system-ui, "Segoe UI", sans-serif;
-  --display: "Space Grotesk", system-ui, "Segoe UI", sans-serif;
+  --banner: rgba(255, 251, 234, .9); --shadow: 4px 4px 0 var(--line); --glow: 0 8px 22px rgba(242, 199, 68, .55);
+  --font: "Archivo", system-ui, "Segoe UI", sans-serif;
+  --display: "Anton", "Archivo", Impact, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #15130D; --group: #15130D; --cell: #221F16; --ink: #FFF6D6; --muted: #B4AC93; --sep: rgba(255, 246, 214, .14);
-    --accent: #FFD23F; --accent-ink: #1E1E1E; --accent-text: #FFD23F; --line: #FFD23F; --red: #FF6B6B; --focus: #FFD23F; --fill: rgba(255, 246, 214, .09);
+    --bg: #0D0D12; --group: #0D0D12; --cell: #17171F; --ink: #F5F5F2; --muted: #A3A3AD; --sep: rgba(255, 255, 255, .1);
+    --accent: #F2C744; --accent-ink: #14141A; --accent-text: #F2C744; --line: #F2C744; --edge: rgba(255, 255, 255, .1); --red: #FF6B6B; --focus: #F2C744; --fill: rgba(255, 255, 255, .08);
     --c-trabajo: #6CB4FF; --c-personal: #C39BFF; --c-casa: #4FD1C1; --c-salud: #5BD47A; --c-creativo: #FFA552; --c-social: #FF8FAB; --c-otro: #A7A08A;
-    --banner: rgba(34, 31, 22, .92); --shadow: 0 0 0 1px rgba(255, 210, 63, .4), 0 10px 40px rgba(0, 0, 0, .6); --glow: 0 0 22px rgba(255, 210, 63, .45);
+    --banner: rgba(23, 23, 31, .92); --shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 10px 40px rgba(0, 0, 0, .6); --glow: 0 8px 26px rgba(242, 199, 68, .4);
     color-scheme: dark;
   }
 }
@@ -273,14 +273,44 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .onboard p { margin: 0; color: var(--muted); font-size: 17px; }
 .pager { display: flex; gap: 6px; } .pager i { width: 7px; height: 7px; border-radius: 50%; background: var(--fill); } .pager i.on { background: var(--accent); }
 
-/* Pendi: ink outlines, offset "sticker" shadows, a slight tilt on the assistant's notes, yellow glow on primary actions. */
-.list, .card, .sheet { border: 2px solid var(--line); }
-@media (prefers-color-scheme: light) { .list { box-shadow: 4px 4px 0 var(--line); } .card { box-shadow: 3px 3px 0 var(--line); } }
-.btn.primary, .fab, .bigmic, .chip[aria-pressed="true"] { border: 2px solid var(--line); box-shadow: 3px 3px 0 var(--line), var(--glow); }
-.btn.primary:active, .fab:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
-.msg.me { border: 2px solid var(--line); }
-.msg.ai { border: 2px solid var(--line); border-radius: 4px 18px 18px 18px; background: var(--group); }
-h1, .pane h2, .sheet h2 { letter-spacing: -0.035em; }
+/* Pendi: ink outlines and offset "sticker" shadows by day; Penumbra cards (yellow top edge) by night. */
+.list, .card, .sheet, .group { border: 2px solid var(--edge); }
+.card, .group { border-top: 4px solid var(--accent); }
+@media (prefers-color-scheme: light) { .list { box-shadow: 4px 4px 0 var(--line); } .card, .group { box-shadow: 3px 3px 0 var(--line); } }
+.msg.me { border: 2px solid var(--edge); }
+.msg.ai { border: 2px solid var(--edge); border-radius: 4px 18px 18px 18px; background: var(--cell); }
+
+/* Penumbra type: condensed uppercase titles, wide-tracked yellow labels. */
+h1, .pane h2, .sheet h2, .onboard h2, .gate h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .005em; line-height: 1.02; }
+h1 { font-size: 46px; }
+.pane h2 { font-size: 34px; }
+.sheet h2 { font-size: 28px; }
+.onboard h2 { font-size: 38px; }
+.gate h2 { font-size: 44px; }
+.eyebrow, .section-label, .pane h3.sub { color: var(--accent-text); font-weight: 800; letter-spacing: .18em; font-size: 12px; }
+.eyebrow::before { content: ""; display: inline-block; width: 22px; height: 3px; background: var(--accent); vertical-align: middle; margin-right: 8px; border-radius: 2px; }
+@media (prefers-color-scheme: light) { .eyebrow::before { box-shadow: 0 0 0 1px var(--line); } }
+
+/* Penumbra buttons: yellow pills with a glow; secondary ones are outlined. */
+.btn { background: transparent; box-shadow: inset 0 0 0 2px var(--line); color: var(--accent-text); text-transform: uppercase; letter-spacing: .08em; font-weight: 800; font-size: 14px; padding: 13px 22px; }
+.btn.small { font-size: 12px; padding: 8px 14px; }
+.btn.danger { box-shadow: inset 0 0 0 2px var(--red); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); }
+@media (prefers-color-scheme: light) { .btn.primary { box-shadow: inset 0 0 0 2px var(--line), var(--glow); } }
+.fab, .bigmic { box-shadow: var(--glow); }
+.btn.primary:active, .fab:active { transform: scale(.97); box-shadow: none; }
+.chip[aria-pressed="true"], .datef.on { box-shadow: 0 4px 14px rgba(242, 199, 68, .4); font-weight: 700; }
+.qa button { font-weight: 800; }
+.qa .big { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); text-transform: uppercase; letter-spacing: .08em; }
+.toggle input:checked { background: var(--accent); }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.wd.today .n { box-shadow: inset 0 0 0 2px var(--accent); }
+.wd[aria-pressed="true"] .n { background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 14px rgba(242, 199, 68, .45); }
+.nowline::before { background: var(--accent); }
+.item.now { background: color-mix(in srgb, var(--accent) 14%, var(--cell)); box-shadow: inset 4px 0 0 var(--accent); }
+
+/* Bichos: a word on a tilted yellow highlighter block. */
+.hl { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 0 .2em; transform: skew(-8deg); box-shadow: 4px 4px 0 var(--ink); }
 </style>
 </head>
 <body>
@@ -1275,7 +1305,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const inp = el("input", { class: "field", type: "password", placeholder: "Contraseña", autocomplete: "current-password" });
     const st = el("div", { class: "status err" }, msg || "");
     g.append(el("form", { class: "card", onsubmit: async (e) => { e.preventDefault(); pass = inp.value; ls.set("pass", pass); await boot(); } },
-      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, "Pendi"),
+      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, el("span", { class: "hl" }, "Pendi")),
       el("p", { class: "muted" }, "Escribe tu contraseña para entrar."), inp, el("button", { class: "btn primary" }, "Entrar"), st));
     inp.focus();
   }
