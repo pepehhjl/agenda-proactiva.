@@ -3,11 +3,20 @@
 import { authed, deny, supa, pushReady, sendToAll } from "./_lib.js";
 
 const THRESHOLDS = [60, 30, 10];
+const EMOJI = { trabajo: "💼", personal: "🙋", casa: "🏠", salud: "💪", creativo: "🎨", social: "🎉", otro: "📌" };
+const icon = (t) => t.emoji || EMOJI[t.cat] || "📌";
 
 function localParts(date, tz) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" })
     .formatToParts(date).map((x) => [x.type, x.value]));
   return { y: +p.year, m: +p.month, d: +p.day, h: +p.hour };
+}
+// "HH:MM" now in the user's time zone.
+const localHm = (date, tz) => new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
+// Quiet hours like {from:"22:00", to:"07:00"}; the range may cross midnight.
+function isQuiet(q, hm) {
+  if (!q || !q.from || !q.to || q.from === q.to) return false;
+  return q.from < q.to ? hm >= q.from && hm < q.to : hm >= q.from || hm < q.to;
 }
 
 export default async function handler(req, res) {
@@ -20,6 +29,9 @@ export default async function handler(req, res) {
   const now = Date.now();
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
+  // Which warnings the user wants (Ajustes > Avisos). Default: all three.
+  const wanted = Array.isArray(settings.remind) && settings.remind.length ? THRESHOLDS.filter((x) => settings.remind.includes(x)) : THRESHOLDS;
+  if (isQuiet(settings.quiet, localHm(new Date(now), tz))) return res.json({ sent: 0, quiet: true });
 
   const due = []; // {keys, payload}
   for (const r of items) {
@@ -27,20 +39,22 @@ export default async function handler(req, res) {
     // A reminder the user postponed with "Posponer".
     if (r.kind === "task" && !t.done && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
       const key = `${r.id}@snooze@${t.snooze}`;
-      due.push({ check: key, keys: [key], payload: { title: `Recordatorio: ${t.title}`, body: t.tip || `Era a las ${t.time}.`, tag: r.id, taskId: r.id } });
+      const past = t.start && Date.parse(t.start) <= now;
+      due.push({ check: key, keys: [key], payload: { title: `${icon(t)} Recordatorio: ${t.title}`, body: `${past ? "Era a las" : "Es a las"} ${t.time}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id } });
     }
     if (r.kind === "task" && !t.done && t.start) {
       const mins = (Date.parse(t.start) - now) / 60000;
       if (mins <= 0 || mins > 60) continue;
-      const hit = THRESHOLDS.filter((th) => mins <= th);
+      const hit = wanted.filter((th) => mins <= th);
+      if (!hit.length) continue;
       const smallest = hit[hit.length - 1];
       // Say the real time left (a task created 3 minutes ahead says "En 3 minutos", not "En 10").
       const left = Math.max(1, Math.round(mins));
-      const label = left >= 55 ? "En 1 hora" : left === 1 ? "En 1 minuto" : `En ${left} minutos`;
+      const label = left >= 55 ? "En 1 hora" : `En ${left} min`;
       due.push({
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
-        payload: { title: `${label}: ${t.title}`, body: t.tip || `A las ${t.time}.`, tag: r.id, taskId: r.id },
+        payload: { title: `${icon(t)} ${label}: ${t.title}`, body: `A las ${t.time}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
