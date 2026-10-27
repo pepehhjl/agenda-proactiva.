@@ -7,7 +7,7 @@ self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
 self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
-  const title = d.title || "Agenda Proactiva";
+  const title = d.title || "Pendi";
   e.waitUntil(self.registration.showNotification(title, {
     body: d.body || "",
     icon: "/icon-192.png",

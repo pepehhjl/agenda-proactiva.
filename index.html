@@ -3,37 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Agenda Proactiva</title>
+<title>Pendi</title>
 <meta name="description" content="Tu calendario con IA: organiza tu día, te avisa antes y te recuerda los cumpleaños.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Agenda">
+<meta name="apple-mobile-web-app-title" content="Pendi">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<meta name="theme-color" id="themeColor" content="#FFFBEA">
+<script>
+// Theme before first paint: the setting (Sistema / Claro / Oscuro) or, for Sistema, the device's mode.
+(function () {
+  var t = "system"; try { t = (JSON.parse(localStorage.getItem("settings")) || {}).theme || "system"; } catch (e) {}
+  var dark = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  document.querySelector("#themeColor").content = dark ? "#0D0D12" : "#FFFBEA";
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: Apple-style minimal. A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
+/* Identity: Pendi, sticky-note style (cream ground, yellow accent, ink outlines), dressed like Penumbra Visuals at night (near-black, glowing yellow pills, condensed uppercase titles). Layout: A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
 :root {
-  --bg: #ffffff; --group: #f2f2f7; --cell: #ffffff; --ink: #1c1c1e; --muted: #8a8a8e; --sep: rgba(60, 60, 67, .16);
-  --accent: #007aff; --accent-ink: #ffffff; --red: #ff3b30; --focus: #007aff; --fill: rgba(120, 120, 128, .12);
-  --c-trabajo: #007aff; --c-personal: #af52de; --c-casa: #30b0c7; --c-salud: #34c759; --c-creativo: #ff9500; --c-social: #ff2d55; --c-otro: #8e8e93;
-  --banner: rgba(245, 245, 247, .82); --shadow: 0 10px 40px rgba(0, 0, 0, .14);
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Figtree", system-ui, "Segoe UI", sans-serif;
-  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Figtree", system-ui, "Segoe UI", sans-serif;
+  --bg: #FFFBEA; --group: #FFF4CC; --cell: #ffffff; --ink: #1E1E1E; --muted: #5F5B4E; --sep: rgba(30, 30, 30, .14);
+  --accent: #F2C744; --accent-ink: #14141A; --accent-text: #1E1E1E; --line: #1E1E1E; --edge: #1E1E1E; --red: #E5484D; --focus: #1E1E1E; --fill: rgba(30, 30, 30, .07);
+  --c-trabajo: #3E8EDE; --c-personal: #9B6BDF; --c-casa: #22A699; --c-salud: #2FA84F; --c-creativo: #F08A24; --c-social: #FF6F91; --c-otro: #8C877A;
+  --banner: rgba(255, 251, 234, .9); --shadow: 4px 4px 0 var(--line); --glow: 0 8px 22px rgba(242, 199, 68, .55);
+  --font: "Archivo", system-ui, "Segoe UI", sans-serif;
+  --display: "Anton", "Archivo", Impact, sans-serif;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000; --group: #000000; --cell: #1c1c1e; --ink: #f5f5f7; --muted: #8d8d93; --sep: rgba(84, 84, 88, .5);
-    --accent: #0a84ff; --accent-ink: #ffffff; --red: #ff453a; --focus: #0a84ff; --fill: rgba(118, 118, 128, .24);
-    --c-trabajo: #0a84ff; --c-personal: #bf5af2; --c-casa: #40c8e0; --c-salud: #30d158; --c-creativo: #ff9f0a; --c-social: #ff375f; --c-otro: #98989d;
-    --banner: rgba(44, 44, 46, .82); --shadow: 0 10px 40px rgba(0, 0, 0, .6);
-    color-scheme: dark;
-  }
+:root[data-theme="dark"] {
+  --bg: #0D0D12; --group: #0D0D12; --cell: #17171F; --ink: #F5F5F2; --muted: #A3A3AD; --sep: rgba(255, 255, 255, .1);
+  --accent: #F2C744; --accent-ink: #14141A; --accent-text: #F2C744; --line: #F2C744; --edge: rgba(255, 255, 255, .1); --red: #FF6B6B; --focus: #F2C744; --fill: rgba(255, 255, 255, .08);
+  --c-trabajo: #6CB4FF; --c-personal: #C39BFF; --c-casa: #4FD1C1; --c-salud: #5BD47A; --c-creativo: #FFA552; --c-social: #FF8FAB; --c-otro: #A7A08A;
+  --banner: rgba(23, 23, 31, .92); --shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 10px 40px rgba(0, 0, 0, .6); --glow: 0 8px 26px rgba(242, 199, 68, .4);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -49,11 +55,11 @@ svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width:
 .side { background: var(--group); border-left: 1px solid var(--sep); min-height: 0; display: grid; grid-template-rows: auto 1fr; }
 
 .top { display: flex; align-items: center; gap: 4px; min-height: 44px; }
-.link { border: 0; background: transparent; color: var(--accent); font-size: 17px; padding: 6px 4px; cursor: pointer; }
-.chev { border: 0; background: transparent; color: var(--accent); width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; border-radius: 50%; }
+.link { border: 0; background: transparent; color: var(--accent-text); font-size: 17px; padding: 6px 4px; cursor: pointer; }
+.chev { border: 0; background: transparent; color: var(--accent-text); width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; border-radius: 50%; }
 .chev:hover, .link:hover { opacity: .7; }
 .spacer { flex: 1; }
-.eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--red); }
+.eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; margin: 2px 0 0; text-wrap: balance; }
 
 .week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
@@ -62,14 +68,14 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .wd .n { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; font-size: 18px; font-variant-numeric: tabular-nums; }
 .wd .m { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); opacity: 0; }
 .wd .m.on { opacity: .6; }
-.wd.today .n { color: var(--red); font-weight: 600; }
+.wd.today .n { box-shadow: inset 0 0 0 2px var(--line); font-weight: 700; }
 .wd[aria-pressed="true"] .n { background: var(--ink); color: var(--bg); font-weight: 600; }
-.wd.today[aria-pressed="true"] .n { background: var(--red); color: #fff; }
+.wd.today[aria-pressed="true"] .n { background: var(--accent); color: var(--accent-ink); }
 
 .list { background: var(--cell); border-radius: 14px; overflow: hidden; }
-@media (prefers-color-scheme: light) { .list { box-shadow: 0 0 0 1px var(--sep); } }
-.item { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; display: grid; grid-template-columns: 58px 3px minmax(0, 1fr); gap: 12px; padding: 12px 16px; align-items: stretch; position: relative; }
-.item + .item::before { content: ""; position: absolute; top: 0; left: 89px; right: 0; height: 1px; background: var(--sep); }
+:root[data-theme="light"] .list { box-shadow: 0 0 0 1px var(--sep); }
+.item { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; display: grid; grid-template-columns: 74px 3px minmax(0, 1fr); gap: 12px; padding: 12px 16px; align-items: stretch; position: relative; }
+.item + .item::before { content: ""; position: absolute; top: 0; left: 105px; right: 0; height: 1px; background: var(--sep); }
 .item:hover { background: var(--fill); }
 .item .t { font-variant-numeric: tabular-nums; font-size: 15px; display: grid; align-content: start; }
 .item .t small { color: var(--muted); font-size: 13px; }
@@ -78,7 +84,7 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .item .tip { color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .item.done .ti { text-decoration: line-through; color: var(--muted); }
 .item.example .ti::after { content: " · ejemplo"; color: var(--muted); font-weight: 400; }
-.item.now { background: color-mix(in srgb, var(--accent) 8%, var(--cell)); }
+.item.now { background: color-mix(in srgb, var(--accent) 22%, var(--cell)); }
 .empty { text-align: center; color: var(--muted); padding: 36px 16px; display: grid; gap: 10px; justify-items: center; }
 .section-label { font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); margin: 0 16px -10px; }
 
@@ -93,7 +99,7 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .field { width: 100%; border: 0; background: var(--cell); border-radius: 12px; padding: 12px 14px; min-width: 0; }
 textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.btn { border: 0; background: var(--fill); color: var(--accent); border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; }
+.btn { border: 0; background: var(--fill); color: var(--accent-text); border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; }
 .btn.primary { background: var(--accent); color: var(--accent-ink); }
 .btn.small { padding: 6px 14px; font-size: 14px; }
 .btn.danger { color: var(--red); }
@@ -105,14 +111,14 @@ textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-variant-numeric: tabular-nums; font-size: 15px; }
 .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.chip.rec:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.chip.rec:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 2px var(--line); }
 .tipbox { background: var(--group); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
-@media (prefers-color-scheme: dark) { .tipbox { background: rgba(255, 255, 255, .06); } }
+:root[data-theme="dark"] .tipbox { background: rgba(255, 255, 255, .06); }
 .status { font-size: 14px; color: var(--muted); }
 .status.err { color: var(--red); }
 .chatlog { display: grid; gap: 6px; }
 .msg { border-radius: 18px; padding: 8px 14px; max-width: 85%; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me { background: var(--accent); color: #fff; justify-self: end; }
+.msg.me { background: var(--accent); color: var(--accent-ink); justify-self: end; }
 .msg.ai { background: var(--cell); justify-self: start; }
 .check { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
 .check .ok { color: var(--c-salud); font-weight: 700; }
@@ -131,8 +137,8 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .sheet h2 { margin: 0; font-family: var(--display); font-size: 24px; letter-spacing: -0.02em; }
 .sheet .when { color: var(--muted); }
 .sheet .actions { display: grid; gap: 1px; background: var(--sep); border-radius: 12px; overflow: hidden; }
-.sheet .actions > * { background: var(--group); border: 0; padding: 13px 16px; text-align: left; font-size: 16px; color: var(--accent); cursor: pointer; text-decoration: none; }
-@media (prefers-color-scheme: dark) { .sheet .actions > * { background: #2c2c2e; } }
+.sheet .actions > * { background: var(--group); border: 0; padding: 13px 16px; text-align: left; font-size: 16px; color: var(--accent-text); cursor: pointer; text-decoration: none; }
+:root[data-theme="dark"] .sheet .actions > * { background: #2c2c2e; }
 .sheet .actions .danger { color: var(--red); }
 
 /* iOS-style notification banner */
@@ -144,11 +150,11 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .toast p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
 .toast { position: relative; overflow: hidden; }
 .toast .acts { grid-column: 1 / -1; display: flex; gap: 6px; }
-.toast .acts button { flex: 1; border: 0; background: var(--fill); color: var(--accent); border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.toast .acts button { flex: 1; border: 0; background: var(--fill); color: var(--accent-text); border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
 .toast .life { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--accent); opacity: .55; transform-origin: left; animation: life var(--life, 10s) linear forwards; }
 .toast.hold .life { animation-play-state: paused; }
 @keyframes life { to { transform: scaleX(0); } }
-.mic { border: 0; background: var(--fill); color: var(--accent); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
+.mic { border: 0; background: var(--fill); color: var(--accent-text); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
 .mic.rec { background: var(--red); color: #fff; }
 @media (prefers-reduced-motion: no-preference) { .mic.rec { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--red) 25%, transparent); } } }
 .msg.ai { white-space: normal; }
@@ -175,7 +181,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   .pane { padding: 12px max(16px, env(safe-area-inset-right, 0px)) 88px max(16px, env(safe-area-inset-left, 0px)); }
   .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--banner); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--sep); padding-bottom: env(safe-area-inset-bottom, 0px); position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; }
   .tabbar button { border: 0; background: transparent; padding: 6px 0 4px; font-size: 10px; font-weight: 500; color: var(--muted); display: grid; justify-items: center; gap: 1px; cursor: pointer; }
-  .tabbar button[aria-selected="true"] { color: var(--accent); }
+  .tabbar button[aria-selected="true"] { color: var(--accent-text); }
   .sheet-bg { place-items: end center; padding: 0; }
   .sheet { border-radius: 22px 22px 0 0; width: 100%; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
   @media (prefers-reduced-motion: no-preference) { .sheet { animation: up .3s cubic-bezier(.2, .9, .3, 1); } @keyframes up { from { transform: translateY(100%); } } }
@@ -184,9 +190,10 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 /* day summary, now line, swipe */
 .summary { color: var(--muted); font-size: 15px; margin-top: 4px; }
 .summary b { color: var(--ink); font-weight: 600; }
-.nowline { position: relative; height: 10px; }
-.nowline::before { content: ""; position: absolute; left: 16px; right: 0; top: 4px; height: 2px; background: var(--red); }
-.nowline::after { content: ""; position: absolute; left: 12px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+/* "Now" marker: a labelled yellow pill followed by a line, so it reads as the current time and not as a missing task. */
+.nowline { display: flex; align-items: center; gap: 8px; padding: 8px 16px; }
+.nowline span { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nowline::after { content: ""; flex: 1; height: 2px; border-radius: 1px; background: var(--accent); }
 .swipe { position: relative; overflow: hidden; }
 .swipe .under { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-weight: 600; color: #fff; }
 .swipe .under .l { opacity: 0; } .swipe .under .r { opacity: 0; }
@@ -204,13 +211,13 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
 
 /* floating add */
-.fab { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); display: grid; place-items: center; cursor: pointer; z-index: 26; }
+.fab { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 20px rgba(0, 0, 0, .25); display: grid; place-items: center; cursor: pointer; z-index: 26; }
 .fab svg { width: 28px; height: 28px; stroke-width: 2.2; }
 @media (min-width: 861px) { .fab { right: calc(400px + 24px); } }
 @media (max-width: 860px) { .fab { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); } }
 
 /* organize */
-.bigmic { width: 96px; height: 96px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; display: grid; place-items: center; cursor: pointer; justify-self: center; box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent); }
+.bigmic { width: 96px; height: 96px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; justify-self: center; box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent); }
 .bigmic svg { width: 40px; height: 40px; }
 .bigmic.rec { background: var(--red); }
 @media (prefers-reduced-motion: no-preference) { .bigmic.rec { animation: pulse 1.2s ease-in-out infinite; } }
@@ -228,12 +235,12 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 [data-pane="chat"]:not([hidden]) { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; grid-auto-rows: auto; padding-bottom: 0; overflow: hidden; }
 [data-pane="chat"] .chatscroll { overflow-y: auto; min-height: 0; display: grid; align-content: start; gap: 10px; padding-bottom: 8px; }
 [data-pane="chat"] form { position: sticky; bottom: 0; background: var(--group); padding: 8px 0 12px; flex-wrap: nowrap; }
-.speak { border: 0; background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; padding: 2px 0 0; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+.speak { border: 0; background: transparent; color: var(--accent-text); font-size: 13px; font-weight: 600; padding: 2px 0 0; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
 .speak svg { width: 16px; height: 16px; }
 
 /* birthdays */
 .phead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.addbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--fill); color: var(--accent); display: grid; place-items: center; cursor: pointer; flex: none; }
+.addbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--fill); color: var(--accent-text); display: grid; place-items: center; cursor: pointer; flex: none; }
 .addbtn svg { width: 20px; height: 20px; stroke-width: 2.2; }
 .person { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; }
 .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: var(--c, var(--c-social)); font-size: 16px; }
@@ -255,14 +262,14 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .steps { display: grid; gap: 10px; counter-reset: s; }
 .step { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
 .step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--fill); color: var(--muted); }
-.step.now .n { background: var(--accent); color: #fff; }
+.step.now .n { background: var(--accent); color: var(--accent-ink); }
 .step.ok .n { background: var(--c-salud); color: #fff; }
 .step.ok b { color: var(--muted); font-weight: 500; }
 .step p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
 
 /* quick actions + onboarding */
 .qa { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-.qa button { border: 0; border-radius: 14px; background: var(--fill); color: var(--accent); font-weight: 600; padding: 14px 4px; font-size: 15px; cursor: pointer; }
+.qa button { border: 0; border-radius: 14px; background: var(--fill); color: var(--accent-text); font-weight: 600; padding: 14px 4px; font-size: 15px; cursor: pointer; }
 .qa .big { grid-column: 1 / -1; background: var(--c-salud); color: #fff; font-size: 17px; padding: 16px; }
 .qhead { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; }
 .qhead .em { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 28px; background: color-mix(in srgb, var(--c) 18%, transparent); }
@@ -272,6 +279,44 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .onboard h2 { margin: 0; font-family: var(--display); font-size: 30px; letter-spacing: -0.02em; }
 .onboard p { margin: 0; color: var(--muted); font-size: 17px; }
 .pager { display: flex; gap: 6px; } .pager i { width: 7px; height: 7px; border-radius: 50%; background: var(--fill); } .pager i.on { background: var(--accent); }
+
+/* Pendi: ink outlines and offset "sticker" shadows by day; Penumbra cards (yellow top edge) by night. */
+.list, .card, .sheet, .group { border: 2px solid var(--edge); }
+.card, .group { border-top: 4px solid var(--accent); }
+:root[data-theme="light"] .list { box-shadow: 4px 4px 0 var(--line); } :root[data-theme="light"] .card, :root[data-theme="light"] .group { box-shadow: 3px 3px 0 var(--line); }
+.msg.me { border: 2px solid var(--edge); }
+.msg.ai { border: 2px solid var(--edge); border-radius: 4px 18px 18px 18px; background: var(--cell); }
+
+/* Penumbra type: condensed uppercase titles, wide-tracked yellow labels. */
+h1, .pane h2, .sheet h2, .onboard h2, .gate h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .005em; line-height: 1.02; }
+h1 { font-size: 46px; }
+.pane h2 { font-size: 34px; }
+.sheet h2 { font-size: 28px; }
+.onboard h2 { font-size: 38px; }
+.gate h2 { font-size: 44px; }
+.eyebrow, .section-label, .pane h3.sub { color: var(--accent-text); font-weight: 800; letter-spacing: .18em; font-size: 12px; }
+.eyebrow::before { content: ""; display: inline-block; width: 22px; height: 3px; background: var(--accent); vertical-align: middle; margin-right: 8px; border-radius: 2px; }
+:root[data-theme="light"] .eyebrow::before { box-shadow: 0 0 0 1px var(--line); }
+
+/* Penumbra buttons: yellow pills with a glow; secondary ones are outlined. */
+.btn { background: transparent; box-shadow: inset 0 0 0 2px var(--line); color: var(--accent-text); text-transform: uppercase; letter-spacing: .08em; font-weight: 800; font-size: 14px; padding: 13px 22px; }
+.btn.small { font-size: 12px; padding: 8px 14px; }
+.btn.danger { box-shadow: inset 0 0 0 2px var(--red); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); }
+:root[data-theme="light"] .btn.primary { box-shadow: inset 0 0 0 2px var(--line), var(--glow); }
+.fab, .bigmic { box-shadow: var(--glow); }
+.btn.primary:active, .fab:active { transform: scale(.97); box-shadow: none; }
+.chip[aria-pressed="true"], .datef.on { box-shadow: 0 4px 14px rgba(242, 199, 68, .4); font-weight: 700; }
+.qa button { font-weight: 800; }
+.qa .big { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); text-transform: uppercase; letter-spacing: .08em; }
+.toggle input:checked { background: var(--accent); }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.wd.today .n { box-shadow: inset 0 0 0 2px var(--accent); }
+.wd[aria-pressed="true"] .n { background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 14px rgba(242, 199, 68, .45); }
+.item.now { background: color-mix(in srgb, var(--accent) 14%, var(--cell)); box-shadow: inset 4px 0 0 var(--accent); }
+
+/* Bichos: a word on a tilted yellow highlighter block. */
+.hl { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 0 .2em; transform: skew(-8deg); box-shadow: 4px 4px 0 var(--ink); }
 </style>
 </head>
 <body>
@@ -360,8 +405,17 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
             <select id="energy"><option>mañana</option><option>tarde</option><option>noche</option></select>
           </label>
         </div>
+        <h3 class="sub">Apariencia</h3>
+        <div class="group">
+          <label class="toggle">Tema
+            <select id="theme"><option value="system">Como mi teléfono</option><option value="light">Claro</option><option value="dark">Oscuro</option></select>
+          </label>
+        </div>
         <h3 class="sub">Formato</h3>
         <div class="group">
+          <label class="toggle">Reloj
+            <select id="clock"><option value="12">12 horas (3:52 PM)</option><option value="24">24 horas (15:52)</option></select>
+          </label>
           <label class="toggle">Fechas
             <select id="datefmt"><option value="es">27/10/2026 (día/mes)</option><option value="en">10/27/2026 (mes/día)</option></select>
           </label>
@@ -374,7 +428,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
           <h3 class="sub">Administrador</h3>
           <div id="setupBox" class="card"></div>
         </div>
-        <div class="version" id="version">Versión 0.3</div>
+        <div class="version" id="version">Versión 0.4</div>
       </div>
     </aside>
 
@@ -425,6 +479,18 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   const icon = (t) => t.emoji || EMOJI[cat(t.cat)];
   // Short date in the format chosen in Ajustes (día/mes or mes/día).
   const fmtDate = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return (state.settings.datefmt === "en" ? `${m}/${d}` : `${d}/${m}`) + "/" + y; };
+  // A "HH:MM" time in the clock chosen in Ajustes: "3:52 PM" (12 h, the default) or "15:52" (24 h).
+  const clock = (s) => {
+    if (!s || state.settings.clock === "24") return s || "";
+    const [h, m] = s.split(":").map(Number);
+    return `${h % 12 || 12}:${pad(m)} ${h < 12 ? "AM" : "PM"}`;
+  };
+  function applyTheme() {
+    const t = state.settings.theme || "system";
+    const dark = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    $("themeColor").content = dark ? "#0D0D12" : "#FFFBEA";
+  }
   // A date picker that shows our format: a pill with the text, over an invisible native date input.
   function dateField(input, opts = {}) {
     const label = el("span", {});
@@ -513,7 +579,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   const bdaysOn = (x) => state.bdays.filter((b) => b.month === x.getMonth() + 1 && b.day === x.getDate());
   function dayButton(x, list, today, k, outside) {
     const xk = ymd(x);
-    const cats = [...new Set(list.filter((t) => t.date === xk).map((t) => cat(t.cat)))].slice(0, 3);
+    const cats = [...new Set(list.filter((t) => t.date === xk).map((t) => cat(t.cat)))].slice(0, 4);
     if (bdaysOn(x).length && !cats.includes("social")) cats.push("social");
     return el("button", { class: "wd" + (xk === today ? " today" : "") + (outside ? " out" : ""), "aria-pressed": String(xk === k), "aria-label": niceDate(xk),
         onclick: () => { state.anchor = x; renderCal(); } },
@@ -530,7 +596,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
       const next = open.map((t) => ({ t, s: at(t.date, t.time) })).filter((x) => x.s > new Date()).sort((a, b) => a.s - b.s)[0];
       if (next) {
         const m = Math.round((next.s - Date.now()) / 60000);
-        parts.push(` · la próxima ${m < 60 ? `en ${Math.max(1, m)} min` : `a las ${next.t.time}`}: ${icon(next.t)} ${next.t.title}`);
+        parts.push(` · la próxima ${m < 60 ? `en ${Math.max(1, m)} min` : `a las ${clock(next.t.time)}`}: ${icon(next.t)} ${next.t.title}`);
       }
     }
     return el("span", {}, parts);
@@ -578,15 +644,15 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
     let lineDone = k !== today;
     for (const t of items) {
       const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000);
-      if (!lineDone && s.getTime() > now) { ul.append(el("div", { class: "nowline", "aria-label": "Ahora" })); lineDone = true; }
+      if (!lineDone && s.getTime() > now) { ul.append(el("div", { class: "nowline" }, el("span", {}, "Ahora · " + clock(hm(new Date()))))); lineDone = true; }
       const live = s.getTime() <= now && now < e.getTime();
       const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : ""), style: `--c: var(--c-${cat(t.cat)})`,
           onclick: () => { if (!row.dragged) openSheet(t); } },
-        el("span", { class: "t" }, t.time, el("small", {}, hm(e))), el("span", { class: "bar" }),
+        el("span", { class: "t" }, clock(t.time), el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
         el("span", {}, el("div", { class: "ti" }, `${icon(t)} ${t.title}`), t.tip ? el("div", { class: "tip" }, t.tip) : null));
       ul.append(t.example ? row : swipeable(row, t));
     }
-    if (!lineDone) ul.append(el("div", { class: "nowline", "aria-label": "Ahora" }));
+    if (!lineDone) ul.append(el("div", { class: "nowline" }, el("span", {}, "Ahora · " + clock(hm(new Date())))));
     box.append(ul);
     if (state.tasks.length && !ls.get("swiped", false)) box.append(el("div", { class: "hint", style: "margin-top:8px" }, "Desliza una tarea → para marcarla hecha, o ← para pasarla a mañana"));
   }
@@ -635,7 +701,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)),
-        el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${niceDate(t.date)} · de ${t.time} a ${hm(end)}`))),
+        el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${niceDate(t.date)} · de ${clock(t.time)} a ${clock(hm(end))}`))),
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
       el("div", { class: "muted" }, t.example ? "Es un ejemplo. Desaparece cuando agendes tu primera tarea." : "Te aviso " + remindText() + "."),
       el("div", { class: "actions" },
@@ -650,11 +716,11 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   function openQuick(t) {
     if (!t) return;
     const mins = Math.round((at(t.date, t.time) - Date.now()) / 60000);
-    const when = mins > 0 ? (mins >= 90 ? (t.date === ymd(new Date()) ? "hoy" : niceDate(t.date)) : `en ${mins} min`) : mins > -(t.dur || 30) ? "es ahora" : `era a las ${t.time}`;
+    const when = mins > 0 ? (mins >= 90 ? (t.date === ymd(new Date()) ? "hoy" : niceDate(t.date)) : `en ${mins} min`) : mins > -(t.dur || 30) ? "es ahora" : `era a las ${clock(t.time)}`;
     const then = (fn) => () => { fn(); closeSheet(); };
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
-      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${t.time} · ${when}`))),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${clock(t.time)} · ${when}`))),
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       el("div", { class: "qa" },
         t.done ? null : el("button", { class: "big", onclick: then(() => { markDone(t.id); notice(`✓ ${t.title}: hecho`); }) }, "✓ Hecho"),
@@ -681,7 +747,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
         go.disabled = false;
         if (!added) return;
         closeSheet(); state.anchor = fromYmd(added[0].date); render();
-        notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${added[0].time}` : `Agregué ${added.length} cosas`);
+        notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${clock(added[0].time)}` : `Agregué ${added.length} cosas`);
       } },
       el("div", { class: "grabber" }), el("h2", {}, "Agregar"),
       el("div", { class: "row", style: "flex-wrap:nowrap" }, mic, text),
@@ -693,7 +759,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   async function quickAdd(what, date, time) {
     let tareas = [];
     try {
-      const res = await ai.json(`Eres el asistente de un calendario personal. Responde en español.
+      const res = await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
 ${time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
@@ -752,7 +818,7 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
     if (!text) { $("dumpStatus").textContent = "Escribe primero lo que tienes que hacer."; return; }
     const date = dumpDate.value || ymd(addDays(new Date(), 1));
     $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = "Pensando cómo organizar tu día...";
-    const prompt = `Eres el asistente de un calendario personal. Responde en español.
+    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Organiza este texto en tareas para el día ${date}. Si el texto menciona otro día para alguna tarea, usa ese día.
 Agenda ya ocupada (no choques con esto):
@@ -810,7 +876,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     if (!late.length) return;
     box.append(el("h2", {}, "Se te pasaron " + late.length));
     for (const t of late.slice(0, 6)) box.append(el("div", { class: "card", style: `--c: var(--c-${cat(t.cat)})` },
-      el("h3", {}, el("span", { class: "dot" }), `${icon(t)} ${t.title}`), el("div", { class: "muted" }, niceDate(t.date) + " · " + t.time),
+      el("h3", {}, el("span", { class: "dot" }), `${icon(t)} ${t.title}`), el("div", { class: "muted" }, niceDate(t.date) + " · " + clock(t.time)),
       el("div", { class: "row" },
         el("button", { class: "btn small", onclick: () => put({ ...t, date: ymd(addDays(new Date(), 1)) }) }, "Pasar a mañana"),
         el("button", { class: "btn small", onclick: () => put({ ...t, done: true }) }, "Ya lo hice"))));
@@ -822,7 +888,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     state.chat.push({ role: "user", content: q });
     const thinking = { role: "assistant", content: "Pensando...", temp: true }; state.chat.push(thinking); renderChat();
     $("chatSend").disabled = true;
-    const rules = `Eres el asistente de un calendario personal. Responde en español, breve, amable y fácil de leer.
+    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español, breve y fácil de leer.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Agenda de los próximos 7 días (cada evento tiene un id):
@@ -851,7 +917,7 @@ Si no hay acciones, usa "acciones":[].`;
     const t = state.tasks.find((x) => x.id === String(a.id));
     if (a.tipo === "crear") return `${emojiOnly(a.emoji) || "➕"} Crear "${a.titulo}" el ${niceDate(a.fecha)} a las ${a.hora}`;
     if (a.tipo === "cumple") return `🎂 Guardar el cumpleaños de ${a.nombre}: ${a.dia} de ${MONTHS[a.mes - 1]}`;
-    if (a.tipo === "mover") return `Mover "${t.title}" al ${niceDate(a.fecha || t.date)} a las ${a.hora || t.time}`;
+    if (a.tipo === "mover") return `Mover "${t.title}" al ${niceDate(a.fecha || t.date)} a las ${clock(a.hora || t.time)}`;
     return `Borrar "${t.title}"`;
   }
   async function applyActions(msg) {
@@ -1041,7 +1107,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
         onpointerenter: (e) => e.pointerType === "mouse" && hold(), onpointerleave: (e) => e.pointerType === "mouse" && resume(), ontouchstart: hold, ontouchend: resume, ontouchcancel: resume },
       el("img", { src: "/icon-192.png", alt: "" }),
       el("div", {}, el("div", { class: "meta" }, el("span", {}, "AGENDA" + (test ? " · vista previa" : "")), el("span", {}, "ahora")),
-        el("b", {}, `${icon(t)} ${label}: ${t.title}`), el("p", {}, `A las ${t.time}${t.tip ? " · " + t.tip : ""}`)),
+        el("b", {}, `${icon(t)} ${label}: ${t.title}`), el("p", {}, `A las ${clock(t.time)}${t.tip ? " · " + t.tip : ""}`)),
       el("div", { class: "acts" },
         act("Posponer 10 min", () => { if (real) snooze(t.id, 10); }),
         act("Hecho", () => { if (real) markDone(t.id); }),
@@ -1190,7 +1256,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("setupAlert").replaceChildren(missing.length && !st.offline ? el("div", { class: "card" }, el("b", {}, "⚠️ Algo no está listo"),
       el("div", { class: "muted" }, `Falta configurar ${missing.join(", ").replace(/, ([^,]*)$/, " y $1")}. Si tú instalaste la app, toca 5 veces "Versión" al final de esta pantalla para ver los detalles.`)) : "");
     $("adminBox").hidden = !ls.get("admin", false);
-    $("version").textContent = "Versión 0.3" + (ls.get("admin", false) ? " · administrador" : "");
+    $("version").textContent = "Versión 0.4" + (ls.get("admin", false) ? " · administrador" : "");
     const item = (ok, label, help) => el("div", { class: "check" }, el("span", { class: ok ? "ok" : "no" }, ok ? "✓" : "✗"), el("div", {}, el("b", {}, label), ok ? null : help));
     box.append(
       item(true, "Contraseña de la app"),
@@ -1206,6 +1272,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("energy").value = energy();
     $("sound").checked = state.settings.sound !== false;
     $("datefmt").value = state.settings.datefmt || "es";
+    $("clock").value = state.settings.clock || "12";
+    $("theme").value = state.settings.theme || "system";
+    applyTheme();
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
     $("quietFrom").value = q.from || "22:00"; $("quietTo").value = q.to || "07:00";
@@ -1266,7 +1335,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const inp = el("input", { class: "field", type: "password", placeholder: "Contraseña", autocomplete: "current-password" });
     const st = el("div", { class: "status err" }, msg || "");
     g.append(el("form", { class: "card", onsubmit: async (e) => { e.preventDefault(); pass = inp.value; ls.set("pass", pass); await boot(); } },
-      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, "Agenda Proactiva"),
+      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, el("span", { class: "hl" }, "Pendi")),
       el("p", { class: "muted" }, "Escribe tu contraseña para entrar."), inp, el("button", { class: "btn primary" }, "Entrar"), st));
     inp.focus();
   }
@@ -1300,6 +1369,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("bdAdd").onclick = () => { $("bdForm").hidden = !$("bdForm").hidden; if (!$("bdForm").hidden) $("bName").focus(); };
   $("bdCancel").onclick = () => { $("bdForm").reset(); $("bdForm").hidden = true; document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh()); };
   $("datefmt").onchange = () => { saveSettings({ datefmt: $("datefmt").value }); syncSettings(); render(); };
+  $("clock").onchange = () => { saveSettings({ clock: $("clock").value }); render(); };
+  $("theme").onchange = () => { saveSettings({ theme: $("theme").value }); applyTheme(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   $("quietOn").onchange = saveQuiet; $("quietFrom").onchange = saveQuiet; $("quietTo").onchange = saveQuiet;
   // Hidden admin mode: tap the version 5 times.
   let taps = [];

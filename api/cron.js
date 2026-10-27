@@ -13,6 +13,12 @@ function localParts(date, tz) {
 }
 // "HH:MM" now in the user's time zone.
 const localHm = (date, tz) => new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
+// "HH:MM" in the clock the user chose (Ajustes > Formato): "3:52 PM" by default, "15:52" for 24 h.
+const clock = (s, mode) => {
+  if (!s || mode === "24") return s || "";
+  const [h, m] = s.split(":").map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+};
 // Quiet hours like {from:"22:00", to:"07:00"}; the range may cross midnight.
 function isQuiet(q, hm) {
   if (!q || !q.from || !q.to || q.from === q.to) return false;
@@ -40,7 +46,7 @@ export default async function handler(req, res) {
     if (r.kind === "task" && !t.done && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
       const key = `${r.id}@snooze@${t.snooze}`;
       const past = t.start && Date.parse(t.start) <= now;
-      due.push({ check: key, keys: [key], payload: { title: `${icon(t)} Recordatorio: ${t.title}`, body: `${past ? "Era a las" : "Es a las"} ${t.time}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id } });
+      due.push({ check: key, keys: [key], payload: { title: `${icon(t)} Recordatorio: ${t.title}`, body: `${past ? "Era a las" : "Es a las"} ${clock(t.time, settings.clock)}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id } });
     }
     if (r.kind === "task" && !t.done && t.start) {
       const mins = (Date.parse(t.start) - now) / 60000;
@@ -54,7 +60,7 @@ export default async function handler(req, res) {
       due.push({
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
-        payload: { title: `${icon(t)} ${label}: ${t.title}`, body: `A las ${t.time}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id },
+        payload: { title: `${icon(t)} ${label}: ${t.title}`, body: `A las ${clock(t.time, settings.clock)}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
