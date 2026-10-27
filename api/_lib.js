@@ -1,6 +1,7 @@
 // Shared helpers for the API routes. Files starting with "_" are not routes on Vercel.
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
+import crypto from "node:crypto";
 
 export const env = (k) => (process.env[k] || "").trim();
 
@@ -28,13 +29,18 @@ export function supa() {
 // Cleans a pasted key: drops a "NAME=" prefix, quotes, spaces and line breaks.
 const cleanKey = (k) => env(k).replace(/^[A-Z_]+=/, "").replace(/[^A-Za-z0-9_-]/g, "");
 
-// The two VAPID keys, fixed up if they were pasted swapped. problem says what is wrong, if anything.
+// The two VAPID keys. The public key is rebuilt from the private one, so a mistyped or swapped
+// public key does not matter. problem says what is wrong, if anything.
 export function vapidKeys() {
-  let pub = cleanKey("VAPID_PUBLIC_KEY"), priv = cleanKey("VAPID_PRIVATE_KEY");
-  if (!pub && !priv) return { problem: "missing" };
-  if (pub.length === 43 && priv.length === 87) [pub, priv] = [priv, pub];
-  if (pub.length !== 87 || priv.length !== 43) return { problem: "invalid" };
-  return { pub, priv };
+  const a = cleanKey("VAPID_PUBLIC_KEY"), b = cleanKey("VAPID_PRIVATE_KEY");
+  if (!a && !b) return { problem: "missing" };
+  const priv = [b, a].find((k) => k.length === 43);
+  if (!priv) return { problem: "invalid" };
+  try {
+    const ecdh = crypto.createECDH("prime256v1");
+    ecdh.setPrivateKey(Buffer.from(priv, "base64url"));
+    return { pub: ecdh.getPublicKey().toString("base64url"), priv };
+  } catch { return { problem: "invalid" }; }
 }
 
 export function pushReady() {
