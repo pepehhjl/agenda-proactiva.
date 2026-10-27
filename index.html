@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Pendi</title>
 <meta name="description" content="Tu calendario con IA: organiza tu día, te avisa antes y te recuerda los cumpleaños.">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -384,6 +384,26 @@ h1 { font-size: 46px; }
 :root[data-theme="light"] .tabbar button[aria-selected="true"] svg { background: var(--accent); border-radius: 999px; box-shadow: 0 0 0 1.5px var(--ink); }
 .tabbar button svg { width: 52px; height: 28px; padding: 2px 14px; }
 
+/* Round 2 use fixes: stop square while recording, keyboard-aware chat, sheets you can pull down, pick suggestions. */
+.mic.rec svg, .bigmic.rec svg { display: none; }
+.mic.rec::after, .bigmic.rec::after { content: ""; width: 14px; height: 14px; border-radius: 3px; background: #fff; }
+.bigmic.rec::after { width: 30px; height: 30px; border-radius: 6px; }
+#chatSend.stop { background: var(--red); color: #fff; box-shadow: none; }
+html.kb .tabbar { display: none; }
+@media (max-width: 860px) {
+  html.kb .app { padding-bottom: 0; }
+  html.kb .side { top: var(--vvt, 0px); bottom: auto; height: var(--vvh, 100%); }
+}
+.sheet.pulling { transition: none !important; animation: none !important; }
+.sheet.letgo { transition: transform .22s ease; }
+.card.pick { cursor: pointer; position: relative; }
+.card.pick.sel { box-shadow: inset 0 0 0 2px var(--accent), var(--glow); }
+.card.pick .tick { position: absolute; top: 12px; right: 12px; width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--sep); display: grid; place-items: center; font-weight: 800; font-size: 14px; color: var(--accent-ink); }
+.card.pick.sel .tick { background: var(--accent); box-shadow: none; }
+.card.pick h3 { padding-right: 34px; }
+.qrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.qrow input[type="time"] { border: 0; background: var(--fill); border-radius: 10px; padding: 8px 12px; font-size: 16px; min-width: 120px; text-align: center; }
+
 /* Bichos: a word on a tilted yellow highlighter block. */
 .hl { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 0 .2em; transform: skew(-8deg); box-shadow: 4px 4px 0 var(--ink); }
 </style>
@@ -427,8 +447,8 @@ h1 { font-size: 46px; }
         <div id="dumpStatus" class="status" role="status"></div>
         <div id="proposals" style="display:grid;gap:10px"></div>
         <div class="row" id="proposalActions" hidden>
-          <button id="scheduleAll" class="btn primary" data-i18n="scheduleChosen"></button>
-          <button id="discard" class="btn" data-i18n="discard"></button>
+          <button id="scheduleAll" class="btn primary"></button>
+          <button id="discard" class="btn"></button>
         </div>
         <div id="overdue" style="display:grid;gap:8px"></div>
       </div>
@@ -464,7 +484,11 @@ h1 { font-size: 46px; }
           <div id="pushBox" style="display:grid;gap:10px"></div>
           <div style="display:grid;gap:8px"><span data-i18n="remindBefore"></span><div class="chips" id="remindChips"></div></div>
           <label class="toggle"><span data-i18n="quiet"></span> <input type="checkbox" id="quietOn"></label>
-          <div class="toggle" id="quietRow" hidden><span><span data-i18n="from"></span> <input type="time" id="quietFrom" value="22:00"> <span data-i18n="to"></span> <input type="time" id="quietTo" value="07:00"></span></div>
+          <div id="quietRow" hidden style="display:grid;gap:10px">
+            <label class="qrow"><span data-i18n="quietFromL"></span> <input type="time" id="quietFrom" value="22:00"></label>
+            <label class="qrow"><span data-i18n="quietToL"></span> <input type="time" id="quietTo" value="07:00"></label>
+            <div class="muted" id="quietSum"></div>
+          </div>
           <label class="toggle"><span data-i18n="sound"></span> <input type="checkbox" id="sound" checked></label>
           <button class="link" id="testToast" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
         </div>
@@ -562,7 +586,7 @@ h1 { font-size: 46px; }
       format: "Formato", clock: "Reloj", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Fechas", dmy: "27/10/2026 (día/mes)", mdy: "10/27/2026 (mes/día)",
       account: "Cuenta", logout: "Cerrar sesión en este dispositivo", version: "Versión", adminSuffix: " · administrador", adminOn: "Modo administrador activado", adminOff: "Modo administrador desactivado",
       chooseDate: "Elegir fecha", otherDay: "Otro día", tomorrow: "Mañana",
-      errRate: "La IA gratis llegó a su límite por ahora. Intenta en un minuto.", errNoAi: "Falta conectar Gemini (mira Ajustes).", errJson: "La IA respondió algo que no entendí. Intenta de nuevo.",
+      errRate: "La IA está muy ocupada ahora mismo. Intenta en un minuto.", errNoAi: "Falta conectar Gemini (mira Ajustes).", errJson: "La IA respondió algo que no entendí. Intenta de nuevo.",
       errAuth: "Tu sesión no es válida. Vuelve a entrar.", errNet: "No se pudo conectar. Intenta de nuevo.",
       ex1Title: "Grabar video de ASMR", ex1Tip: "Busca el cuarto más callado y haz una prueba de micrófono de 30 segundos.", ex2Title: "Ir al banco", ex2Tip: "Lleva tu documento y revisa el horario de cierre.", exampleTag: " · ejemplo",
       freeDay: "Día libre", allDone: "Todo listo ✓", doneOne: "{n} cosa hecha", doneMany: "{n} cosas hechas", thingOne: "{n} cosa", thingMany: "{n} cosas",
@@ -624,7 +648,7 @@ h1 { font-size: 46px; }
       format: "Format", clock: "Clock", clock12: "12-hour (3:52 PM)", clock24: "24-hour (15:52)", dates: "Dates", dmy: "27/10/2026 (day/month)", mdy: "10/27/2026 (month/day)",
       account: "Account", logout: "Sign out on this device", version: "Version", adminSuffix: " · admin", adminOn: "Admin mode on", adminOff: "Admin mode off",
       chooseDate: "Choose date", otherDay: "Other day", tomorrow: "Tomorrow",
-      errRate: "The free AI hit its limit for now. Try again in a minute.", errNoAi: "Gemini isn't connected yet (see Settings).", errJson: "The AI replied with something I didn't understand. Try again.",
+      errRate: "The AI is very busy right now. Try again in a minute.", errNoAi: "Gemini isn't connected yet (see Settings).", errJson: "The AI replied with something I didn't understand. Try again.",
       errAuth: "Your session isn't valid. Sign in again.", errNet: "Couldn't connect. Try again.",
       ex1Title: "Record ASMR video", ex1Tip: "Find the quietest room and do a 30-second mic test.", ex2Title: "Go to the bank", ex2Tip: "Bring your ID and check the closing time.", exampleTag: " · example",
       freeDay: "Free day", allDone: "All done ✓", doneOne: "{n} thing done", doneMany: "{n} things done", thingOne: "{n} thing", thingMany: "{n} things",
@@ -686,7 +710,7 @@ h1 { font-size: 46px; }
       format: "Formato", clock: "Relógio", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Datas", dmy: "27/10/2026 (dia/mês)", mdy: "10/27/2026 (mês/dia)",
       account: "Conta", logout: "Sair neste dispositivo", version: "Versão", adminSuffix: " · administrador", adminOn: "Modo administrador ativado", adminOff: "Modo administrador desativado",
       chooseDate: "Escolher data", otherDay: "Outro dia", tomorrow: "Amanhã",
-      errRate: "A IA gratuita chegou ao limite por enquanto. Tente de novo em um minuto.", errNoAi: "Falta conectar o Gemini (veja Ajustes).", errJson: "A IA respondeu algo que não entendi. Tente de novo.",
+      errRate: "A IA está muito ocupada agora. Tente de novo em um minuto.", errNoAi: "Falta conectar o Gemini (veja Ajustes).", errJson: "A IA respondeu algo que não entendi. Tente de novo.",
       errAuth: "Sua sessão não é válida. Entre de novo.", errNet: "Não foi possível conectar. Tente de novo.",
       ex1Title: "Gravar vídeo de ASMR", ex1Tip: "Procure o cômodo mais silencioso e faça um teste de microfone de 30 segundos.", ex2Title: "Ir ao banco", ex2Tip: "Leve seu documento e confira o horário de fechamento.", exampleTag: " · exemplo",
       freeDay: "Dia livre", allDone: "Tudo pronto ✓", doneOne: "{n} coisa feita", doneMany: "{n} coisas feitas", thingOne: "{n} coisa", thingMany: "{n} coisas",
@@ -748,7 +772,7 @@ h1 { font-size: 46px; }
       format: "Format", clock: "Horloge", clock12: "12 heures (3:52 PM)", clock24: "24 heures (15:52)", dates: "Dates", dmy: "27/10/2026 (jour/mois)", mdy: "10/27/2026 (mois/jour)",
       account: "Compte", logout: "Se déconnecter sur cet appareil", version: "Version", adminSuffix: " · administrateur", adminOn: "Mode administrateur activé", adminOff: "Mode administrateur désactivé",
       chooseDate: "Choisir une date", otherDay: "Autre jour", tomorrow: "Demain",
-      errRate: "L'IA gratuite a atteint sa limite pour le moment. Réessaie dans une minute.", errNoAi: "Gemini n'est pas encore connecté (voir Réglages).", errJson: "L'IA a répondu quelque chose que je n'ai pas compris. Réessaie.",
+      errRate: "L'IA est très occupée en ce moment. Réessaie dans une minute.", errNoAi: "Gemini n'est pas encore connecté (voir Réglages).", errJson: "L'IA a répondu quelque chose que je n'ai pas compris. Réessaie.",
       errAuth: "Ta session n'est pas valide. Reconnecte-toi.", errNet: "Connexion impossible. Réessaie.",
       ex1Title: "Tourner une vidéo ASMR", ex1Tip: "Trouve la pièce la plus calme et fais un test micro de 30 secondes.", ex2Title: "Aller à la banque", ex2Tip: "Prends ta pièce d'identité et vérifie l'heure de fermeture.", exampleTag: " · exemple",
       freeDay: "Journée libre", allDone: "Tout est fait ✓", doneOne: "{n} chose faite", doneMany: "{n} choses faites", thingOne: "{n} chose", thingMany: "{n} choses",
@@ -798,7 +822,7 @@ h1 { font-size: 46px; }
   };
   // Round 2 texts: repeats, tasks without a time, search, undo, timeline, summaries, photos, celebrations, backup.
   Object.assign(I18N.es, {
-    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", moreOptions: "Más opciones",
+    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", quietFromL: "Desde", quietToL: "Hasta", quietSum: "No te llegarán avisos de {a} a {b}.", stop: "Parar", stopped: "Lo detuve. Pregunta otra cosa cuando quieras.", errAi: "La IA no respondió esta vez. Intenta de nuevo.", schedAll: "Agendar todo", schedSel: "Agendar {n} elegidas", schedSel1: "Agendar la elegida", discAll: "Descartar todo", discSel: "Descartar {n} elegidas", discSel1: "Descartar la elegida", tapPick: "Toca las sugerencias para elegir solo algunas.", moreOptions: "Más opciones",
     deleted: "🗑️ {t}: borrada", deletedSeries: "🗑️ Borré esta y las que siguen", delOne: "Borrar solo esta", delSeries: "Borrar esta y las que siguen",
     repeat: "Repetir", rep_none: "No se repite", rep_daily: "Todos los días", rep_weekdays: "De lunes a viernes", rep_weekly: "Cada semana", rep_monthly: "Cada mes",
     repEvery: "Cada {d}", repMonthDay: "Cada mes, el día {n}", repeats: "Se repite",
@@ -823,7 +847,7 @@ h1 { font-size: 46px; }
     offlineNote: "Sin internet: guardo todo y lo subo cuando vuelva", backOnline: "Conexión de vuelta: todo al día",
   });
   Object.assign(I18N.en, {
-    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", moreOptions: "More options",
+    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", quietFromL: "From", quietToL: "Until", quietSum: "No reminders from {a} to {b}.", stop: "Stop", stopped: "Stopped. Ask something else whenever you like.", errAi: "The AI didn't answer this time. Try again.", schedAll: "Schedule all", schedSel: "Schedule {n} selected", schedSel1: "Schedule the selected one", discAll: "Discard all", discSel: "Discard {n} selected", discSel1: "Discard the selected one", tapPick: "Tap suggestions to pick only some.", moreOptions: "More options",
     deleted: "🗑️ {t}: deleted", deletedSeries: "🗑️ Deleted this one and the ones after", delOne: "Delete only this one", delSeries: "Delete this and the ones after",
     repeat: "Repeat", rep_none: "Doesn't repeat", rep_daily: "Every day", rep_weekdays: "Monday to Friday", rep_weekly: "Every week", rep_monthly: "Every month",
     repEvery: "Every {d}", repMonthDay: "Every month, on day {n}", repeats: "Repeats",
@@ -848,7 +872,7 @@ h1 { font-size: 46px; }
     offlineNote: "No internet: I'm saving everything and will upload it when it's back", backOnline: "Back online: all up to date",
   });
   Object.assign(I18N.pt, {
-    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", moreOptions: "Mais opções",
+    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções",
     deleted: "🗑️ {t}: apagada", deletedSeries: "🗑️ Apaguei esta e as seguintes", delOne: "Apagar só esta", delSeries: "Apagar esta e as seguintes",
     repeat: "Repetir", rep_none: "Não se repete", rep_daily: "Todos os dias", rep_weekdays: "De segunda a sexta", rep_weekly: "Toda semana", rep_monthly: "Todo mês",
     repEvery: "Toda {d}", repMonthDay: "Todo mês, no dia {n}", repeats: "Se repete",
@@ -873,7 +897,7 @@ h1 { font-size: 46px; }
     offlineNote: "Sem internet: guardo tudo e envio quando voltar", backOnline: "Conexão de volta: tudo em dia",
   });
   Object.assign(I18N.fr, {
-    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", moreOptions: "Plus d'options",
+    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", quietFromL: "De", quietToL: "Jusqu'à", quietSum: "Aucun rappel de {a} à {b}.", stop: "Arrêter", stopped: "J'ai arrêté. Pose une autre question quand tu veux.", errAi: "L'IA n'a pas répondu cette fois. Réessaie.", schedAll: "Tout planifier", schedSel: "Planifier les {n} choisies", schedSel1: "Planifier celle choisie", discAll: "Tout ignorer", discSel: "Ignorer les {n} choisies", discSel1: "Ignorer celle choisie", tapPick: "Touche les suggestions pour n'en choisir que certaines.", moreOptions: "Plus d'options",
     deleted: "🗑️ {t} : supprimée", deletedSeries: "🗑️ Supprimé celle-ci et les suivantes", delOne: "Supprimer seulement celle-ci", delSeries: "Supprimer celle-ci et les suivantes",
     repeat: "Répéter", rep_none: "Ne se répète pas", rep_daily: "Tous les jours", rep_weekdays: "Du lundi au vendredi", rep_weekly: "Chaque semaine", rep_monthly: "Chaque mois",
     repEvery: "Chaque {d}", repMonthDay: "Chaque mois, le {n}", repeats: "Se répète",
@@ -981,14 +1005,14 @@ h1 { font-size: 46px; }
 
   // ---------- server ----------
   let pass = ls.get("pass", "");
-  async function call(path, body) {
-    const r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined });
+  async function call(path, body, signal) {
+    const r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined, signal });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw { status: r.status, ...j };
     return j;
   }
   const ai = {
-    json: (input, search) => call("/api/ai", { input, search: !!search }).then((j) => j.data),
+    json: (input, search, signal) => call("/api/ai", { input, search: !!search }, signal).then((j) => j.data),
     see: (input, image) => call("/api/ai", { input, image }).then((j) => j.data),
     transcribe: (audio) => call("/api/ai", { audio }).then((j) => String((j.data && j.data.texto) || "")),
   };
@@ -997,10 +1021,10 @@ h1 { font-size: 46px; }
     if (e && e.error === "no_ai") return tr("errNoAi");
     if (e && e.error === "invalid_json") return tr("errJson");
     if (e && e.status === 401) return tr("errAuth");
-    return (e && e.status ? e.message : "") || tr("errNet");
+    return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.6.1";
+  const VERSION = "0.6.2";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1687,8 +1711,14 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     const box = $("proposals"); box.replaceChildren();
     const ps = state.proposals || [];
     $("proposalActions").hidden = !ps.length;
+    const n = ps.filter((p) => p.sel).length;
+    $("scheduleAll").textContent = !n ? tr("schedAll") : n === 1 ? tr("schedSel1") : tr("schedSel", { n });
+    $("discard").textContent = !n ? tr("discAll") : n === 1 ? tr("discSel1") : tr("discSel", { n });
+    if (ps.length > 1) box.append(el("div", { class: "muted" }, tr("tapPick")));
     ps.forEach((p, i) => {
-      box.append(el("div", { class: "card", style: `--c: var(--c-${p.cat})` },
+      box.append(el("div", { class: "card pick" + (p.sel ? " sel" : ""), style: `--c: var(--c-${p.cat})`, role: "checkbox", "aria-checked": String(!!p.sel), tabindex: "0",
+          onclick: (e) => { if (e.target.closest("button")) return; p.sel = !p.sel; renderProposals(); } },
+        el("span", { class: "tick", "aria-hidden": "true" }, p.sel ? "✓" : ""),
         el("h3", {}, el("span", { class: "dot" }), `${i + 1}. ${icon(p)} ${p.title}`),
         el("div", { class: "muted" }, `${niceDate(p.date)} · ${p.dur} min`),
         el("div", { class: "chips" },
@@ -1700,9 +1730,11 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     });
   }
   async function scheduleAll() {
-    const ps = (state.proposals || []).filter((p) => !p.skip && p.pick);
+    const all = state.proposals || [], some = all.some((p) => p.sel);
+    const ps = all.filter((p) => (!some || p.sel) && !p.skip && p.pick);
+    const rest = some ? all.filter((p) => !p.sel) : [];
     for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, done: false, created: Date.now() });
-    state.proposals = null; renderProposals(); $("dump").value = "";
+    state.proposals = rest.length ? rest : null; renderProposals(); if (!rest.length) $("dump").value = "";
     $("dumpStatus").className = "status";
     $("dumpStatus").textContent = ps.length ? tr(ps.length === 1 ? "scheduledOne" : "scheduledMany", { n: ps.length }) : tr("noneChosen");
     if (ps[0]) { state.anchor = fromYmd(ps[0].date); if (isPhone()) showTab("cal"); render(); }
@@ -1724,7 +1756,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     q = (q || "").trim(); if (!q) return;
     state.chat.push({ role: "user", content: q });
     const thinking = { role: "assistant", content: tr("thinking"), temp: true }; state.chat.push(thinking); renderChat();
-    $("chatSend").disabled = true;
+    const ctl = new AbortController(); chatAbort = ctl; chatBusy(true);
     const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]} (la respuesta y los títulos y consejos de las acciones), breve y fácil de leer.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
@@ -1741,16 +1773,18 @@ Las tareas marcadas con ⭐ son importantes.
 Si no hay acciones, usa "acciones":[].`;
     const turns = state.chat.filter((m) => !m.temp && !m.actions).slice(-8);
     try {
-      const res = await ai.json([{ role: "user", content: rules }, ...turns]);
+      const res = await ai.json([{ role: "user", content: rules }, ...turns], false, ctl.signal);
       state.chat.splice(state.chat.indexOf(thinking), 1);
       state.chat.push({ role: "assistant", content: String((res && res.respuesta) || tr("okDone")) });
       const acts = (Array.isArray(res && res.acciones) ? res.acciones : []).filter((a) => a && ((a.tipo === "crear" && /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || "")) || (a.tipo === "cumple" && a.nombre && Number(a.mes) >= 1 && Number(a.mes) <= 12 && Number(a.dia) >= 1 && Number(a.dia) <= 31) || state.tasks.some((t) => t.id === String(a.id))));
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
       state.chat.splice(state.chat.indexOf(thinking), 1);
-      state.chat.push({ role: "assistant", content: errText(e), temp: true });
-    } finally { $("chatSend").disabled = false; renderChat(); }
+      state.chat.push({ role: "assistant", content: ctl.signal.aborted ? tr("stopped") : errText(e), temp: true });
+    } finally { chatAbort = null; chatBusy(false); renderChat(); }
   }
+  let chatAbort = null;
+  function chatBusy(on) { const b = $("chatSend"); b.classList.toggle("stop", on); b.textContent = tr(on ? "stop" : "send"); }
   function describe(a) {
     const t = state.tasks.find((x) => x.id === String(a.id));
     if (a.tipo === "crear") return (/^\d{1,2}:\d{2}$/.test(a.hora || "") ? tr("actCreate", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha), h: clock(String(a.hora).padStart(5, "0")) }) : tr("actCreateAny", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha) })) + (repFromAi(a.repetir) ? " 🔁 " + repeatText({ ...repFromAi(a.repetir), start: a.fecha }) : "");
@@ -2006,39 +2040,49 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const setRec = (on) => { btn.classList.toggle("rec", on); btn.setAttribute("aria-label", tr(on ? "stopDictation" : "dictate")); if (lab) lab.textContent = tr(on ? "listening" : "tapTalk"); };
     const write = (txt) => { field.value = base + txt; };
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let finished; const done = new Promise((ok) => (finished = ok));
     const record = async () => {
-      if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = tr("noDictate"); return; }
+      if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = tr("noDictate"); return finished(); }
       let stream;
-      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { field.placeholder = tr("noMic"); return; }
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { field.placeholder = tr("noMic"); return finished(); }
       const rec = new MediaRecorder(stream), parts = [];
       rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop()); setRec(false);
         const blob = new Blob(parts, { type: rec.mimeType || "audio/webm" });
-        if (!blob.size) return;
+        if (!blob.size) return finished();
         btn.disabled = true; const ph = field.placeholder; field.placeholder = tr("transcribing");
         try {
           const data = await new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = ko; r.readAsDataURL(blob); });
           const txt = await ai.transcribe({ mime: blob.type, data, lang: AI_LANG[lang] });
           if (txt) write(txt); field.placeholder = ph;
         } catch (e) { field.placeholder = errText(e); }
-        finally { btn.disabled = false; field.focus(); }
+        finally { btn.disabled = false; finished(); }
       };
       rec.start(); setRec(true);
-      dictating = { stop: () => rec.state !== "inactive" && rec.stop() };
+      dictating = { stop: () => { if (rec.state !== "inactive") rec.stop(); return done; } };
     };
     if (!SR) return record();
-    const r = new SR(); let finalText = "", failed = false;
-    r.lang = loc() === "es" ? "es-ES" : loc(); r.interimResults = true; r.continuous = true;
-    r.onresult = (e) => {
-      let interim = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) { const s = e.results[i][0].transcript; if (e.results[i].isFinal) finalText += s; else interim += s; }
-      write((finalText + interim).trim());
+    const android = /android/i.test(navigator.userAgent);
+    let kept = "", failed = false, live = true, r;
+    const listen = () => {
+      r = new SR(); let heard = "";
+      r.lang = loc() === "es" ? "es-ES" : loc(); r.interimResults = true; r.continuous = !android;
+      r.onresult = (e) => { heard = Array.from(e.results, (x) => x[0].transcript).join(""); write((kept + " " + heard).trim()); };
+      r.onerror = (e) => { if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error)) failed = true; };
+      r.onend = () => {
+        kept = (kept + " " + heard).trim();
+        // Android ends after each phrase: keep listening until the person taps stop.
+        if (live && android && !failed) { try { return listen(); } catch {} }
+        setRec(false); if (dictating && dictating.sr === r) dictating = null;
+        // If live dictation is blocked (common in installed iPhone apps), fall back to recording.
+        if (failed && !kept) return record();
+        finished();
+      };
+      r.start();
+      dictating = { sr: r, stop: () => { live = false; try { r.stop(); } catch { finished(); } return done; } };
     };
-    r.onerror = (e) => { if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error)) failed = true; };
-    // If live dictation is blocked (common in installed iPhone apps), fall back to recording.
-    r.onend = () => { setRec(false); dictating = null; if (failed && !finalText) record(); };
-    try { r.start(); setRec(true); dictating = { stop: () => r.stop() }; } catch { record(); }
+    try { listen(); setRec(true); } catch { record(); }
   }
   document.querySelectorAll("[data-mic]").forEach((b) => b.addEventListener("click", () => toggleMic(b)));
 
@@ -2141,6 +2185,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
     $("quietFrom").value = q.from || "22:00"; $("quietTo").value = q.to || "07:00";
+    $("quietSum").textContent = tr("quietSum", { a: clock($("quietFrom").value), b: clock($("quietTo").value) });
     const wanted = remindList();
     $("remindChips").replaceChildren(...[60, 30, 10].map((m) => el("button", { class: "chip", "aria-pressed": String(wanted.includes(m)), onclick: () => {
       const next = wanted.includes(m) ? wanted.filter((x) => x !== m) : [...wanted, m];
@@ -2167,7 +2212,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       notice(tr("restored", { n: rows.length }));
     } catch { notice(tr("restoreBad")); }
   }
-  const saveQuiet = () => { saveSettings({ quiet: { on: $("quietOn").checked, from: $("quietFrom").value, to: $("quietTo").value } }); syncSettings(); };
+  const saveQuiet = () => {
+    saveSettings({ quiet: { on: $("quietOn").checked, from: $("quietFrom").value, to: $("quietTo").value } }); syncSettings();
+    $("quietSum").textContent = tr("quietSum", { a: clock($("quietFrom").value), b: clock($("quietTo").value) });
+  };
 
   // ---------- first-time welcome ----------
   function onboarding() {
@@ -2201,6 +2249,67 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (name === "chat") { const sc = $("chatScroll"); sc.scrollTop = sc.scrollHeight; }
   }
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
+  // ---------- phone gestures ----------
+  // The keyboard: the open pane shrinks to the space above it (the tab bar hides), so the last messages stay in view.
+  const vv = window.visualViewport;
+  if (vv) {
+    let tallest = vv.height;
+    const typing = () => { const a = document.activeElement; return a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && !/^(checkbox|radio|button|submit|date|time|file)$/.test(a.type))); };
+    const fit = () => {
+      tallest = Math.max(tallest, vv.height);
+      const kb = typing() && (tallest - vv.height > 120 || innerHeight - vv.height > 120);
+      const root = document.documentElement;
+      root.classList.toggle("kb", kb);
+      root.style.setProperty("--vvh", vv.height + "px"); root.style.setProperty("--vvt", vv.offsetTop + "px");
+      if (kb) { const sc = $("chatScroll"); if (sc && !$("side").hidden) sc.scrollTop = sc.scrollHeight; }
+    };
+    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit);
+    addEventListener("orientationchange", () => { tallest = 0; setTimeout(fit, 300); });
+    document.addEventListener("focusin", () => setTimeout(fit, 50)); document.addEventListener("focusout", () => setTimeout(fit, 50));
+  }
+  // Installed app: no pinch zoom (iPhone ignores the page setting, so the gesture is blocked here too).
+  ["gesturestart", "gesturechange"].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault()));
+  // Sheets from the bottom: pull them down to close.
+  (() => {
+    const bg = $("sheet"); let y0 = 0, x0 = 0, dy = 0, sh = null, pulling = false;
+    bg.addEventListener("touchstart", (e) => {
+      sh = e.target.closest(".sheet"); pulling = false; dy = 0;
+      if (!sh || e.touches.length > 1 || e.target.closest("input, select, textarea, .steps-list")) { sh = null; return; }
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX;
+    }, { passive: true });
+    bg.addEventListener("touchmove", (e) => {
+      if (!sh) return;
+      const d = e.touches[0].clientY - y0, dx = e.touches[0].clientX - x0;
+      if (!pulling) { if (d > 8 && d > Math.abs(dx) && sh.scrollTop <= 0) { pulling = true; sh.classList.add("pulling"); } else if (Math.abs(d) > 8 || Math.abs(dx) > 8) { sh = null; return; } else return; }
+      dy = Math.max(0, d); sh.style.transform = `translateY(${dy}px)`; e.preventDefault();
+    }, { passive: false });
+    const end = () => {
+      if (!sh || !pulling) { sh = null; return; }
+      const s = sh; sh = null; s.classList.remove("pulling"); s.classList.add("letgo");
+      if (dy > Math.min(140, s.offsetHeight / 4)) { s.style.transform = "translateY(100%)"; setTimeout(closeSheet, 200); }
+      else { s.style.transform = ""; setTimeout(() => s.classList.remove("letgo"), 250); }
+    };
+    bg.addEventListener("touchend", end); bg.addEventListener("touchcancel", end);
+  })();
+  // Swipe sideways to go to the next or previous tab (phones). Task rows keep their own swipe.
+  (() => {
+    const order = ["cal", "organize", "chat", "bdays", "settings"];
+    let x0 = 0, y0 = 0, t0 = 0, ok = false;
+    $("app").addEventListener("touchstart", (e) => {
+      const t = e.target;
+      ok = isPhone() && e.touches.length === 1 && !document.documentElement.classList.contains("kb") && !t.closest(".swipe, input, select, textarea, .snack, .tl, .seg2, .week, .month");
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    }, { passive: true });
+    $("app").addEventListener("touchend", (e) => {
+      if (!ok || !$("sheet").hidden) return;
+      const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2 || Date.now() - t0 > 700) return;
+      const cur = document.querySelector(".tabbar button[aria-selected='true']"), i = order.indexOf(cur ? cur.dataset.tab : "cal");
+      const next = order[i + (dx < 0 ? 1 : -1)];
+      if (next) showTab(next);
+    }, { passive: true });
+  })();
+
 
   function render() { renderCal(); renderOverdue(); renderBdays(); }
 
@@ -2274,8 +2383,14 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   };
   $("organize").onclick = organize;
   $("scheduleAll").onclick = scheduleAll;
-  $("discard").onclick = () => { state.proposals = null; renderProposals(); $("dumpStatus").textContent = ""; };
-  $("chatForm").onsubmit = (e) => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
+  $("discard").onclick = () => { const left = (state.proposals || []).filter((p) => !p.sel); state.proposals = left.length && left.length < state.proposals.length ? left : null; renderProposals(); $("dumpStatus").textContent = ""; };
+  // Send stops a recording first (and sends what was said); while the AI thinks, the same button stops it.
+  $("chatForm").onsubmit = async (e) => {
+    e.preventDefault();
+    if (chatAbort) { chatAbort.abort(); return; }
+    if (dictating) { const d = dictating; dictating = null; await d.stop(); }
+    const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v);
+  };
   $("energy").onchange = () => saveSettings({ energy: $("energy").value });
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
