@@ -854,7 +854,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     box.append(
       item(true, "Contraseña de la app"),
       item(st.ai, "Inteligencia artificial (Gemini)", el("div", { class: "muted" }, "Agrega GEMINI_API_KEY en Vercel.")),
-      item(st.db, "Guardar en la nube (Supabase)", el("div", { class: "muted" }, "Agrega SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en Vercel. Mientras tanto se guarda solo en este dispositivo.")),
+      item(st.db, "Guardar en la nube (Supabase)", el("div", { class: "muted" }, st.dbProblem ? "Supabase respondió: " + st.dbProblem + ". Revisa SUPABASE_URL (Project URL, termina en .supabase.co) y SUPABASE_SERVICE_ROLE_KEY en Vercel." : "Agrega SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en Vercel. Mientras tanto se guarda solo en este dispositivo.")),
       item(st.push, "Claves de avisos (VAPID)", st.suggestedVapid ? el("div", { class: "muted" }, st.pushProblem ? "Las claves que pusiste en Vercel no se leen bien. Reemplaza las dos por estas (copia solo el texto del recuadro, cada una en su nombre) y haz Redeploy:" : "Copia estas dos en Vercel:",
         el("div", {}, "VAPID_PUBLIC_KEY"), el("code", { class: "key" }, st.suggestedVapid.publicKey),
         el("div", {}, "VAPID_PRIVATE_KEY"), el("code", { class: "key" }, st.suggestedVapid.privateKey)) : null));

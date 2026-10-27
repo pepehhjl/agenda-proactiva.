@@ -19,8 +19,19 @@ export function deny(res) {
 }
 
 let client;
+// Accepts what people usually paste: the Project URL, a URL with /rest/v1/ at the end,
+// a database connection string, or just the project id.
+export function supabaseUrl() {
+  const raw = env("SUPABASE_URL").replace(/^["']|["']$/g, "");
+  if (!raw) return "";
+  const ref = raw.match(/(?:db\.)?([a-z0-9]{15,30})\.supabase\.(?:co|com)/i);
+  if (ref) return `https://${ref[1].toLowerCase()}.supabase.co`;
+  if (/^[a-z0-9]{15,30}$/i.test(raw)) return `https://${raw.toLowerCase()}.supabase.co`;
+  try { return new URL(raw).origin; } catch { return raw; }
+}
+
 export function supa() {
-  const url = env("SUPABASE_URL"), key = env("SUPABASE_SERVICE_ROLE_KEY");
+  const url = supabaseUrl(), key = env("SUPABASE_SERVICE_ROLE_KEY").replace(/^["']|["']$/g, "");
   if (!url || !key) return null;
   client ||= createClient(url, key, { auth: { persistSession: false } });
   return client;

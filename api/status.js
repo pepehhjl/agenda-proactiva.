@@ -8,7 +8,14 @@ export default async function handler(req, res) {
   const out = { password, authed: ok };
   if (password && !ok) return res.json(out);
   out.ai = !!env("GEMINI_API_KEY");
-  out.db = !!supa();
+  const sb = supa();
+  out.db = false;
+  if (sb) {
+    // Make a real request, so a wrong URL or key shows up here instead of failing silently.
+    const { error } = await sb.from("items").select("id").limit(1);
+    out.db = !error;
+    if (error) out.dbProblem = error.message || "No se pudo conectar.";
+  }
   const vk = vapidKeys();
   out.push = pushReady();
   out.vapidPublicKey = out.push ? vk.pub : null;
