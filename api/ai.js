@@ -1,4 +1,5 @@
 // Asks Gemini. Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
+// {input, image:{mime, data}} to read a photo (a flyer, an appointment, a screenshot),
 // or {audio:{mime, data}} (base64) to transcribe a voice note. Returns {data}.
 import { env, authed, deny, readBody } from "./_lib.js";
 
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
   if (!authed(req)) return deny(res);
   const key = env("GEMINI_API_KEY");
   if (!key) return res.status(503).json({ error: "no_ai", message: "Falta configurar GEMINI_API_KEY en Vercel." });
-  const { input, search, audio } = await readBody(req);
+  const { input, search, audio, image } = await readBody(req);
 
   if (audio && audio.data) {
     const out = await gemini(key, { contents: [{ role: "user", parts: [
@@ -40,7 +41,9 @@ export default async function handler(req, res) {
 
   const turns = typeof input === "string" ? [{ role: "user", content: input }] : Array.isArray(input) ? input : [];
   if (!turns.length) return res.status(400).json({ error: "bad_request" });
-  const contents = turns.slice(-12).map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: String(t.content).slice(0, 20000) }] }));
+  const contents = image && image.data && typeof input === "string"
+    ? [{ role: "user", parts: [{ inline_data: { mime_type: String(image.mime || "image/jpeg").split(";")[0], data: image.data } }, { text: input.slice(0, 20000) }] }]
+    : turns.slice(-12).map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: String(t.content).slice(0, 20000) }] }));
 
   // Google Search grounding cannot be combined with a forced JSON reply, so it asks for JSON in the prompt instead.
   let out = search

@@ -125,10 +125,10 @@ textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .check .no { color: var(--red); font-weight: 700; }
 code.key { display: block; font-size: 12px; word-break: break-all; background: var(--group); border-radius: 8px; padding: 6px 8px; user-select: all; }
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.toggle input { width: 46px; height: 28px; appearance: none; background: var(--fill); border-radius: 999px; position: relative; cursor: pointer; transition: background .2s; flex: none; }
-.toggle input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, .2); transition: transform .2s; }
-.toggle input:checked { background: var(--c-salud); }
-.toggle input:checked::after { transform: translateX(18px); }
+.toggle input[type="checkbox"] { width: 46px; height: 28px; appearance: none; background: var(--fill); border-radius: 999px; position: relative; cursor: pointer; transition: background .2s; flex: none; }
+.toggle input[type="checkbox"]::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, .2); transition: transform .2s; }
+.toggle input[type="checkbox"]:checked { background: var(--c-salud); }
+.toggle input[type="checkbox"]:checked::after { transform: translateX(18px); }
 
 /* sheet */
 .sheet-bg { position: fixed; inset: 0; background: rgba(0, 0, 0, .3); z-index: 30; display: grid; place-items: center; padding: 16px; }
@@ -309,11 +309,51 @@ h1 { font-size: 46px; }
 .chip[aria-pressed="true"], .datef.on { box-shadow: 0 4px 14px rgba(242, 199, 68, .4); font-weight: 700; }
 .qa button { font-weight: 800; }
 .qa .big { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); text-transform: uppercase; letter-spacing: .08em; }
-.toggle input:checked { background: var(--accent); }
+.toggle input[type="checkbox"]:checked { background: var(--accent); }
 .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
 .wd.today .n { box-shadow: inset 0 0 0 2px var(--accent); }
 .wd[aria-pressed="true"] .n { background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 14px rgba(242, 199, 68, .45); }
 .item.now { background: color-mix(in srgb, var(--accent) 14%, var(--cell)); box-shadow: inset 4px 0 0 var(--accent); }
+
+/* Round 2: day tools, tasks without a time, timeline, steps, celebrations, week review. */
+.daytools { display: flex; gap: 8px; align-items: center; }
+.seg2 { display: inline-flex; background: var(--fill); border-radius: 999px; padding: 3px; }
+.seg2 button { border: 0; background: transparent; border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.seg2 button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.trayhead { display: flex; align-items: center; justify-content: space-between; margin: 0 4px -10px; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+.trayhead .link { font-size: 14px; letter-spacing: 0; text-transform: none; font-weight: 600; }
+.item.star .ti { color: var(--ink); }
+.item.star { box-shadow: inset 4px 0 0 var(--accent); }
+.item .prog { color: var(--muted); font-size: 13px; font-weight: 600; }
+.tl { position: relative; }
+.tl-h { position: absolute; left: 0; right: 0; border-top: 1px solid var(--sep); }
+.tl-h span { position: absolute; top: -8px; left: 8px; font-size: 11px; color: var(--muted); background: var(--cell); padding-right: 4px; font-variant-numeric: tabular-nums; }
+.tl-b { position: absolute; border: 0; border-left: 4px solid var(--c); border-radius: 10px; background: color-mix(in srgb, var(--c) 20%, var(--cell)); text-align: left; padding: 4px 8px; overflow: hidden; cursor: pointer; font-size: 12px; color: var(--muted); display: grid; align-content: start; }
+.tl-b b { font-size: 14px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-b.short span { display: none; }
+.tl-b.short { padding-top: 2px; }
+.tl-b.done { opacity: .5; } .tl-b.done b { text-decoration: line-through; }
+.tl-b.star { box-shadow: 0 0 0 2px var(--accent); }
+.tl-free { position: absolute; left: 66px; right: 6px; border: 2px dashed var(--sep); border-radius: 10px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; display: grid; place-items: center; overflow: hidden; }
+.tl-now { position: absolute; left: 60px; right: 0; height: 2px; background: var(--accent); z-index: 2; pointer-events: none; }
+.tl-now::before { content: ""; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.steps-list { display: grid; gap: 2px; }
+.steps-list label { display: flex; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; }
+.steps-list input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+.steps-list .done span { text-decoration: line-through; color: var(--muted); }
+.sheet select { border: 0; background: var(--fill); border-radius: 8px; padding: 6px 10px; }
+.toast .undo { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 13px; cursor: pointer; }
+.confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; }
+.cheer { position: fixed; left: 50%; top: 38%; transform: translate(-50%, -50%); z-index: 61; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 18px; line-height: 1.3; padding: 16px 22px; border-radius: 20px; box-shadow: var(--glow); text-align: center; width: max-content; max-width: min(340px, 88vw); pointer-events: none; animation: cheer 2.6s ease forwards; }
+.cheer.big { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 30px; animation-duration: 3.6s; }
+@keyframes cheer { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.7); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } 18% { transform: translate(-50%, -50%) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%); } }
+@media (prefers-reduced-motion: reduce) { .cheer { animation-name: fade; } @keyframes fade { 0%, 85% { opacity: 1; } 100% { opacity: 0; } } }
+.weekstat { display: flex; align-items: baseline; gap: 10px; }
+.weekstat b { font-family: var(--display); font-size: 48px; font-weight: 400; line-height: 1; color: var(--accent-text); }
+.bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; }
+.bars > div { display: grid; justify-items: center; gap: 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; }
+.bars .v { width: 100%; max-width: 30px; min-height: 4px; background: var(--fill); border-radius: 6px; display: flex; align-items: flex-end; overflow: hidden; }
+.bars .v i { display: block; width: 100%; background: var(--accent); }
 
 /* Bichos: a word on a tilted yellow highlighter block. */
 .hl { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 0 .2em; transform: skew(-8deg); box-shadow: 4px 4px 0 var(--ink); }
@@ -328,6 +368,7 @@ h1 { font-size: 46px; }
       <div class="top">
         <button class="link" id="todayBtn" data-i18n="today">Hoy</button>
         <div class="spacer"></div>
+        <button class="chev" id="searchBtn" data-i18n-aria="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
         <button class="link" id="viewBtn" aria-pressed="false">Mes</button>
         <button class="chev" id="prevBtn" aria-label=""><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
         <button class="chev" id="nextBtn" aria-label=""><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
@@ -405,6 +446,16 @@ h1 { font-size: 46px; }
             <select id="energy"><option value="mañana" data-i18n="morning"></option><option value="tarde" data-i18n="afternoon"></option><option value="noche" data-i18n="night"></option></select>
           </label>
         </div>
+        <h3 class="sub" data-i18n="summaries"></h3>
+        <div class="group">
+          <label class="toggle"><span data-i18n="morningBrief"></span> <input type="checkbox" id="briefMOn"></label>
+          <div class="toggle" id="briefMRow"><span><span data-i18n="atTime"></span> <input type="time" id="briefM" value="08:00"></span></div>
+          <label class="toggle"><span data-i18n="eveningBrief"></span> <input type="checkbox" id="briefEOn"></label>
+          <div class="toggle" id="briefERow"><span><span data-i18n="atTime"></span> <input type="time" id="briefE" value="21:00"></span></div>
+          <label class="toggle"><span data-i18n="weeklyBrief"></span> <input type="checkbox" id="briefWOn"></label>
+          <button class="link" id="seeWeek" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
+        </div>
+        <p class="foot" data-i18n="briefFoot"></p>
         <h3 class="sub" data-i18n="appearance"></h3>
         <div class="group">
           <label class="toggle"><span data-i18n="theme"></span>
@@ -423,6 +474,13 @@ h1 { font-size: 46px; }
             <select id="datefmt"><option value="es" data-i18n="dmy"></option><option value="en" data-i18n="mdy"></option></select>
           </label>
         </div>
+        <h3 class="sub" data-i18n="yourData"></h3>
+        <div class="group">
+          <button class="link" id="backupBtn" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="backupDl"></button>
+          <button class="link" id="restoreBtn" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="backupRestore"></button>
+        </div>
+        <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+        <p class="foot" data-i18n="backupFoot"></p>
         <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
           <button class="link" id="logout" style="justify-self:start;color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
@@ -708,6 +766,107 @@ h1 { font-size: 46px; }
       missingStepNote: "Ce mot de passe protège ton agenda et ta clé d'IA.", password: "Mot de passe", enterPw: "Écris ton mot de passe pour entrer.", enter: "Entrer", wrongPw: "Mot de passe incorrect.",
     },
   };
+  // Round 2 texts: repeats, tasks without a time, search, undo, timeline, summaries, photos, celebrations, backup.
+  Object.assign(I18N.es, {
+    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer",
+    deleted: "🗑️ {t}: borrada", deletedSeries: "🗑️ Borré esta y las que siguen", delOne: "Borrar solo esta", delSeries: "Borrar esta y las que siguen",
+    repeat: "Repetir", rep_none: "No se repite", rep_daily: "Todos los días", rep_weekdays: "De lunes a viernes", rep_weekly: "Cada semana", rep_monthly: "Cada mes",
+    repEvery: "Cada {d}", repMonthDay: "Cada mes, el día {n}", repeats: "Se repite",
+    anyTimeShort: "Sin hora", anyTimeTitle: "Sin hora y todo el día", anyTimeChip: "Sin hora", allDayTitle: "Todo el día",
+    findSlots: "Buscar huecos", findSlot: "🕐 Buscarle un hueco", noSlot: "No encontré un hueco libre ese día", placedAt: "🕐 {t}: a las {h}", placedN: "🕐 Acomodé {n} en tus huecos libres",
+    viewList: "Lista", viewHours: "Horas", freeGap: "Libre · {d}", durH: "{h} h{m}",
+    runningLate: "Se me hizo tarde", qRunningLate: "Se me hizo tarde. Son las {t}. Reacomoda lo que me queda de hoy desde ahora y dime qué conviene pasar a mañana.",
+    star: "⭐ Marcar como importante", unstar: "Quitar de importantes", starOn: "⭐ {t}: importante",
+    splitSteps: "🪜 Dividir en pasos", stepsTitle: "Pasos",
+    fromPhoto: "📷 Desde una foto", photoHint: "Un flyer, una cita o una captura", readingPhoto: "Leyendo la foto...", nothingFound: "No encontré fechas ni tareas en esa foto",
+    actCreateAny: "{e} Crear \"{t}\" el {d}, sin hora",
+    cheer1: "¡{t}: listo! Una cosa menos ✨", cheer2: "¡Bien ahí! {t} quedó hecho 💪", cheer3: "{t} ✓ ¡Así se hace! 🎉", cheer4: "¡Tachado! {t} ya es historia 🙌",
+    dayComplete: "¡Día completo! Hiciste todo lo de hoy",
+    eveningTitle: "Cierre del día", leftOne: "Te queda 1 cosa de hoy", leftMany: "Te quedan {n} cosas de hoy", moveAllTomorrow: "Pasar todo a mañana", movedN: "↪️ {n} pasaron a mañana",
+    weekTitle: "Tu semana", weekDone: "cosas hechas en los últimos 7 días", bestDay: "Tu mejor día fue el {d}: {n} hechas 💪", nextWeekN: "En los próximos 7 días: {n}",
+    planWeek: "Planear la semana conmigo", qPlanWeek: "Ayúdame a planear la semana que viene: qué es lo más importante y si algo choca.",
+    summaries: "Resúmenes", morningBrief: "Resumen de la mañana", eveningBrief: "Cierre de la noche", weeklyBrief: "Resumen del domingo", atTime: "A las",
+    seeWeek: "Ver resumen de la semana", briefFoot: "Llegan como aviso. El de la noche te deja pasar lo pendiente a mañana; el del domingo, a las 6:00 PM.",
+    yourData: "Tus datos", backupDl: "Descargar una copia", backupRestore: "Recuperar una copia",
+    backupFoot: "La copia es un archivo con todas tus tareas y cumpleaños. Guárdalo donde quieras.", backupDone: "Copia descargada",
+    restoreConfirm: "¿Agrego las {n} tareas y cumpleaños de esta copia? Lo que ya tienes se queda.", restored: "Listo: recuperé {n} cosas", restoreBad: "Ese archivo no es una copia de Pendi",
+    offlineNote: "Sin internet: guardo todo y lo subo cuando vuelva", backOnline: "Conexión de vuelta: todo al día",
+  });
+  Object.assign(I18N.en, {
+    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo",
+    deleted: "🗑️ {t}: deleted", deletedSeries: "🗑️ Deleted this one and the ones after", delOne: "Delete only this one", delSeries: "Delete this and the ones after",
+    repeat: "Repeat", rep_none: "Doesn't repeat", rep_daily: "Every day", rep_weekdays: "Monday to Friday", rep_weekly: "Every week", rep_monthly: "Every month",
+    repEvery: "Every {d}", repMonthDay: "Every month, on day {n}", repeats: "Repeats",
+    anyTimeShort: "No time", anyTimeTitle: "No time and all day", anyTimeChip: "No set time", allDayTitle: "All day",
+    findSlots: "Find free time", findSlot: "🕐 Find it a free slot", noSlot: "I couldn't find a free slot that day", placedAt: "🕐 {t}: at {h}", placedN: "🕐 Fit {n} into your free time",
+    viewList: "List", viewHours: "Hours", freeGap: "Free · {d}", durH: "{h} h{m}",
+    runningLate: "I'm running late", qRunningLate: "I'm running late. It's {t}. Rearrange what's left of today starting now and tell me what to move to tomorrow.",
+    star: "⭐ Mark as important", unstar: "Remove from important", starOn: "⭐ {t}: important",
+    splitSteps: "🪜 Break into steps", stepsTitle: "Steps",
+    fromPhoto: "📷 From a photo", photoHint: "A flyer, an appointment or a screenshot", readingPhoto: "Reading the photo...", nothingFound: "I didn't find dates or tasks in that photo",
+    actCreateAny: "{e} Create \"{t}\" on {d}, no set time",
+    cheer1: "{t}: done! One less thing ✨", cheer2: "Nice! {t} is done 💪", cheer3: "{t} ✓ That's how it's done! 🎉", cheer4: "Crossed off! {t} is history 🙌",
+    dayComplete: "Day complete! You did everything today",
+    eveningTitle: "End of the day", leftOne: "1 thing left from today", leftMany: "{n} things left from today", moveAllTomorrow: "Move all to tomorrow", movedN: "↪️ {n} moved to tomorrow",
+    weekTitle: "Your week", weekDone: "things done in the last 7 days", bestDay: "Your best day was {d}: {n} done 💪", nextWeekN: "In the next 7 days: {n}",
+    planWeek: "Plan the week with me", qPlanWeek: "Help me plan the coming week: what matters most and whether anything clashes.",
+    summaries: "Summaries", morningBrief: "Morning summary", eveningBrief: "Evening wrap-up", weeklyBrief: "Sunday summary", atTime: "At",
+    seeWeek: "See this week's summary", briefFoot: "They arrive as notifications. The evening one lets you move what's left to tomorrow; Sunday's comes at 6:00 PM.",
+    yourData: "Your data", backupDl: "Download a backup", backupRestore: "Restore a backup",
+    backupFoot: "The backup is a file with all your tasks and birthdays. Keep it wherever you like.", backupDone: "Backup downloaded",
+    restoreConfirm: "Add the {n} tasks and birthdays from this backup? What you already have stays.", restored: "Done: restored {n} items", restoreBad: "That file isn't a Pendi backup",
+    offlineNote: "No internet: I'm saving everything and will upload it when it's back", backOnline: "Back online: all up to date",
+  });
+  Object.assign(I18N.pt, {
+    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer",
+    deleted: "🗑️ {t}: apagada", deletedSeries: "🗑️ Apaguei esta e as seguintes", delOne: "Apagar só esta", delSeries: "Apagar esta e as seguintes",
+    repeat: "Repetir", rep_none: "Não se repete", rep_daily: "Todos os dias", rep_weekdays: "De segunda a sexta", rep_weekly: "Toda semana", rep_monthly: "Todo mês",
+    repEvery: "Toda {d}", repMonthDay: "Todo mês, no dia {n}", repeats: "Se repete",
+    anyTimeShort: "Sem hora", anyTimeTitle: "Sem hora e o dia todo", anyTimeChip: "Sem hora", allDayTitle: "O dia todo",
+    findSlots: "Buscar horários livres", findSlot: "🕐 Encontrar um horário livre", noSlot: "Não encontrei um horário livre nesse dia", placedAt: "🕐 {t}: às {h}", placedN: "🕐 Encaixei {n} nos seus horários livres",
+    viewList: "Lista", viewHours: "Horas", freeGap: "Livre · {d}", durH: "{h} h{m}",
+    runningLate: "Estou atrasado", qRunningLate: "Estou atrasado. São {t}. Reorganize o que me resta de hoje a partir de agora e diga o que vale passar para amanhã.",
+    star: "⭐ Marcar como importante", unstar: "Tirar dos importantes", starOn: "⭐ {t}: importante",
+    splitSteps: "🪜 Dividir em passos", stepsTitle: "Passos",
+    fromPhoto: "📷 De uma foto", photoHint: "Um folheto, uma consulta ou um print", readingPhoto: "Lendo a foto...", nothingFound: "Não encontrei datas nem tarefas nessa foto",
+    actCreateAny: "{e} Criar \"{t}\" em {d}, sem hora",
+    cheer1: "{t}: pronto! Uma coisa a menos ✨", cheer2: "Boa! {t} está feito 💪", cheer3: "{t} ✓ É assim que se faz! 🎉", cheer4: "Riscado! {t} já era 🙌",
+    dayComplete: "Dia completo! Você fez tudo hoje",
+    eveningTitle: "Fim do dia", leftOne: "Falta 1 coisa de hoje", leftMany: "Faltam {n} coisas de hoje", moveAllTomorrow: "Passar tudo para amanhã", movedN: "↪️ {n} passaram para amanhã",
+    weekTitle: "Sua semana", weekDone: "coisas feitas nos últimos 7 dias", bestDay: "Seu melhor dia foi {d}: {n} feitas 💪", nextWeekN: "Nos próximos 7 dias: {n}",
+    planWeek: "Planejar a semana comigo", qPlanWeek: "Me ajude a planejar a próxima semana: o que é mais importante e se algo se choca.",
+    summaries: "Resumos", morningBrief: "Resumo da manhã", eveningBrief: "Fechamento da noite", weeklyBrief: "Resumo de domingo", atTime: "Às",
+    seeWeek: "Ver o resumo da semana", briefFoot: "Chegam como aviso. O da noite deixa você passar o que falta para amanhã; o de domingo chega às 18:00.",
+    yourData: "Seus dados", backupDl: "Baixar uma cópia", backupRestore: "Recuperar uma cópia",
+    backupFoot: "A cópia é um arquivo com todas as suas tarefas e aniversários. Guarde onde quiser.", backupDone: "Cópia baixada",
+    restoreConfirm: "Adiciono as {n} tarefas e aniversários desta cópia? O que você já tem continua.", restored: "Pronto: recuperei {n} itens", restoreBad: "Esse arquivo não é uma cópia do Pendi",
+    offlineNote: "Sem internet: guardo tudo e envio quando voltar", backOnline: "Conexão de volta: tudo em dia",
+  });
+  Object.assign(I18N.fr, {
+    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler",
+    deleted: "🗑️ {t} : supprimée", deletedSeries: "🗑️ Supprimé celle-ci et les suivantes", delOne: "Supprimer seulement celle-ci", delSeries: "Supprimer celle-ci et les suivantes",
+    repeat: "Répéter", rep_none: "Ne se répète pas", rep_daily: "Tous les jours", rep_weekdays: "Du lundi au vendredi", rep_weekly: "Chaque semaine", rep_monthly: "Chaque mois",
+    repEvery: "Chaque {d}", repMonthDay: "Chaque mois, le {n}", repeats: "Se répète",
+    anyTimeShort: "Sans heure", anyTimeTitle: "Sans heure et toute la journée", anyTimeChip: "Sans heure", allDayTitle: "Toute la journée",
+    findSlots: "Trouver des créneaux", findSlot: "🕐 Lui trouver un créneau", noSlot: "Je n'ai pas trouvé de créneau libre ce jour-là", placedAt: "🕐 {t} : à {h}", placedN: "🕐 J'en ai placé {n} dans tes créneaux libres",
+    viewList: "Liste", viewHours: "Heures", freeGap: "Libre · {d}", durH: "{h} h{m}",
+    runningLate: "Je suis en retard", qRunningLate: "Je suis en retard. Il est {t}. Réorganise ce qu'il me reste aujourd'hui à partir de maintenant et dis-moi quoi passer à demain.",
+    star: "⭐ Marquer comme importante", unstar: "Retirer des importantes", starOn: "⭐ {t} : importante",
+    splitSteps: "🪜 Découper en étapes", stepsTitle: "Étapes",
+    fromPhoto: "📷 Depuis une photo", photoHint: "Un flyer, un rendez-vous ou une capture", readingPhoto: "Je lis la photo...", nothingFound: "Je n'ai trouvé ni date ni tâche sur cette photo",
+    actCreateAny: "{e} Créer « {t} » le {d}, sans heure",
+    cheer1: "{t} : fait ! Une chose de moins ✨", cheer2: "Bravo ! {t}, c'est fait 💪", cheer3: "{t} ✓ Bien joué ! 🎉", cheer4: "Rayé ! {t}, c'est de l'histoire 🙌",
+    dayComplete: "Journée complète ! Tu as tout fait aujourd'hui",
+    eveningTitle: "Fin de journée", leftOne: "Il te reste 1 chose d'aujourd'hui", leftMany: "Il te reste {n} choses d'aujourd'hui", moveAllTomorrow: "Tout passer à demain", movedN: "↪️ {n} passées à demain",
+    weekTitle: "Ta semaine", weekDone: "choses faites ces 7 derniers jours", bestDay: "Ton meilleur jour : {d}, {n} faites 💪", nextWeekN: "Dans les 7 prochains jours : {n}",
+    planWeek: "Planifier la semaine avec moi", qPlanWeek: "Aide-moi à planifier la semaine qui vient : ce qui compte le plus et si quelque chose se chevauche.",
+    summaries: "Résumés", morningBrief: "Résumé du matin", eveningBrief: "Bilan du soir", weeklyBrief: "Résumé du dimanche", atTime: "À",
+    seeWeek: "Voir le résumé de la semaine", briefFoot: "Ils arrivent comme des rappels. Celui du soir te laisse passer le reste à demain ; celui du dimanche arrive à 18 h.",
+    yourData: "Tes données", backupDl: "Télécharger une copie", backupRestore: "Restaurer une copie",
+    backupFoot: "La copie est un fichier avec toutes tes tâches et anniversaires. Garde-le où tu veux.", backupDone: "Copie téléchargée",
+    restoreConfirm: "J'ajoute les {n} tâches et anniversaires de cette copie ? Ce que tu as déjà reste.", restored: "C'est fait : {n} éléments restaurés", restoreBad: "Ce fichier n'est pas une copie de Pendi",
+    offlineNote: "Pas d'internet : je garde tout et je l'envoie au retour", backOnline: "Connexion revenue : tout est à jour",
+  });
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -767,6 +926,13 @@ h1 { font-size: 46px; }
     const [h, m] = s.split(":").map(Number);
     return `${h % 12 || 12}:${pad(m)} ${h < 12 ? "AM" : "PM"}`;
   };
+  const mins = (s) => { const [h, m] = String(s || "0:0").split(":").map(Number); return (h || 0) * 60 + (m || 0); };
+  const hhmm = (n) => pad(Math.floor(n / 60)) + ":" + pad(n % 60);
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  // For search: lower case and without accents.
+  const norm = (s) => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  const timeOf = (t) => (t.anytime ? tr("anyTimeShort") : clock(t.time));
+  const dur = (m) => (m >= 60 ? tr("durH", { h: Math.floor(m / 60), m: m % 60 ? " " + (m % 60) + " min" : "" }) : m + " min");
   function applyTheme() {
     const t = state.settings.theme || "system";
     const dark = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
@@ -793,6 +959,7 @@ h1 { font-size: 46px; }
   }
   const ai = {
     json: (input, search) => call("/api/ai", { input, search: !!search }).then((j) => j.data),
+    see: (input, image) => call("/api/ai", { input, image }).then((j) => j.data),
     transcribe: (audio) => call("/api/ai", { audio }).then((j) => String((j.data && j.data.texto) || "")),
   };
   function errText(e) {
@@ -803,9 +970,9 @@ h1 { font-size: 46px; }
     return (e && e.status ? e.message : "") || tr("errNet");
   }
 
-  const VERSION = "0.5";
+  const VERSION = "0.6";
   // ---------- state ----------
-  const state = { status: {}, tasks: [], bdays: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
+  const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
 
   function examples() {
@@ -818,45 +985,165 @@ h1 { font-size: 46px; }
   const visibleTasks = () => (state.tasks.length ? state.tasks : examples());
 
   async function loadData() {
-    state.tasks = ls.get("tasks", []); state.bdays = ls.get("bdays", []); state.settings = ls.get("settings", {});
+    state.tasks = ls.get("tasks", []); state.bdays = ls.get("bdays", []); state.series = ls.get("series", []); state.settings = ls.get("settings", {});
     if (state.status.db) {
       try {
+        await flush();
         const { items } = await call("/api/items");
-        if (items.length) {
+        // Changes made without internet that could not be sent yet win over the server's copy.
+        if (items.length && !pending()) {
           state.tasks = items.filter((r) => r.kind === "task");
           state.bdays = items.filter((r) => r.kind === "bday");
+          state.series = items.filter((r) => r.kind === "series");
           state.settings = items.find((r) => r.kind === "settings") || state.settings;
-        } else if (state.tasks.length || state.bdays.length) {
-          await call("/api/items", { upsert: [...state.tasks, ...state.bdays] });
+        } else if (!items.length && (state.tasks.length || state.bdays.length)) {
+          await call("/api/items", { upsert: [...state.tasks, ...state.bdays, ...state.series] });
         }
       } catch {}
     }
     saveLocal();
+    expandSeries();
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (state.settings.tz !== tz) saveSettings({ tz });
     setLang(); applyLang();
     if (state.settings.uiLang !== lang) saveSettings({ uiLang: lang });
   }
-  function saveLocal() { ls.set("tasks", state.tasks); ls.set("bdays", state.bdays); ls.set("settings", state.settings); }
-  async function put(row) {
+  function saveLocal() { ls.set("tasks", state.tasks); ls.set("bdays", state.bdays); ls.set("series", state.series); ls.set("settings", state.settings); }
+  const listOf = (kind) => (kind === "task" ? state.tasks : kind === "bday" ? state.bdays : state.series);
+  // batch: several changes in a row; the caller repaints once at the end.
+  async function put(row, batch) {
     if (row.kind === "task") row.start = at(row.date, row.time).toISOString();
-    const list = row.kind === "task" ? state.tasks : state.bdays;
+    const list = listOf(row.kind);
     const i = list.findIndex((r) => r.id === row.id);
     if (i >= 0) list[i] = row; else list.push(row);
-    saveLocal(); render();
-    if (state.status.db) call("/api/items", { upsert: [row] }).catch(() => {});
+    saveLocal(); if (!batch) render();
+    sync([row], []);
   }
-  async function remove(row) {
-    const list = row.kind === "task" ? state.tasks : state.bdays;
+  async function remove(row, batch) {
+    const list = listOf(row.kind);
     const i = list.findIndex((r) => r.id === row.id);
     if (i >= 0) list.splice(i, 1);
-    saveLocal(); render();
-    if (state.status.db) call("/api/items", { remove: [row.id] }).catch(() => {});
+    saveLocal(); if (!batch) render();
+    sync([], [row.id]);
   }
   function saveSettings(patch) {
     state.settings = { ...state.settings, ...patch, id: "settings", kind: "settings" };
     saveLocal();
-    if (state.status.db) call("/api/items", { upsert: [state.settings] }).catch(() => {});
+    sync([state.settings], []);
+  }
+  // Changes wait in an outbox until the server has them, so nothing is lost without internet.
+  const outbox = ls.get("outbox", { up: {}, rm: [] });
+  const pending = () => Object.keys(outbox.up).length + outbox.rm.length > 0;
+  function sync(up, rm) {
+    if (!state.status.db && !state.status.offline) return;
+    for (const r of up) { outbox.up[r.id] = r; outbox.rm = outbox.rm.filter((x) => x !== r.id); }
+    for (const id of rm) { delete outbox.up[id]; if (!outbox.rm.includes(id)) outbox.rm.push(id); }
+    ls.set("outbox", outbox); flush();
+  }
+  let flushing = null;
+  function flush() {
+    if (!state.status.db || flushing || !pending()) return flushing || Promise.resolve();
+    const up = Object.values(outbox.up), rm = outbox.rm.slice();
+    flushing = call("/api/items", { upsert: up, remove: rm }).then(() => {
+      for (const r of up) if (outbox.up[r.id] === r) delete outbox.up[r.id];
+      outbox.rm = outbox.rm.filter((x) => !rm.includes(x)); ls.set("outbox", outbox);
+      flushing = null; return flush();
+    }, () => { flushing = null; });
+    return flushing;
+  }
+  window.addEventListener("offline", () => notice(tr("offlineNote")));
+  window.addEventListener("online", async () => {
+    try { state.status = await call("/api/status"); } catch { return; }
+    if (state.status.db) { await flush(); await loadData(); syncSettings(); render(); }
+    renderSetup(); notice(tr("backOnline"));
+  });
+
+  // ---------- repeating tasks ----------
+  // A series keeps the pattern; its tasks for the next 60 days are real tasks with ids like "<series>_<date>",
+  // so reminders work as usual and two phones never create the same day twice.
+  const REP = { diaria: "daily", entre_semana: "weekdays", semanal: "weekly", mensual: "monthly" };
+  const repFromAi = (r) => (r && REP[r.frecuencia] ? { freq: REP[r.frecuencia], days: Array.isArray(r.dias) ? r.dias.map(Number).filter((x) => x >= 0 && x <= 6) : [] } : null);
+  function occurs(s, d) {
+    const k = ymd(d);
+    if (k < s.start || (s.until && k > s.until) || (s.skip || []).includes(k)) return false;
+    if (s.freq === "daily") return true;
+    if (s.freq === "weekdays") return d.getDay() >= 1 && d.getDay() <= 5;
+    if (s.freq === "weekly") return (s.days && s.days.length ? s.days : [fromYmd(s.start).getDay()]).includes(d.getDay());
+    if (s.freq === "monthly") return d.getDate() === fromYmd(s.start).getDate();
+    return false;
+  }
+  function expandSeries() {
+    const today = fromYmd(ymd(new Date()));
+    let added = false;
+    for (const s of state.series) for (let i = 0; i < 60; i++) {
+      const d = addDays(today, i), k = ymd(d), id = s.id + "_" + k;
+      if (!occurs(s, d) || state.tasks.some((t) => t.id === id)) continue;
+      put({ id, kind: "task", series: s.id, title: s.title, emoji: s.emoji, cat: s.cat, date: k, time: s.time || "", anytime: !!s.anytime, dur: s.dur || 30, tip: s.tip || "", star: !!s.star, cheer: s.cheer || "", done: false, created: Date.now() }, true);
+      added = true;
+    }
+    return added;
+  }
+  function repeatText(s) {
+    if (!s) return "";
+    if (s.freq === "weekly") return tr("repEvery", { d: andList((s.days && s.days.length ? s.days : [fromYmd(s.start).getDay()]).slice().sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((i) => dayName(new Date(2024, 0, i === 0 ? 7 : i)))) });
+    if (s.freq === "monthly") return tr("repMonthDay", { n: fromYmd(s.start).getDate() });
+    return tr("rep_" + s.freq);
+  }
+  // Saves a new task; with a repeat it becomes a series that fills the next weeks.
+  async function addTask(row, rep) {
+    if (!rep) { await put(row); return row; }
+    const { id, kind, start, date, created, done, ...rest } = row;
+    const s = { ...rest, id: uid("s"), kind: "series", start: date, freq: rep.freq, days: rep.days || [], skip: [] };
+    put(s, true); expandSeries(); render();
+    return state.tasks.filter((t) => t.series === s.id).sort((a, b) => a.date.localeCompare(b.date))[0] || row;
+  }
+
+  // ---------- changes with "Deshacer" ----------
+  function change(t, patch, msg) {
+    const prev = clone(t), next = { ...t, ...patch };
+    put(next);
+    if (patch.done && !t.done) celebrate(next);
+    if (msg) notice(msg, () => put(prev));
+  }
+  function del(t) {
+    const prev = clone(t), s = t.series && state.series.find((x) => x.id === t.series), prevS = s && clone(s);
+    if (s) put({ ...s, skip: [...(s.skip || []), t.date] }, true);
+    remove(t);
+    notice(tr("deleted", { t: t.title }), () => { if (prevS) put(prevS, true); put(prev); });
+  }
+  function delSeries(t) {
+    const s = state.series.find((x) => x.id === t.series);
+    if (!s) return del(t);
+    const gone = state.tasks.filter((x) => x.series === s.id && x.date >= t.date && !x.done), prevS = clone(s), prevT = gone.map(clone);
+    const until = ymd(addDays(fromYmd(t.date), -1));
+    if (until < s.start) remove(s, true); else put({ ...s, until }, true);
+    gone.forEach((x) => remove(x, true)); render();
+    notice(tr("deletedSeries"), () => { put(prevS, true); prevT.forEach((x) => put(x, true)); render(); });
+  }
+  // A free slot of the task's length that day, from 8:00 to 22:00 (and from now on, if it is today).
+  function freeSlot(k, len) {
+    const busy = state.tasks.filter((t) => t.date === k && !t.anytime && !t.done).map((t) => [mins(t.time), mins(t.time) + (t.dur || 30)]).sort((a, b) => a[0] - b[0]);
+    const n = new Date();
+    let from = Math.max(8 * 60, k === ymd(n) ? Math.ceil((n.getHours() * 60 + n.getMinutes() + 10) / 15) * 15 : 0);
+    for (const [a, b] of busy) { if (a - from >= len) break; from = Math.max(from, b); }
+    return from + len <= 22 * 60 ? hhmm(from) : null;
+  }
+  function placeAnytime(t) {
+    const slot = freeSlot(t.date, t.dur || 30);
+    if (!slot) { notice(tr("noSlot")); return; }
+    change(t, { time: slot, anytime: false }, tr("placedAt", { t: t.title, h: clock(slot) }));
+  }
+  function placeAll(k) {
+    const list = state.tasks.filter((t) => t.date === k && t.anytime && !t.done), prev = list.map(clone);
+    let n = 0;
+    for (const t of list) { const slot = freeSlot(k, t.dur || 30); if (slot) { put({ ...t, time: slot, anytime: false }, true); n++; } }
+    render();
+    notice(n ? tr("placedN", { n }) : tr("noSlot"), n ? () => { prev.forEach((x) => put(x, true)); render(); } : null);
+  }
+  // The number on the app icon: what is left for today.
+  function updateBadge() {
+    const n = state.tasks.filter((t) => t.date === ymd(new Date()) && !t.done).length;
+    try { if (navigator.setAppBadge) (n ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(() => {}); } catch {}
   }
 
   // ---------- day list ----------
@@ -878,7 +1165,7 @@ h1 { font-size: 46px; }
     if (!open.length) return el("span", {}, el("b", {}, tr("allDone")), " · " + tr(items.length === 1 ? "doneOne" : "doneMany", { n: items.length }));
     const parts = [el("b", {}, tr(open.length === 1 ? "thingOne" : "thingMany", { n: open.length }))];
     if (k === ymd(new Date())) {
-      const next = open.map((t) => ({ t, s: at(t.date, t.time) })).filter((x) => x.s > new Date()).sort((a, b) => a.s - b.s)[0];
+      const next = open.filter((t) => !t.anytime).map((t) => ({ t, s: at(t.date, t.time) })).filter((x) => x.s > new Date()).sort((a, b) => a.s - b.s)[0];
       if (next) {
         const m = Math.round((next.s - Date.now()) / 60000);
         parts.push(` · ${m < 60 ? tr("nextIn", { n: Math.max(1, m) }) : tr("nextAt", { t: clock(next.t.time) })}: ${icon(next.t)} ${next.t.title}`);
@@ -917,30 +1204,83 @@ h1 { font-size: 46px; }
     const bds = bdaysOn(d);
     const items = list.filter((t) => t.date === k).sort((a, b) => a.time.localeCompare(b.time));
     $("summary").replaceChildren(daySummary(k, items));
+    updateBadge();
     if (!items.length && !bds.length) {
       box.append(el("div", { class: "list" }, el("div", { class: "empty" }, el("div", {}, tr("nothing")),
         el("button", { class: "btn small", onclick: () => { setDump(k); showTab("organize"); } }, tr("organizeThisDay")))));
       return;
     }
-    const ul = el("div", { class: "list" });
-    for (const b of bds) ul.append(el("button", { class: "item", style: "--c: var(--c-social)", onclick: () => showTab("bdays") },
-      el("span", { class: "t" }, tr("allDay")), el("span", { class: "bar" }), el("span", {}, el("div", { class: "ti" }, "🎂 " + tr("bdayOf", { n: b.name })), el("div", { class: "tip" }, tr("tapGifts")))));
-    const now = Date.now();
-    let lineDone = k !== today;
-    for (const t of items) {
-      const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000);
-      if (!lineDone && s.getTime() > now) { ul.append(el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date()))))); lineDone = true; }
-      const live = s.getTime() <= now && now < e.getTime();
-      const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : ""), style: `--c: var(--c-${cat(t.cat)})`,
-          onclick: () => { if (!row.dragged) openSheet(t); } },
-        el("span", { class: "t" }, clock(t.time), el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
-        el("span", {}, el("div", { class: "ti", "data-example": t.example ? tr("exampleTag") : null }, `${icon(t)} ${t.title}`), t.tip ? el("div", { class: "tip" }, t.tip) : null));
-      ul.append(t.example ? row : swipeable(row, t));
+    const any = items.filter((t) => t.anytime), timed = items.filter((t) => !t.anytime);
+    const late = k === today && timed.some((t) => !t.done && !t.example);
+    box.append(el("div", { class: "daytools" },
+      el("div", { class: "seg2", role: "group" }, ["list", "hours"].map((v) => el("button", { "aria-pressed": String(dayView === v), onclick: () => { dayView = v; ls.set("dayView", v); renderCal(); } }, tr(v === "list" ? "viewList" : "viewHours")))),
+      el("div", { class: "spacer" }),
+      late ? el("button", { class: "btn small", onclick: runningLate }, tr("runningLate")) : null));
+    // Birthdays and tasks without a time go in a tray above the hours.
+    if (bds.length || any.length) {
+      const top = el("div", { class: "list" });
+      for (const b of bds) top.append(el("button", { class: "item", style: "--c: var(--c-social)", onclick: () => showTab("bdays") },
+        el("span", { class: "t" }, tr("allDay")), el("span", { class: "bar" }), el("span", {}, el("div", { class: "ti" }, "🎂 " + tr("bdayOf", { n: b.name })), el("div", { class: "tip" }, tr("tapGifts")))));
+      for (const t of any) top.append(swipeable(taskRow(t), t));
+      box.append(el("div", { class: "trayhead" }, el("span", {}, tr(any.length ? "anyTimeTitle" : "allDayTitle")),
+        any.some((t) => !t.done) ? el("button", { class: "link", onclick: () => placeAll(k) }, tr("findSlots")) : null), top);
     }
-    if (!lineDone) ul.append(el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date())))));
-    box.append(ul);
+    if (dayView === "hours") { if (timed.length || k === today) box.append(timeline(timed, k)); }
+    else if (timed.length) {
+      const ul = el("div", { class: "list" }), now = Date.now();
+      let lineDone = k !== today;
+      for (const t of timed) {
+        if (!lineDone && at(t.date, t.time).getTime() > now) { ul.append(nowMark()); lineDone = true; }
+        ul.append(t.example ? taskRow(t) : swipeable(taskRow(t), t));
+      }
+      if (!lineDone) ul.append(nowMark());
+      box.append(ul);
+    }
     if (state.tasks.length && !ls.get("swiped", false)) box.append(el("div", { class: "hint", style: "margin-top:8px" }, tr("swipeHint")));
   }
+  const nowMark = () => el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date()))));
+  function taskRow(t) {
+    const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000), now = Date.now();
+    const live = !t.anytime && s.getTime() <= now && now < e.getTime();
+    const steps = t.steps && t.steps.length ? ` ${t.steps.filter((x) => x.done).length}/${t.steps.length}` : "";
+    const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : "") + (t.star ? " star" : ""), style: `--c: var(--c-${cat(t.cat)})`,
+        onclick: () => { if (!row.dragged) openSheet(t); } },
+      el("span", { class: "t" }, t.anytime ? tr("anyTimeShort") : clock(t.time), t.anytime ? null : el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
+      el("span", {}, el("div", { class: "ti", "data-example": t.example ? tr("exampleTag") : null }, `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`,
+          t.series ? el("span", { class: "prog", title: tr("repeats") }, " 🔁") : null, steps ? el("span", { class: "prog" }, steps) : null),
+        t.tip ? el("div", { class: "tip" }, t.tip) : null));
+    return row;
+  }
+  // The day as blocks as tall as they last, with the free gaps in between (tap a gap to fill it).
+  let dayView = ls.get("dayView", "list");
+  function timeline(timed, k) {
+    const HOUR = 64, n0 = new Date(), isToday = k === ymd(n0), nowM = n0.getHours() * 60 + n0.getMinutes();
+    let a0 = 8 * 60, a1 = 21 * 60;
+    for (const t of timed) { a0 = Math.min(a0, mins(t.time)); a1 = Math.max(a1, mins(t.time) + (t.dur || 30)); }
+    if (isToday) { a0 = Math.min(a0, nowM); a1 = Math.max(a1, nowM + 30); }
+    a0 = Math.floor(a0 / 60) * 60; a1 = Math.min(24 * 60, Math.ceil(a1 / 60) * 60);
+    const y = (m) => 10 + ((m - a0) / 60) * HOUR;
+    const box = el("div", { class: "list tl", style: `height:${y(a1) + 10}px` });
+    for (let m = a0; m <= a1; m += 60) box.append(el("div", { class: "tl-h", style: `top:${y(m)}px` }, el("span", {}, clock(hhmm(m % (24 * 60))))));
+    const lanes = [];
+    const blocks = timed.slice().sort((p, q) => mins(p.time) - mins(q.time)).map((t) => {
+      const s = mins(t.time), e = s + Math.max(20, t.dur || 30);
+      let c = 0; while (lanes[c] > s) c++; lanes[c] = e;
+      return { t, s, e, c };
+    });
+    const n = Math.max(1, lanes.length);
+    let from = isToday ? Math.max(a0, Math.ceil(nowM / 15) * 15) : a0;
+    for (const [s, e] of [...blocks.filter((b) => !b.t.done).map((b) => [b.s, b.e]), [a1, a1]]) {
+      if (s - from >= 30) box.append(el("button", { class: "tl-free", style: `top:${y(from) + 3}px;height:${y(s) - y(from) - 6}px`, onclick: ((f) => () => openAdd({ date: k, time: hhmm(f) }))(from) }, tr("freeGap", { d: dur(s - from) })));
+      from = Math.max(from, e);
+    }
+    for (const b of blocks) box.append(el("button", { class: "tl-b" + (b.t.done ? " done" : "") + (b.t.star ? " star" : "") + (b.e - b.s < 45 ? " short" : ""), onclick: () => openSheet(b.t),
+        style: `--c: var(--c-${cat(b.t.cat)});top:${y(b.s) + 1}px;height:${y(b.e) - y(b.s) - 2}px;left:calc(64px + (100% - 70px) * ${b.c / n});width:calc((100% - 70px) / ${n} - 4px)` },
+      el("b", {}, `${b.t.star ? "⭐ " : ""}${icon(b.t)} ${b.t.title}`), el("span", {}, `${clock(b.t.time)} – ${clock(hhmm((b.s + (b.t.dur || 30)) % 1440))}`)));
+    if (isToday && nowM >= a0 && nowM <= a1) box.append(el("div", { class: "tl-now", style: `top:${y(nowM)}px` }));
+    return box;
+  }
+  function runningLate() { showTab("chat"); sendChat(tr("qRunningLate", { t: clock(hm(new Date())) })); }
   // Swipe right = done, swipe left = move to tomorrow.
   function swipeable(row, t) {
     const wrap = el("div", { class: "swipe" }, el("div", { class: "under" }, el("span", { class: "l" }, tr("swDone")), el("span", { class: "r" }, tr("swLater"))), row);
@@ -956,8 +1296,8 @@ h1 { font-size: 46px; }
     const end = () => {
       if (id === null) return;
       id = null; wrap.classList.remove("dragging");
-      if (on && dx > 90) { ls.set("swiped", true); put({ ...t, done: !t.done, snooze: null }); notice(t.done ? tr("markedPending") : tr("doneMsg", { t: t.title })); return; }
-      if (on && dx < -90) { ls.set("swiped", true); put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(tr("movedTomorrow", { t: t.title })); return; }
+      if (on && dx > 90) { ls.set("swiped", true); change(t, { done: !t.done, snooze: null }, t.done ? tr("markedPending") : tr("doneMsg", { t: t.title })); return; }
+      if (on && dx < -90) { ls.set("swiped", true); change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title })); return; }
       row.style.transform = ""; wrap.classList.remove("go-done", "go-later");
       setTimeout(() => { row.dragged = false; }, 50);
     };
@@ -966,9 +1306,38 @@ h1 { font-size: 46px; }
   }
   function scrollToNow() {}
   // Small message at the top that leaves after 2.5 s.
-  function notice(text) {
-    const n = el("div", { class: "toast", role: "status", style: "grid-template-columns:1fr;padding:12px 16px" }, el("b", {}, text));
-    $("toasts").prepend(n); setTimeout(() => n.remove(), 2500);
+  // With undo, it stays 6 s and has a "Deshacer" button.
+  function notice(text, undo) {
+    const n = el("div", { class: "toast", role: "status", style: `grid-template-columns:1fr${undo ? " auto" : ""};padding:12px 16px;align-items:center` }, el("b", {}, text),
+      undo ? el("button", { class: "undo", onclick: (e) => { e.stopPropagation(); n.remove(); undo(); } }, tr("undo")) : null);
+    $("toasts").prepend(n); setTimeout(() => n.remove(), undo ? 6000 : 2500);
+  }
+  // Confetti and a phrase about the task; a bigger one when the whole day is done.
+  function celebrate(t) {
+    const today = ymd(new Date()), all = state.tasks.filter((x) => x.date === today);
+    const dayDone = t.date === today && all.length > 1 && all.every((x) => x.done);
+    confetti(dayDone ? 160 : 80);
+    const c = el("div", { class: "cheer" + (dayDone ? " big" : ""), role: "status" }, dayDone ? "🎉 " + tr("dayComplete") : t.cheer || tr("cheer" + (1 + Math.floor(Math.random() * 4)), { t: t.title }));
+    document.body.append(c); setTimeout(() => c.remove(), dayDone ? 3700 : 2700);
+  }
+  function confetti(n) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const r = devicePixelRatio || 1, cv = el("canvas", { class: "confetti" });
+    const W = (cv.width = innerWidth * r), H = (cv.height = innerHeight * r), g = cv.getContext("2d");
+    const css = getComputedStyle(document.documentElement);
+    const colors = ["--accent", "--c-social", "--c-trabajo", "--c-salud", "--c-creativo", "--c-personal"].map((v) => css.getPropertyValue(v).trim());
+    const ps = Array.from({ length: n }, (_, i) => ({ x: W / 2, y: H * 0.4, vx: (Math.random() - 0.5) * 22 * r, vy: (-8 - Math.random() * 16) * r, s: (6 + Math.random() * 6) * r, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.4, c: i % 2 ? colors[0] : colors[i % colors.length] }));
+    document.body.append(cv);
+    const t0 = performance.now();
+    const step = (now) => {
+      const k = (now - t0) / 1000; g.clearRect(0, 0, W, H);
+      for (const p of ps) {
+        p.vy += 0.6 * r; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.a += p.va;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.a); g.globalAlpha = Math.max(0, 1 - k / 2.2); g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); g.restore();
+      }
+      if (k < 2.2) requestAnimationFrame(step); else cv.remove();
+    };
+    requestAnimationFrame(step);
   }
 
   // ---------- event sheet ----------
@@ -983,85 +1352,221 @@ h1 { font-size: 46px; }
   function showSheet(sh) { const bg = $("sheet"); bg.replaceChildren(sh); bg.hidden = false; }
   function openSheet(t) {
     const end = new Date(at(t.date, t.time).getTime() + t.dur * 60000);
+    const s = t.series && state.series.find((x) => x.id === t.series);
+    const real = !t.example;
+    const then = (fn) => () => { closeSheet(); fn(); };
+    const split = el("button", { onclick: () => splitSteps(t, split) }, tr("splitSteps"));
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)),
-        el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
+        el("div", {}, el("h2", {}, (t.star ? "⭐ " : "") + t.title), el("div", { class: "when" }, t.anytime ? niceDate(t.date) + " · " + tr("anyTimeShort") : tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
+      s ? el("div", { class: "muted" }, "🔁 " + repeatText(s)) : null,
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
-      el("div", { class: "muted" }, t.example ? tr("exampleNote") : tr("notifyYou", { x: remindText() })),
+      t.steps && t.steps.length ? el("div", { class: "steps-list" }, el("b", {}, tr("stepsTitle")), t.steps.map((st, i) => {
+        const lab = el("label", { class: st.done ? "done" : "" },
+          el("input", { type: "checkbox", checked: !!st.done, onchange: (e) => { lab.className = e.target.checked ? "done" : ""; toggleStep(t, i, e.target.checked); } }),
+          el("span", {}, st.t + (st.min ? ` · ${st.min} min` : "")));
+        return lab;
+      })) : null,
+      el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("notifyYou", { x: remindText() })),
       el("div", { class: "actions" },
-        t.example ? null : el("button", { onclick: () => { put({ ...t, done: !t.done, snooze: null }); closeSheet(); } }, tr(t.done ? "markPending" : "markDone")),
-        t.example ? null : el("button", { onclick: () => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); closeSheet(); notice(tr("movedTomorrow", { t: t.title })); } }, tr("moveTomorrow")),
-        el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
-        el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
-        t.example ? null : el("button", { class: "danger", onclick: () => { remove(t); closeSheet(); } }, tr("del"))),
+        real ? el("button", { onclick: then(() => change(t, { done: !t.done, snooze: null }, t.done ? tr("markedPending") : tr("doneMsg", { t: t.title }))) }, tr(t.done ? "markPending" : "markDone")) : null,
+        real && t.anytime && !t.done ? el("button", { onclick: then(() => placeAnytime(t)) }, tr("findSlot")) : null,
+        real ? el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
+        real ? el("button", { onclick: then(() => change(t, { star: !t.star }, t.star ? null : tr("starOn", { t: t.title }))) }, tr(t.star ? "unstar" : "star")) : null,
+        real && !(t.steps && t.steps.length) && !t.done ? split : null,
+        t.anytime ? null : el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
+        t.anytime ? null : el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
+        real ? el("button", { class: "danger", onclick: then(() => del(t)) }, tr(s ? "delOne" : "del")) : null,
+        real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null),
       el("button", { class: "btn", onclick: closeSheet }, tr("doneBtn"))));
+  }
+  // Big task into small steps (AI); the steps are a checklist inside the task.
+  async function splitSteps(t, btn) {
+    btn.disabled = true; btn.textContent = tr("thinking");
+    try {
+      const r = await ai.json(`Responde en ${AI_LANG[lang]}. Divide esta tarea en 3 a 6 pasos pequeños y concretos, en orden, para empezar sin agobiarse. Tarea: "${t.title}"${t.tip ? ` (consejo: ${t.tip})` : ""}; dura unos ${t.dur || 30} minutos en total.
+Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
+      const steps = (Array.isArray(r && r.pasos) ? r.pasos : []).slice(0, 8).map((p) => ({ t: String((p && p.paso) || (typeof p === "string" ? p : "")).slice(0, 100), min: Number(p && p.minutos) || null, done: false })).filter((p) => p.t);
+      if (!steps.length) throw { error: "invalid_json" };
+      const next = { ...t, steps }; put(next); openSheet(next);
+    } catch (e) { btn.disabled = false; btn.textContent = errText(e); }
+  }
+  function toggleStep(t, i, on) {
+    const cur = state.tasks.find((x) => x.id === t.id); if (!cur || !cur.steps) return;
+    const steps = cur.steps.map((s, j) => (j === i ? { ...s, done: on } : s));
+    if (steps.every((s) => s.done) && !cur.done) { closeSheet(); change(cur, { steps, done: true, snooze: null }, tr("doneMsg", { t: cur.title })); }
+    else put({ ...cur, steps });
+  }
+  // Search across every task and birthday.
+  function openSearch() {
+    const q = el("input", { class: "field", type: "search", placeholder: tr("searchPh"), autocomplete: "off", style: "background:var(--group)" });
+    const res = el("div", { class: "actions" });
+    const today = ymd(new Date());
+    // Upcoming first (soonest first), then the past (most recent first).
+    const order = (t) => (t.date >= today ? "0" + t.date + t.time : "1" + String(99999999 - Number(t.date.replace(/-/g, ""))).padStart(8, "0"));
+    const go = (t) => { closeSheet(); monthView = false; state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); };
+    const paint = () => {
+      const w = norm(q.value.trim()); res.replaceChildren(); res.hidden = !w;
+      if (!w) return;
+      for (const b of state.bdays.filter((b) => norm(b.name + " " + (b.notes || "")).includes(w)).slice(0, 5))
+        res.append(el("button", { onclick: () => { closeSheet(); showTab("bdays"); } }, el("b", {}, "🎂 " + b.name), el("div", { class: "muted" }, dayMonth(b.month, b.day))));
+      // A repeating task shows once: its next day.
+      const seen = new Set();
+      const hits = state.tasks.filter((t) => norm(t.title + " " + (t.tip || "")).includes(w)).sort((a, b) => order(a).localeCompare(order(b)))
+        .filter((t) => !t.series || (!seen.has(t.series) && seen.add(t.series)));
+      for (const t of hits.slice(0, 30))
+        res.append(el("button", { onclick: () => go(t) }, el("b", {}, `${icon(t)} ${t.title}`), el("div", { class: "muted" }, `${niceDate(t.date)} · ${timeOf(t)}${t.done ? " · ✓" : ""}`)));
+      if (!res.children.length) res.append(el("div", { class: "muted", style: "padding:13px 16px" }, tr("noResults")));
+    };
+    q.addEventListener("input", paint);
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("search") }, el("div", { class: "grabber" }), el("h2", {}, tr("search")), q, res, el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+    paint(); q.focus();
+  }
+  // From the evening notification: what is left of today, to finish or move.
+  function openEvening() {
+    const today = ymd(new Date()), tomorrow = ymd(addDays(new Date(), 1)), left = state.tasks.filter((t) => t.date === today && !t.done);
+    if (!left.length) { notice("🎉 " + tr("dayComplete")); return; }
+    const moveAll = () => {
+      const prev = left.map(clone);
+      left.forEach((t) => put({ ...t, date: tomorrow, done: false, snooze: null }, true)); render(); closeSheet();
+      notice(tr("movedN", { n: left.length }), () => { prev.forEach((x) => put(x, true)); render(); });
+    };
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("eveningTitle") }, el("div", { class: "grabber" }),
+      el("h2", {}, "🌙 " + tr("eveningTitle")), el("div", { class: "muted" }, tr(left.length === 1 ? "leftOne" : "leftMany", { n: left.length })),
+      el("div", { class: "actions" }, left.map((t) => el("button", { onclick: () => { closeSheet(); openQuick(t); } }, `${icon(t)} ${t.title} · ${timeOf(t)}`))),
+      el("button", { class: "btn primary", onclick: moveAll }, tr("moveAllTomorrow")),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+  }
+  // The week in review: done per day, the best day, and what comes next.
+  function openWeek() {
+    const now = new Date(), today = ymd(now), limit = ymd(addDays(now, 7));
+    const stats = [...Array(7)].map((_, i) => { const d = addDays(now, i - 6), ts = state.tasks.filter((t) => t.date === ymd(d)); return { d, n: ts.length, done: ts.filter((t) => t.done).length }; });
+    const total = stats.reduce((a, x) => a + x.n, 0), done = stats.reduce((a, x) => a + x.done, 0), max = Math.max(1, ...stats.map((x) => x.n));
+    const best = stats.slice().sort((a, b) => b.done - a.done)[0];
+    const next = state.tasks.filter((t) => t.date > today && t.date <= limit && !t.done).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("weekTitle") }, el("div", { class: "grabber" }),
+      el("h2", {}, "📊 " + tr("weekTitle")),
+      el("div", { class: "weekstat" }, el("b", {}, `${done}/${total}`), el("span", { class: "muted" }, tr("weekDone"))),
+      el("div", { class: "bars" }, stats.map((x) => el("div", {}, el("div", { class: "v", style: `height:${4 + Math.round((x.n / max) * 70)}px` }, el("i", { style: `height:${x.n ? Math.round((x.done / x.n) * 100) : 0}%` })), el("span", {}, fmt(x.d, { weekday: "short" }))))),
+      best && best.done ? el("div", { class: "tipbox" }, tr("bestDay", { d: dayName(best.d), n: best.done })) : null,
+      el("b", {}, tr("nextWeekN", { n: next.length })),
+      next.length ? el("div", { class: "actions" }, next.slice(0, 8).map((t) => el("button", { onclick: () => { closeSheet(); state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, `${icon(t)} ${t.title} · ${niceDate(t.date)}`))) : null,
+      el("button", { class: "btn primary", onclick: () => { closeSheet(); showTab("chat"); sendChat(tr("qPlanWeek")); } }, tr("planWeek")),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // Opened by tapping a notification: the task in big, with one-tap answers.
   function openQuick(t) {
     if (!t) return;
-    const mins = Math.round((at(t.date, t.time) - Date.now()) / 60000);
-    const when = mins > 0 ? (mins >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: mins })) : mins > -(t.dur || 30) ? tr("isNow") : tr("wasAt", { t: clock(t.time) });
+    const left = Math.round((at(t.date, t.time) - Date.now()) / 60000);
+    const when = t.anytime ? niceDate(t.date) : left > 0 ? (left >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: left })) : left > -(t.dur || 30) ? tr("isNow") : tr("wasAt", { t: clock(t.time) });
     const then = (fn) => () => { fn(); closeSheet(); };
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
-      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${clock(t.time)} · ${when}`))),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${timeOf(t)} · ${when}`))),
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       el("div", { class: "qa" },
-        t.done ? null : el("button", { class: "big", onclick: then(() => { markDone(t.id); notice(tr("doneMsg", { t: t.title })); }) }, tr("done")),
+        t.done ? null : el("button", { class: "big", onclick: then(() => markDone(t.id)) }, tr("done")),
         [10, 30, 60].map((m) => el("button", { onclick: then(() => { snooze(t.id, m); notice(tr("againIn", { x: m === 60 ? tr("oneHour") : tr("nMin", { n: m }) })); }) }, m === 60 ? tr("plusHour") : tr("plusMin", { n: m })))),
       el("div", { class: "actions" },
-        el("button", { onclick: then(() => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(tr("movedTomorrow", { t: t.title })); }) }, tr("moveTomorrow")),
+        el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")),
         el("button", { onclick: () => { state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, tr("seeInAgenda"))),
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // Quick add from the + button: say or type it; if there is no time, the AI picks a good one.
-  function openAdd() {
-    const day = el("input", { id: "addDate" }); day.value = ymd(new Date());
+  // opts: date, time, text (prefilled) and image (a shared picture to read right away).
+  function openAdd(opts = {}) {
+    const day = el("input", { id: "addDate" }); day.value = opts.date || ymd(new Date());
     const seg = el("div", { class: "seg" });
     const text = el("input", { class: "field", id: "addIn", placeholder: tr("whatToDo"), autocomplete: "off", style: "background:var(--group);flex:1" });
     const mic = el("button", { type: "button", class: "mic", "data-mic": "addIn", "aria-label": tr("dictate"), onclick: () => toggleMic(mic) }, micSvg());
-    const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" });
+    const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" }); time.value = opts.time || "";
+    text.value = opts.text || "";
+    const anyChip = el("button", { type: "button", class: "chip", "aria-pressed": "false", onclick: () => {
+      const on = anyChip.getAttribute("aria-pressed") !== "true"; anyChip.setAttribute("aria-pressed", String(on)); time.disabled = on; if (on) time.value = "";
+    } }, tr("anyTimeChip"));
+    const rep = el("select", { "aria-label": tr("repeat") }, ["none", "daily", "weekdays", "weekly", "monthly"].map((v) => el("option", { value: v }, tr("rep_" + v))));
+    const days = el("div", { class: "chips", hidden: true });
+    let picked = [];
+    const paintDays = () => days.replaceChildren(...[1, 2, 3, 4, 5, 6, 0].map((i) => el("button", { type: "button", class: "chip", "aria-pressed": String(picked.includes(i)),
+      onclick: () => { picked = picked.includes(i) ? picked.filter((x) => x !== i) : [...picked, i]; paintDays(); } }, fmt(new Date(2024, 0, i === 0 ? 7 : i), { weekday: "short" }))));
+    rep.onchange = () => { days.hidden = rep.value !== "weekly"; if (rep.value === "weekly" && !picked.length) picked = [fromYmd(day.value).getDay()]; paintDays(); };
+    const repValue = () => (rep.value === "none" ? null : { freq: rep.value, days: rep.value === "weekly" ? picked : [] });
     const st = el("div", { class: "status", role: "status" });
     const go = el("button", { class: "btn primary" }, tr("add"));
+    const finish = (added) => {
+      if (!added || !added.length) { st.className = "status err"; st.textContent = tr("nothingFound"); return; }
+      closeSheet(); state.anchor = fromYmd(added[0].date); render();
+      notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${added[0].anytime ? tr("anyTimeShort").toLowerCase() : clock(added[0].time)}` : tr("addedN", { n: added.length }),
+        () => { added.forEach((t) => (t.series ? delSeries(t) : remove(t, true))); render(); });
+    };
+    const fromPhoto = async (file) => {
+      go.disabled = true; st.className = "status"; st.textContent = tr("readingPhoto");
+      try { finish(await quickAdd(text.value.trim(), day.value, time.value, { image: await shrink(file), rep: repValue() })); }
+      catch (err) { st.className = "status err"; st.textContent = errText(err); }
+      finally { go.disabled = false; }
+    };
+    const photo = el("input", { type: "file", accept: "image/*", hidden: true, onchange: () => photo.files[0] && fromPhoto(photo.files[0]) });
     const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("add"), onsubmit: async (e) => {
         e.preventDefault();
         const what = text.value.trim(); if (!what) { text.focus(); return; }
-        go.disabled = true; st.className = "status"; st.textContent = tr(time.value ? "adding" : "findingTime");
-        const added = await quickAdd(what, day.value, time.value).catch((err) => { st.className = "status err"; st.textContent = errText(err); return null; });
+        const anytime = anyChip.getAttribute("aria-pressed") === "true";
+        go.disabled = true; st.className = "status"; st.textContent = tr(time.value || anytime ? "adding" : "findingTime");
+        const added = await quickAdd(what, day.value, time.value, { anytime, rep: repValue() }).catch((err) => { st.className = "status err"; st.textContent = errText(err); return null; });
         go.disabled = false;
-        if (!added) return;
-        closeSheet(); state.anchor = fromYmd(added[0].date); render();
-        notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${clock(added[0].time)}` : tr("addedN", { n: added.length }));
+        if (added) finish(added);
       } },
       el("div", { class: "grabber" }), el("h2", {}, tr("add")),
       el("div", { class: "row", style: "flex-wrap:nowrap" }, mic, text),
       seg,
-      el("label", { class: "row muted" }, tr("hourLbl"), time, el("span", {}, tr("suggestHint"))),
+      el("label", { class: "row muted" }, tr("hourLbl"), time, anyChip),
+      el("div", { class: "muted", style: "margin-top:-8px" }, tr("suggestHint")),
+      el("label", { class: "row muted" }, tr("repeat"), rep), days,
+      el("div", { class: "row" }, el("button", { type: "button", class: "btn small", onclick: () => photo.click() }, tr("fromPhoto")), el("span", { class: "muted" }, tr("photoHint"))), photo,
       st, el("div", { class: "row" }, go, el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
-    showSheet(form); daySeg(seg, day); text.focus();
+    showSheet(form); daySeg(seg, day);
+    if (opts.image) fromPhoto(opts.image); else text.focus();
   }
-  async function quickAdd(what, date, time) {
+  // o: anytime (no time), rep (repeat), image (a photo to read).
+  async function quickAdd(what, date, time, o = {}) {
     let tareas = [];
+    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","repetir":null}]}
+"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
     try {
-      const res = await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: títulos y consejos van en ese idioma.
+      const res = o.image ? await ai.see(`Responde en ${AI_LANG[lang]}: títulos y consejos van en ese idioma.
+${nowLine()}
+Mira esta imagen: puede ser un flyer, una cita, una invitación o la captura de un mensaje. Saca cada evento o cosa por hacer con su fecha y hora. Si no dice fecha, usa ${date}. Si no dice hora, deja "hora" vacía.${what ? `\nNota de la persona: """${what.slice(0, 500)}"""` : ""}
+${shape}`, o.image) : await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: títulos y consejos van en ese idioma.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
-${time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
+${o.anytime ? "No pongas hora: deja \"hora\" vacía.\n" : time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
 ${agendaText(date, 2)}
 Texto: """${what.slice(0, 1000)}"""
-Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"${time || "16:00"}","duracion":45,"consejo":"Lleva tu documento."}]}`);
+${shape}`);
       tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
-    } catch (e) { if (!time) throw e; }
+    } catch (e) { if (o.image) throw e; }
+    if (o.image && !tareas.length) return [];
+    // Without the AI (no internet, for example) it is saved as written, without a time unless one was chosen.
     if (!tareas.length) tareas = [{ titulo: what, fecha: date, hora: time }];
     const out = [];
     for (const t of tareas.slice(0, 8)) {
-      const okTime = /^\d{1,2}:\d{2}$/.test(t.hora || "") ? t.hora.padStart(5, "0") : time || hm(new Date(Math.ceil(Date.now() / 3600000) * 3600000));
+      const has = /^\d{1,2}:\d{2}$/.test(t.hora || ""), anytime = !!o.anytime || (!has && !time);
       const row = { id: uid("t"), kind: "task", title: String(t.titulo || what).slice(0, 120), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha || "") ? t.fecha : date,
-        time: okTime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), done: false, created: Date.now() };
-      await put(row); out.push(row);
+        time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), done: false, created: Date.now() };
+      out.push(await addTask(row, o.rep || repFromAi(t.repetir)));
     }
     return out;
+  }
+  // Photos go to the AI as a JPEG of at most 1280 px, to keep them small.
+  async function shrink(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = url; });
+      const k = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = el("canvas", { width: Math.round(img.naturalWidth * k), height: Math.round(img.naturalHeight * k) });
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      return { mime: "image/jpeg", data: c.toDataURL("image/jpeg", 0.82).split(",")[1] };
+    } finally { URL.revokeObjectURL(url); }
   }
   const emojiOnly = (e) => { const m = String(e || "").match(/\p{Extended_Pictographic}(️|‍\p{Extended_Pictographic})*|\p{Regional_Indicator}{2}/u); return m ? m[0] : null; };
   const micSvg = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.innerHTML = '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>'; return s; };
@@ -1092,7 +1597,7 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
     for (let i = 0; i < days; i++) {
       const d = ymd(addDays(start, i));
       const items = state.tasks.filter((t) => t.date === d).sort((a, b) => a.time.localeCompare(b.time));
-      out.push(d + " (" + dayName(addDays(start, i)) + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.time} ${t.title} (${t.dur} min${t.done ? ", hecho" : ""})`).join("; ") : "libre"));
+      out.push(d + " (" + dayName(addDays(start, i)) + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.anytime ? "sin hora" : t.time} ${t.star ? "⭐ " : ""}${t.title} (${t.dur} min${t.done ? ", hecho" : ""}${t.series ? ", se repite" : ""})`).join("; ") : "libre"));
     }
     return out.join("\n");
   }
@@ -1114,7 +1619,8 @@ Texto de la persona:
 
 Para cada tarea da: título corto, un emoji que la represente, categoría (una de: trabajo, personal, casa, salud, creativo, social, otro), duración estimada en minutos, 3 opciones de hora distintas (mañana, tarde y noche si tiene sentido; formato HH:MM 24h; sin choques), cuál recomiendas y por qué en pocas palabras, y un consejo práctico breve (1-2 frases).
 Ordena las tareas en el orden recomendado.
-Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario."}]}`;
+Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦"}]}
+"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea.`;
     try {
       const res = await ai.json(prompt);
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
@@ -1123,7 +1629,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
         title: String(t.titulo || tr("task")), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
         dur: Math.max(5, Number(t.duracion) || 30),
         options: (Array.isArray(t.opciones) ? t.opciones : []).map(String).filter((x) => /^\d{1,2}:\d{2}$/.test(x)).map((x) => x.padStart(5, "0")).slice(0, 3),
-        rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), skip: false,
+        rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), skip: false,
       })).filter((p) => p.options.length);
       state.proposals.forEach((p) => { p.pick = p.options[Math.min(p.rec, p.options.length - 1)]; });
       $("dumpStatus").textContent = res.resumen ? String(res.resumen) : tr("chooseTimes");
@@ -1149,7 +1655,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
   }
   async function scheduleAll() {
     const ps = (state.proposals || []).filter((p) => !p.skip && p.pick);
-    for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, done: false, created: Date.now() });
+    for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, done: false, created: Date.now() });
     state.proposals = null; renderProposals(); $("dump").value = "";
     $("dumpStatus").className = "status";
     $("dumpStatus").textContent = ps.length ? tr(ps.length === 1 ? "scheduledOne" : "scheduledMany", { n: ps.length }) : tr("noneChosen");
@@ -1163,8 +1669,8 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     for (const t of late.slice(0, 6)) box.append(el("div", { class: "card", style: `--c: var(--c-${cat(t.cat)})` },
       el("h3", {}, el("span", { class: "dot" }), `${icon(t)} ${t.title}`), el("div", { class: "muted" }, niceDate(t.date) + " · " + clock(t.time)),
       el("div", { class: "row" },
-        el("button", { class: "btn small", onclick: () => put({ ...t, date: ymd(addDays(new Date(), 1)) }) }, tr("moveTomorrow")),
-        el("button", { class: "btn small", onclick: () => put({ ...t, done: true }) }, tr("didIt")))));
+        el("button", { class: "btn small", onclick: () => change(t, { date: ymd(addDays(new Date(), 1)) }, tr("movedTomorrow", { t: t.title })) }, tr("moveTomorrow")),
+        el("button", { class: "btn small", onclick: () => change(t, { done: true }, tr("doneMsg", { t: t.title })) }, tr("didIt")))));
   }
 
   // ---------- chat ----------
@@ -1183,15 +1689,16 @@ Pendientes atrasados sin hacer: ${state.tasks.filter((t) => !t.done && t.date < 
 Cumpleaños guardados: ${state.bdays.map((b) => `${b.name} (${b.day}/${b.month})`).join("; ") || "ninguno"}
 
 Si la persona pide crear, mover o borrar eventos, o guardar un cumpleaños, propón las acciones; ella las confirmará. Nunca inventes ids.
-Responde solo JSON: {"respuesta":"texto para la persona","acciones":[{"tipo":"crear","titulo":"...","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve"},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
-En "cumple", "anio" y "gustos" son opcionales.
+Responde solo JSON: {"respuesta":"texto para la persona","acciones":[{"tipo":"crear","titulo":"...","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
+En "cumple", "anio" y "gustos" son opcionales. En "crear", "hora" puede ir vacía si no tiene hora fija, y "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (0 domingo a 6 sábado) si se repite.
+Las tareas marcadas con ⭐ son importantes.
 Si no hay acciones, usa "acciones":[].`;
     const turns = state.chat.filter((m) => !m.temp && !m.actions).slice(-8);
     try {
       const res = await ai.json([{ role: "user", content: rules }, ...turns]);
       state.chat.splice(state.chat.indexOf(thinking), 1);
       state.chat.push({ role: "assistant", content: String((res && res.respuesta) || tr("okDone")) });
-      const acts = (Array.isArray(res && res.acciones) ? res.acciones : []).filter((a) => a && (a.tipo === "crear" || (a.tipo === "cumple" && a.nombre && Number(a.mes) >= 1 && Number(a.mes) <= 12 && Number(a.dia) >= 1 && Number(a.dia) <= 31) || state.tasks.some((t) => t.id === String(a.id))));
+      const acts = (Array.isArray(res && res.acciones) ? res.acciones : []).filter((a) => a && ((a.tipo === "crear" && /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || "")) || (a.tipo === "cumple" && a.nombre && Number(a.mes) >= 1 && Number(a.mes) <= 12 && Number(a.dia) >= 1 && Number(a.dia) <= 31) || state.tasks.some((t) => t.id === String(a.id))));
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
       state.chat.splice(state.chat.indexOf(thinking), 1);
@@ -1200,7 +1707,7 @@ Si no hay acciones, usa "acciones":[].`;
   }
   function describe(a) {
     const t = state.tasks.find((x) => x.id === String(a.id));
-    if (a.tipo === "crear") return tr("actCreate", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha), h: clock(String(a.hora || "").padStart(5, "0")) });
+    if (a.tipo === "crear") return (/^\d{1,2}:\d{2}$/.test(a.hora || "") ? tr("actCreate", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha), h: clock(String(a.hora).padStart(5, "0")) }) : tr("actCreateAny", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha) })) + (repFromAi(a.repetir) ? " 🔁 " + repeatText({ ...repFromAi(a.repetir), start: a.fecha }) : "");
     if (a.tipo === "cumple") return tr("actBday", { n: a.nombre, d: dayMonth(Number(a.mes), Number(a.dia)) });
     if (a.tipo === "mover") return tr("actMove", { t: t.title, d: niceDate(a.fecha || t.date), h: clock(a.hora ? String(a.hora).padStart(5, "0") : t.time) });
     return tr("actDel", { t: t.title });
@@ -1209,10 +1716,10 @@ Si no hay acciones, usa "acciones":[].`;
     for (const a of msg.actions) {
       const okDate = /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || ""), okTime = /^\d{1,2}:\d{2}$/.test(a.hora || "");
       if (a.tipo === "cumple") await put({ id: uid("b"), kind: "bday", name: String(a.nombre).slice(0, 60), month: Number(a.mes), day: Number(a.dia), year: Number(a.anio) > 1900 ? Number(a.anio) : null, notes: String(a.gustos || "") });
-      if (a.tipo === "crear" && okDate && okTime) await put({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: a.hora.padStart(5, "0"), dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), done: false, created: Date.now() });
+      if (a.tipo === "crear" && okDate) await addTask({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: okTime ? a.hora.padStart(5, "0") : "", anytime: !okTime, dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), cheer: String(a.felicitacion || "").slice(0, 140), done: false, created: Date.now() }, repFromAi(a.repetir));
       const t = state.tasks.find((x) => x.id === String(a.id));
-      if (a.tipo === "mover" && t) await put({ ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, done: false });
-      if (a.tipo === "borrar" && t) await remove(t);
+      if (a.tipo === "mover" && t) await put({ ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, anytime: okTime ? false : t.anytime, done: false });
+      if (a.tipo === "borrar" && t) del(t);
     }
     msg.applied = true; renderChat();
   }
@@ -1407,8 +1914,16 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     put({ ...t, snooze: new Date(Date.now() + mins * 60000).toISOString() });
   }
   function markDone(id) {
+    const t = state.tasks.find((x) => x.id === id); if (!t || t.done) return;
+    change(t, { done: true, snooze: null }, tr("doneMsg", { t: t.title }));
+  }
+  // Opening the app from a notification: the in-app banner for that task would only repeat it.
+  function silence(id) {
     const t = state.tasks.find((x) => x.id === id); if (!t) return;
-    put({ ...t, done: true, snooze: null });
+    const key = t.id + "@" + t.date + t.time + "#";
+    [60, 30, 10].forEach((th) => fired.add(key + th));
+    if (t.snooze) fired.add(t.id + "@snooze@" + t.snooze);
+    ls.set("fired", [...fired].slice(-300));
   }
   // Quiet hours like {from:"22:00", to:"07:00"}; the range may cross midnight.
   function isQuiet() {
@@ -1421,7 +1936,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (isQuiet()) return;
     const wanted = remindList().sort((a, b) => b - a);
     for (const t of state.tasks) {
-      if (t.done) continue;
+      if (t.done || t.anytime) continue;
       if (t.snooze) {
         const s = Date.parse(t.snooze), key = t.id + "@snooze@" + t.snooze;
         if (s <= now && now - s < 30 * 60000 && !fired.has(key)) { fired.add(key); ls.set("fired", [...fired].slice(-300)); toast(t, "snooze", false); }
@@ -1484,14 +1999,26 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // Taps on a notification open the app with ?accion=snooze|done&id=... or ?tab=chat.
   function handleUrl() {
     const q = new URLSearchParams(location.search);
-    const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab");
-    if (!accion && !tab) return false;
+    const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab"), share = q.get("share");
+    if (!accion && !tab && !share) return false;
     history.replaceState(null, "", location.pathname);
+    if (id) silence(id);
     if (accion === "snooze" && id) { snooze(id, 10); notice(tr("againIn", { x: tr("nMin", { n: 10 }) })); }
-    else if (accion === "done" && id) { markDone(id); notice(tr("done")); }
+    else if (accion === "done" && id) markDone(id);
     else if (accion === "open" && id) { const t = state.tasks.find((x) => x.id === id); if (t) { state.anchor = fromYmd(t.date); render(); openQuick(t); } }
+    else if (accion === "evening") openEvening();
+    else if (accion === "week") openWeek();
+    if (share) { openShared(q.get("text") || "", q.get("img") === "1"); return true; }
     if (tab) { showTab(tab); return true; }
-    return false;
+    return !!accion;
+  }
+  // Shared to Pendi from another app (Android): the text fills the add sheet; a picture is read by the AI.
+  async function openShared(text, img) {
+    let image = null;
+    if (img && "caches" in window) {
+      try { const c = await caches.open("pendi-share"), r = await c.match("/shared-image"); if (r) { image = await r.blob(); await c.delete("/shared-image"); } } catch {}
+    }
+    showTab("cal"); openAdd({ text: text.slice(0, 500), image });
   }
 
   // ---------- push notifications ----------
@@ -1561,6 +2088,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("theme").value = state.settings.theme || "system";
     $("lang").value = LANGS[state.settings.lang] ? state.settings.lang : "system";
     applyTheme();
+    const b = state.settings.brief || {};
+    $("briefMOn").checked = b.mOn !== false; $("briefMRow").hidden = b.mOn === false; $("briefM").value = b.m || "08:00";
+    $("briefEOn").checked = b.eOn !== false; $("briefERow").hidden = b.eOn === false; $("briefE").value = b.e || "21:00";
+    $("briefWOn").checked = b.wOn !== false;
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
     $("quietFrom").value = q.from || "22:00"; $("quietTo").value = q.to || "07:00";
@@ -1571,6 +2102,24 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       saveSettings({ remind: next }); syncSettings();
     } }, m === 60 ? tr("oneHour") : tr("nMin", { n: m }))));
     document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh());
+  }
+  const saveBrief = () => { saveSettings({ brief: { mOn: $("briefMOn").checked, m: $("briefM").value || "08:00", eOn: $("briefEOn").checked, e: $("briefE").value || "21:00", wOn: $("briefWOn").checked } }); syncSettings(); };
+  // Backup: one file with everything; restoring adds what is missing and keeps what is there.
+  function backup() {
+    const data = { app: "pendi", version: VERSION, saved: new Date().toISOString(), tasks: state.tasks, bdays: state.bdays, series: state.series, settings: state.settings };
+    const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: "application/json" })), download: `pendi-${ymd(new Date())}.json` });
+    document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    notice(tr("backupDone"));
+  }
+  async function restore(file) {
+    try {
+      const d = JSON.parse(await file.text());
+      if (!d || d.app !== "pendi") throw 0;
+      const rows = [...(d.tasks || []), ...(d.bdays || []), ...(d.series || [])].filter((r) => r && r.id && ["task", "bday", "series"].includes(r.kind));
+      if (!confirm(tr("restoreConfirm", { n: rows.length }))) return;
+      rows.forEach((r) => put(r, true)); expandSeries(); render();
+      notice(tr("restored", { n: rows.length }));
+    } catch { notice(tr("restoreBad")); }
   }
   const saveQuiet = () => { saveSettings({ quiet: { on: $("quietOn").checked, from: $("quietFrom").value, to: $("quietTo").value } }); syncSettings(); };
 
@@ -1664,6 +2213,12 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     applyLang(); syncSettings(); render(); renderChat(); renderSetup(); renderPush(); renderProposals();
   };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+  ["briefMOn", "briefM", "briefEOn", "briefE", "briefWOn"].forEach((x) => { $(x).onchange = saveBrief; });
+  $("seeWeek").onclick = openWeek;
+  $("searchBtn").onclick = openSearch;
+  $("backupBtn").onclick = backup;
+  $("restoreBtn").onclick = () => $("restoreFile").click();
+  $("restoreFile").onchange = (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) restore(f); };
   $("quietOn").onchange = saveQuiet; $("quietFrom").onchange = saveQuiet; $("quietTo").onchange = saveQuiet;
   // Hidden admin mode: tap the version 5 times.
   let taps = [];
@@ -1691,7 +2246,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
   setInterval(checkReminders, 20000);
-  setInterval(() => { if (!document.hidden) renderCal(); }, 60000);
+  setInterval(() => { if (expandSeries()) render(); else if (!document.hidden) renderCal(); }, 60000);
   applyLang();
   boot();
 })();

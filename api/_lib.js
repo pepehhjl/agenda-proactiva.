@@ -70,7 +70,7 @@ export async function sendToAll(sb, payload) {
   let sent = 0;
   for (const row of subs || []) {
     try {
-      await webpush.sendNotification(row.sub, JSON.stringify(payload), { TTL: 3600 });
+      await webpush.sendNotification(row.sub, JSON.stringify(payload), { TTL: 3600, urgency: payload.urgency || "normal" });
       sent++;
     } catch (e) {
       if (e.statusCode === 404 || e.statusCode === 410) await sb.from("push_subs").delete().eq("endpoint", row.endpoint);
