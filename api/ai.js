@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   if (audio && audio.data) {
     const out = await gemini(key, { contents: [{ role: "user", parts: [
       { inline_data: { mime_type: String(audio.mime || "audio/webm").split(";")[0], data: audio.data } },
-      { text: "Transcribe este audio en español, tal como se dijo, sin agregar nada. Si no se entiende nada, responde vacío." },
+      { text: `Transcribe este audio tal como se dijo, en el idioma en que se habló (lo más probable: ${String(audio.lang || "español").slice(0, 60)}), sin traducir ni agregar nada. Si no se entiende nada, responde vacío.` },
     ] }] });
     if (!out.ok) return res.status(out.status === 429 ? 429 : 502).json({ error: out.status === 429 ? "rate_limited" : "ai_error", message: out.message || "No pude transcribir." });
     return res.json({ data: { texto: out.text.trim() } });

@@ -83,7 +83,7 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .item .ti { font-weight: 600; font-size: 16px; }
 .item .tip { color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .item.done .ti { text-decoration: line-through; color: var(--muted); }
-.item.example .ti::after { content: " · ejemplo"; color: var(--muted); font-weight: 400; }
+.item.example .ti::after { content: attr(data-example); color: var(--muted); font-weight: 400; }
 .item.now { background: color-mix(in srgb, var(--accent) 22%, var(--cell)); }
 .empty { text-align: center; color: var(--muted); padding: 36px 16px; display: grid; gap: 10px; justify-items: center; }
 .section-label { font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); margin: 0 16px -10px; }
@@ -323,14 +323,14 @@ h1 { font-size: 46px; }
 <div id="gate" class="gate" hidden></div>
 
 <div id="app" class="app" hidden>
-  <section class="cal" aria-label="Agenda">
+  <section class="cal" data-i18n-aria="agenda">
     <div class="cal-inner">
       <div class="top">
-        <button class="link" id="todayBtn">Hoy</button>
+        <button class="link" id="todayBtn" data-i18n="today">Hoy</button>
         <div class="spacer"></div>
         <button class="link" id="viewBtn" aria-pressed="false">Mes</button>
-        <button class="chev" id="prevBtn" aria-label="Día anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <button class="chev" id="nextBtn" aria-label="Día siguiente"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="chev" id="prevBtn" aria-label=""><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button class="chev" id="nextBtn" aria-label=""><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
       <div><div class="eyebrow" id="eyebrow"></div><h1 id="title"></h1><div class="summary" id="summary"></div></div>
       <div class="week" id="week"></div>
@@ -340,108 +340,111 @@ h1 { font-size: 46px; }
 
   <aside class="side" id="side">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" data-tab="organize" aria-selected="true">Organizar</button>
-        <button class="tab" role="tab" data-tab="chat" aria-selected="false">Chat</button>
-        <button class="tab" role="tab" data-tab="bdays" aria-selected="false">Cumpleaños</button>
-        <button class="tab" role="tab" data-tab="settings" aria-selected="false">Ajustes</button>
+        <button class="tab" role="tab" data-tab="organize" aria-selected="true" data-i18n="tabOrganize">Organizar</button>
+        <button class="tab" role="tab" data-tab="chat" aria-selected="false" data-i18n="tabChat">Chat</button>
+        <button class="tab" role="tab" data-tab="bdays" aria-selected="false" data-i18n="tabBdays">Cumpleaños</button>
+        <button class="tab" role="tab" data-tab="settings" aria-selected="false" data-i18n="tabSettings">Ajustes</button>
       </div>
 
       <div class="pane" data-pane="organize">
-        <h2>Vacía tu cabeza</h2>
-        <p class="muted">Dime todo lo que tienes pendiente. Te propongo horarios y tú eliges.</p>
-        <button type="button" class="bigmic" data-mic="dump" aria-label="Dictar"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
-        <div class="miclabel" id="dumpMicLabel">Toca y habla</div>
-        <textarea id="dump" class="field" placeholder="O escríbelo aquí. Ej: mañana tengo que ir al banco, grabar un video de ASMR y llamar a mamá"></textarea>
-        <div class="seg" id="dumpDay" role="group" aria-label="Para qué día"></div>
-        <button id="organize" class="btn primary">Organizar mi día</button>
+        <h2 data-i18n="orgTitle">Vacía tu cabeza</h2>
+        <p class="muted" data-i18n="orgIntro"></p>
+        <button type="button" class="bigmic" data-mic="dump" data-i18n-aria="dictate"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+        <div class="miclabel" id="dumpMicLabel" data-i18n="tapTalk"></div>
+        <textarea id="dump" class="field" data-i18n-ph="dumpPh"></textarea>
+        <div class="seg" id="dumpDay" role="group" data-i18n-aria="whichDay"></div>
+        <button id="organize" class="btn primary" data-i18n="organizeBtn"></button>
         <div id="dumpStatus" class="status" role="status"></div>
         <div id="proposals" style="display:grid;gap:10px"></div>
         <div class="row" id="proposalActions" hidden>
-          <button id="scheduleAll" class="btn primary">Agendar lo elegido</button>
-          <button id="discard" class="btn">Descartar</button>
+          <button id="scheduleAll" class="btn primary" data-i18n="scheduleChosen"></button>
+          <button id="discard" class="btn" data-i18n="discard"></button>
         </div>
         <div id="overdue" style="display:grid;gap:8px"></div>
       </div>
 
       <div class="pane" data-pane="chat" hidden>
-        <h2>Habla con tu calendario</h2>
+        <h2 data-i18n="chatTitle"></h2>
         <div class="chips" id="chatChips"></div>
         <div class="chatscroll" id="chatScroll"><div id="chatlog" class="chatlog" aria-live="polite"></div></div>
         <form id="chatForm" class="row">
-          <button type="button" class="mic" data-mic="chatIn" aria-label="Dictar"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
-          <input id="chatIn" class="field" placeholder="Escribe o dicta..." autocomplete="off" style="flex:1">
-          <button class="btn primary" id="chatSend">Enviar</button>
+          <button type="button" class="mic" data-mic="chatIn" data-i18n-aria="dictate"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+          <input id="chatIn" class="field" data-i18n-ph="chatPh" autocomplete="off" style="flex:1">
+          <button class="btn primary" id="chatSend" data-i18n="send"></button>
         </form>
       </div>
 
       <div class="pane" data-pane="bdays" hidden>
-        <div class="phead"><h2>Cumpleaños</h2><button class="addbtn" id="bdAdd" aria-label="Agregar cumpleaños"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
-        <p class="muted">Te aviso 2 días antes y el mismo día, con ideas de regalo. También puedes decírmelo en el chat.</p>
+        <div class="phead"><h2 data-i18n="tabBdays"></h2><button class="addbtn" id="bdAdd" data-i18n-aria="addBday"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+        <p class="muted" data-i18n="bdIntro"></p>
         <form id="bdForm" class="card" hidden>
-          <input id="bName" class="field" placeholder="Nombre" required style="background:var(--group)">
+          <input id="bName" class="field" data-i18n-ph="name" required style="background:var(--group)">
           <div id="bDateBox"></div>
-          <input id="bNotes" class="field" placeholder="Gustos (opcional): café, anime, fútbol..." style="background:var(--group)">
-          <div class="row"><button class="btn primary">Guardar</button><button type="button" class="btn" id="bdCancel">Cancelar</button></div>
+          <input id="bNotes" class="field" data-i18n-ph="likesPh" style="background:var(--group)">
+          <div class="row"><button class="btn primary" data-i18n="save"></button><button type="button" class="btn" id="bdCancel" data-i18n="cancel"></button></div>
         </form>
         <div id="bdays" style="display:grid;gap:8px"></div>
       </div>
 
       <div class="pane" data-pane="settings" hidden>
-        <h2>Ajustes</h2>
+        <h2 data-i18n="tabSettings"></h2>
         <div id="setupAlert"></div>
-        <h3 class="sub">Avisos</h3>
+        <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
-          <div style="display:grid;gap:8px"><span>Avisarme antes</span><div class="chips" id="remindChips"></div></div>
-          <label class="toggle">Horas de silencio <input type="checkbox" id="quietOn"></label>
-          <div class="toggle" id="quietRow" hidden><span>De <input type="time" id="quietFrom" value="22:00"> a <input type="time" id="quietTo" value="07:00"></span></div>
-          <label class="toggle">Sonido dentro de la app <input type="checkbox" id="sound" checked></label>
-          <button class="link" id="testToast" style="justify-self:start;font-size:16px;padding:12px 16px">Ver cómo se ve un aviso</button>
+          <div style="display:grid;gap:8px"><span data-i18n="remindBefore"></span><div class="chips" id="remindChips"></div></div>
+          <label class="toggle"><span data-i18n="quiet"></span> <input type="checkbox" id="quietOn"></label>
+          <div class="toggle" id="quietRow" hidden><span><span data-i18n="from"></span> <input type="time" id="quietFrom" value="22:00"> <span data-i18n="to"></span> <input type="time" id="quietTo" value="07:00"></span></div>
+          <label class="toggle"><span data-i18n="sound"></span> <input type="checkbox" id="sound" checked></label>
+          <button class="link" id="testToast" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
         </div>
-        <p class="foot">Durante las horas de silencio no te llega ningún aviso.</p>
-        <h3 class="sub">Mi rutina</h3>
+        <p class="foot" data-i18n="quietFoot"></p>
+        <h3 class="sub" data-i18n="routine"></h3>
         <div class="group">
-          <label class="toggle">Rindo mejor en la
-            <select id="energy"><option>mañana</option><option>tarde</option><option>noche</option></select>
+          <label class="toggle"><span data-i18n="bestAt"></span>
+            <select id="energy"><option value="mañana" data-i18n="morning"></option><option value="tarde" data-i18n="afternoon"></option><option value="noche" data-i18n="night"></option></select>
           </label>
         </div>
-        <h3 class="sub">Apariencia</h3>
+        <h3 class="sub" data-i18n="appearance"></h3>
         <div class="group">
-          <label class="toggle">Tema
-            <select id="theme"><option value="system">Como mi teléfono</option><option value="light">Claro</option><option value="dark">Oscuro</option></select>
+          <label class="toggle"><span data-i18n="theme"></span>
+            <select id="theme"><option value="system" data-i18n="system"></option><option value="light" data-i18n="light"></option><option value="dark" data-i18n="dark"></option></select>
+          </label>
+          <label class="toggle"><span data-i18n="language"></span>
+            <select id="lang"><option value="system" data-i18n="system"></option></select>
           </label>
         </div>
-        <h3 class="sub">Formato</h3>
+        <h3 class="sub" data-i18n="format"></h3>
         <div class="group">
-          <label class="toggle">Reloj
-            <select id="clock"><option value="12">12 horas (3:52 PM)</option><option value="24">24 horas (15:52)</option></select>
+          <label class="toggle"><span data-i18n="clock"></span>
+            <select id="clock"><option value="12" data-i18n="clock12"></option><option value="24" data-i18n="clock24"></option></select>
           </label>
-          <label class="toggle">Fechas
-            <select id="datefmt"><option value="es">27/10/2026 (día/mes)</option><option value="en">10/27/2026 (mes/día)</option></select>
+          <label class="toggle"><span data-i18n="dates"></span>
+            <select id="datefmt"><option value="es" data-i18n="dmy"></option><option value="en" data-i18n="mdy"></option></select>
           </label>
         </div>
-        <h3 class="sub">Cuenta</h3>
+        <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
-          <button class="link" id="logout" style="justify-self:start;color:var(--red);font-size:16px;padding:12px 16px">Cerrar sesión en este dispositivo</button>
+          <button class="link" id="logout" style="justify-self:start;color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
         </div>
         <div id="adminBox" hidden style="display:grid;gap:14px">
           <h3 class="sub">Administrador</h3>
           <div id="setupBox" class="card"></div>
         </div>
-        <div class="version" id="version">Versión 0.4</div>
+        <div class="version" id="version"></div>
       </div>
     </aside>
 
-  <nav class="tabbar" role="tablist" aria-label="Secciones">
-    <button data-tab="cal" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
-    <button data-tab="organize" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Organizar</button>
-    <button data-tab="chat" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12z"/></svg>Chat</button>
-    <button data-tab="bdays" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="9" width="17" height="11.5" rx="2"/><path d="M3.5 13h17M12 9v11.5M12 9c-1.5-3-5-3.5-5-1.2C7 9 9.5 9 12 9zm0 0c1.5-3 5-3.5 5-1.2C17 9 14.5 9 12 9z"/></svg>Cumples</button>
-    <button data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</button>
+  <nav class="tabbar" role="tablist" data-i18n-aria="sections">
+    <button data-tab="cal" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span data-i18n="agenda"></span></button>
+    <button data-tab="organize" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span data-i18n="tabOrganize"></span></button>
+    <button data-tab="chat" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12z"/></svg><span data-i18n="tabChat"></span></button>
+    <button data-tab="bdays" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="9" width="17" height="11.5" rx="2"/><path d="M3.5 13h17M12 9v11.5M12 9c-1.5-3-5-3.5-5-1.2C7 9 9.5 9 12 9zm0 0c1.5-3 5-3.5 5-1.2C17 9 14.5 9 12 9z"/></svg><span data-i18n="tabBdaysShort"></span></button>
+    <button data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="tabSettings"></span></button>
   </nav>
 </div>
 
-<button class="fab" id="fab" aria-label="Agregar" hidden><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+<button class="fab" id="fab" data-i18n-aria="add" hidden><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 <div id="sheet" class="sheet-bg" hidden></div>
 <div id="onboard" class="onboard" hidden></div>
 <div class="toasts" id="toasts" aria-live="assertive"></div>
@@ -449,16 +452,295 @@ h1 { font-size: 46px; }
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const DAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-  const DAYS_LONG = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-  const MONTHS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  // ---------- languages ----------
+  // Every text the person sees, per language. "{x}" marks are filled in by tr(). Add a language by adding a block here and in LANGS.
+  const LANGS = { es: "Español", en: "English", pt: "Português", fr: "Français" };
+  const LOCALE = { es: "es", en: "en-US", pt: "pt-BR", fr: "fr-FR" };
+  // For the AI prompts: the language it must answer in.
+  const AI_LANG = { es: "español", en: "inglés (English)", pt: "portugués de Brasil (português)", fr: "francés (français)" };
+  const I18N = {
+    es: {
+      agenda: "Agenda", today: "Hoy", month: "Mes", week: "Semana", prevDay: "Día anterior", nextDay: "Día siguiente", prevMonth: "Mes anterior", nextMonth: "Mes siguiente",
+      tabOrganize: "Organizar", tabChat: "Chat", tabBdays: "Cumpleaños", tabBdaysShort: "Cumples", tabSettings: "Ajustes", sections: "Secciones", add: "Agregar",
+      orgTitle: "Vacía tu cabeza", orgIntro: "Dime todo lo que tienes pendiente. Te propongo horarios y tú eliges.", dictate: "Dictar", tapTalk: "Toca y habla",
+      dumpPh: "O escríbelo aquí. Ej: mañana tengo que ir al banco, grabar un video de ASMR y llamar a mamá", whichDay: "Para qué día", organizeBtn: "Organizar mi día",
+      scheduleChosen: "Agendar lo elegido", discard: "Descartar",
+      chatTitle: "Habla con tu calendario", chatPh: "Escribe o dicta...", send: "Enviar",
+      addBday: "Agregar cumpleaños", bdIntro: "Te aviso 2 días antes y el mismo día, con ideas de regalo. También puedes decírmelo en el chat.", name: "Nombre",
+      likesPh: "Gustos (opcional): café, anime, fútbol...", save: "Guardar", cancel: "Cancelar", bdayDate: "Fecha de cumpleaños", chooseBdayDate: "Elige la fecha del cumpleaños",
+      setNotices: "Avisos", remindBefore: "Avisarme antes", quiet: "Horas de silencio", from: "De", to: "a", sound: "Sonido dentro de la app", previewNotice: "Ver cómo se ve un aviso",
+      quietFoot: "Durante las horas de silencio no te llega ningún aviso.", routine: "Mi rutina", bestAt: "Rindo mejor en la", morning: "mañana", afternoon: "tarde", night: "noche",
+      appearance: "Apariencia", theme: "Tema", system: "Como mi teléfono", light: "Claro", dark: "Oscuro", language: "Idioma",
+      format: "Formato", clock: "Reloj", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Fechas", dmy: "27/10/2026 (día/mes)", mdy: "10/27/2026 (mes/día)",
+      account: "Cuenta", logout: "Cerrar sesión en este dispositivo", version: "Versión", adminSuffix: " · administrador", adminOn: "Modo administrador activado", adminOff: "Modo administrador desactivado",
+      chooseDate: "Elegir fecha", otherDay: "Otro día", tomorrow: "Mañana",
+      errRate: "La IA gratis llegó a su límite por ahora. Intenta en un minuto.", errNoAi: "Falta conectar Gemini (mira Ajustes).", errJson: "La IA respondió algo que no entendí. Intenta de nuevo.",
+      errAuth: "Tu sesión no es válida. Vuelve a entrar.", errNet: "No se pudo conectar. Intenta de nuevo.",
+      ex1Title: "Grabar video de ASMR", ex1Tip: "Busca el cuarto más callado y haz una prueba de micrófono de 30 segundos.", ex2Title: "Ir al banco", ex2Tip: "Lleva tu documento y revisa el horario de cierre.", exampleTag: " · ejemplo",
+      freeDay: "Día libre", allDone: "Todo listo ✓", doneOne: "{n} cosa hecha", doneMany: "{n} cosas hechas", thingOne: "{n} cosa", thingMany: "{n} cosas",
+      nextIn: "la próxima en {n} min", nextAt: "la próxima a las {t}", todayDot: "Hoy · ",
+      nothing: "Nada agendado.", organizeThisDay: "Organizar este día", allDay: "Todo el día", bdayOf: "Cumpleaños de {n}", tapGifts: "Toca para ver ideas de regalo", now: "Ahora",
+      swipeHint: "Desliza una tarea → para marcarla hecha, o ← para pasarla a mañana", swDone: "✓ Hecho", swLater: "Mañana →", markedPending: "Marcada como pendiente",
+      doneMsg: "✓ {t}: hecho", movedTomorrow: "↪️ {t}: pasó a mañana", tipLabel: "Consejo: ",
+      oneHour: "1 hora", nMinutes: "{n} minutos", nMin: "{n} min", before: "{list} antes", fromTo: "{d} · de {a} a {b}",
+      exampleNote: "Es un ejemplo. Desaparece cuando agendes tu primera tarea.", notifyYou: "Te aviso {x}.", markPending: "Marcar como pendiente", markDone: "✓ Marcar como hecho",
+      moveTomorrow: "Pasar a mañana", previewAlert: "Ver cómo será el aviso", addGcal: "Agregar a Google Calendar", del: "Borrar", doneBtn: "Listo",
+      todayLower: "hoy", inN: "en {n} min", isNow: "es ahora", wasAt: "era a las {t}", done: "✓ Hecho", againIn: "⏰ Te aviso otra vez en {x}", plusHour: "+1 hora", plusMin: "+{n} min",
+      seeInAgenda: "Ver en la agenda", close: "Cerrar",
+      whatToDo: "¿Qué tienes que hacer?", adding: "Agregando...", findingTime: "Buscando la mejor hora...", addedN: "Agregué {n} cosas", hourLbl: "Hora", suggestHint: "(si no la pones, te sugiero una)",
+      writeFirst: "Escribe primero lo que tienes que hacer.", thinkingDay: "Pensando cómo organizar tu día...", task: "Tarea", chooseTimes: "Elige una hora para cada tarea.",
+      suggested: "Sugerida", dontSchedule: "No agendar", suggestedX: "Sugerida: {t}. ", scheduledOne: "Listo: agendé 1 tarea.", scheduledMany: "Listo: agendé {n} tareas.", noneChosen: "No elegiste ninguna tarea.",
+      missedN: "Se te pasaron {n}", didIt: "Ya lo hice",
+      thinking: "Pensando...", okDone: "Listo.", actCreate: "{e} Crear \"{t}\" el {d} a las {h}", actBday: "🎂 Guardar el cumpleaños de {n}: {d}", actMove: "Mover \"{t}\" al {d} a las {h}", actDel: "Borrar \"{t}\"",
+      chatEmpty: "Pregúntale lo que quieras sobre tu agenda o pídele que cree o mueva cosas. Siempre te pide confirmar.", doneHeading: "Hecho", doIt: "¿Lo hago?", yesDo: "Sí, hazlo", no: "No",
+      cPlanToday: "☀️ Plan de hoy", qPlanToday: "Hazme el plan de hoy en orden, con pausas.", cLeft: "⏭️ ¿Qué me queda hoy?", qLeft: "¿Qué me queda por hacer hoy?",
+      cFree: "🧘 Tengo la tarde libre", qFree: "Tengo la tarde libre. ¿Qué me recomiendas hacer según mi agenda?", cTomorrow: "🌙 ¿Qué tengo mañana?", qTomorrow: "¿Qué tengo mañana?",
+      cLateOne: "↪️ Mover 1 atrasada a mañana", cLateMany: "↪️ Mover {n} atrasadas a mañana", qLate: "Mueve lo que no hice a mañana.", cGift: "🎁 Regalo para {n}", cWeek: "📅 Resumen de mi semana", qWeek: "Resúmeme mi semana.",
+      listen: "Escuchar", stop: "Detener",
+      whenToday: "hoy", whenTomorrow: "mañana", whenDayAfter: "pasado mañana", whenInDays: "en {n} días",
+      nudge: "🎂 **{w}** es el cumpleaños de **{n}**.\n¿Quieres que escojamos un regalo juntos? Te busco lo que está de moda.",
+      giftYes: "🎁 Sí, ideas de regalo", onlyMsg: "💌 Solo el mensaje", notNow: "Ahora no", writeMsgFor: "Escríbeme un mensaje para {n}", giftIdeasFor: "Sí, ideas de regalo para {n}",
+      writingMsg: "✍️ Escribiendo el mensaje...", searchingTrends: "🔎 Buscando qué está de moda...", copied: "Copiado ✓", selectCopy: "Selecciona y copia", copyMsg: "Copiar mensaje",
+      ideasFor: "🎁 Ideas para {n}", message: "💌 Mensaje",
+      noBdays: "Aún no hay cumpleaños. Toca + o dile al chat: \"el cumple de Ana es el 3 de mayo\".", turnsAge: " · cumple {n}", todayExcl: "¡hoy!", dayOne: "día", dayMany: "días",
+      giftIdeasBtn: "🎁 Ideas de regalo", confirmDelBday: "¿Borrar el cumpleaños de {n}?",
+      reminder: "Recordatorio", inHourCap: "En 1 hora", inMinCap: "En {n} min", previewTag: " · vista previa", nowLower: "ahora", atCap: "A las {t}", snooze10: "Posponer 10 min",
+      stopDictation: "Detener dictado", listening: "Te escucho... toca para terminar", noDictate: "Este navegador no permite dictar.", noMic: "No diste permiso al micrófono.", transcribing: "Transcribiendo...",
+      pushClosed: "Avisos con la app cerrada", pushNotReady: "Todavía no están listos en el servidor.", pushNoBrowser: "Este navegador no permite avisos. Prueba con Chrome o Safari actualizados.",
+      pushOn: "✅ Avisos activados", pushOnText: "Te llegan aunque la app esté cerrada. Al tocar uno se abre con botones para posponer o marcar hecho.",
+      sending: "Enviando...", checkNotifs: "Listo, revisa tus notificaciones.", sendTest: "Mandar un aviso de prueba", activating: "Activando...",
+      noPermission: "No diste permiso. Puedes activarlo en Ajustes del celular > Notificaciones.", allowNotifs: "Permitir avisos", steps3: "Activa los avisos en 3 pasos",
+      step1: "Agrégala a tu pantalla de inicio", step1Text: "En Safari toca Compartir (el cuadrito con la flecha) y elige \"Agregar a pantalla de inicio\".",
+      step2: "Ábrela desde el ícono nuevo", step2Text: "Así funciona como una app y puede avisarte.", step3: "Permite los avisos",
+      step3Denied: "Los bloqueaste antes. Actívalos en Ajustes del celular > Notificaciones > Pendi.", step3Text: "Te preguntará si dejas que la app te avise. Toca Permitir.",
+      missAi: "la inteligencia artificial", missDb: "guardar en la nube", missPush: "los avisos", notReady: "⚠️ Algo no está listo",
+      missingX: "Falta configurar {x}. Si tú instalaste la app, toca 5 veces \"Versión\" al final de esta pantalla para ver los detalles.", keepOne: "Deja al menos un aviso",
+      ob1Title: "Tu agenda que piensa contigo", ob1Text: "Dime lo que tienes pendiente, con tu voz o escribiendo. Te propongo cuándo hacerlo y te aviso antes, con un consejo.", start: "Empezar",
+      ob2Title: "¿Cuándo rindes mejor?", ob2Text: "Así pongo lo difícil en tu mejor momento.", morningE: "☀️ Mañana", afternoonE: "🌤️ Tarde", nightE: "🌙 Noche",
+      ob3Title: "Activa los avisos", ob3Text: "Te aviso {x} de cada cosa, aunque la app esté cerrada.", enableNotifs: "Activar avisos",
+      missingStep: "Falta un paso", missingStepText: "En Vercel, abre tu proyecto, ve a Settings > Environment Variables y agrega APP_PASSWORD con la contraseña que quieras. Luego toca Redeploy.",
+      missingStepNote: "Esa contraseña protege tu agenda y tu clave de IA.", password: "Contraseña", enterPw: "Escribe tu contraseña para entrar.", enter: "Entrar", wrongPw: "Contraseña incorrecta.",
+    },
+    en: {
+      agenda: "Agenda", today: "Today", month: "Month", week: "Week", prevDay: "Previous day", nextDay: "Next day", prevMonth: "Previous month", nextMonth: "Next month",
+      tabOrganize: "Organize", tabChat: "Chat", tabBdays: "Birthdays", tabBdaysShort: "Birthdays", tabSettings: "Settings", sections: "Sections", add: "Add",
+      orgTitle: "Empty your head", orgIntro: "Tell me everything on your plate. I'll suggest times and you choose.", dictate: "Dictate", tapTalk: "Tap and talk",
+      dumpPh: "Or type it here. E.g.: tomorrow I have to go to the bank, record an ASMR video and call mom", whichDay: "Which day", organizeBtn: "Organize my day",
+      scheduleChosen: "Schedule selected", discard: "Discard",
+      chatTitle: "Talk to your calendar", chatPh: "Type or dictate...", send: "Send",
+      addBday: "Add birthday", bdIntro: "I'll remind you 2 days before and on the day, with gift ideas. You can also tell me in the chat.", name: "Name",
+      likesPh: "Likes (optional): coffee, anime, soccer...", save: "Save", cancel: "Cancel", bdayDate: "Birthday date", chooseBdayDate: "Choose the birthday date",
+      setNotices: "Reminders", remindBefore: "Remind me before", quiet: "Quiet hours", from: "From", to: "to", sound: "Sound inside the app", previewNotice: "See what a reminder looks like",
+      quietFoot: "During quiet hours you won't get any reminders.", routine: "My routine", bestAt: "I work best in the", morning: "morning", afternoon: "afternoon", night: "evening",
+      appearance: "Appearance", theme: "Theme", system: "Same as my phone", light: "Light", dark: "Dark", language: "Language",
+      format: "Format", clock: "Clock", clock12: "12-hour (3:52 PM)", clock24: "24-hour (15:52)", dates: "Dates", dmy: "27/10/2026 (day/month)", mdy: "10/27/2026 (month/day)",
+      account: "Account", logout: "Sign out on this device", version: "Version", adminSuffix: " · admin", adminOn: "Admin mode on", adminOff: "Admin mode off",
+      chooseDate: "Choose date", otherDay: "Other day", tomorrow: "Tomorrow",
+      errRate: "The free AI hit its limit for now. Try again in a minute.", errNoAi: "Gemini isn't connected yet (see Settings).", errJson: "The AI replied with something I didn't understand. Try again.",
+      errAuth: "Your session isn't valid. Sign in again.", errNet: "Couldn't connect. Try again.",
+      ex1Title: "Record ASMR video", ex1Tip: "Find the quietest room and do a 30-second mic test.", ex2Title: "Go to the bank", ex2Tip: "Bring your ID and check the closing time.", exampleTag: " · example",
+      freeDay: "Free day", allDone: "All done ✓", doneOne: "{n} thing done", doneMany: "{n} things done", thingOne: "{n} thing", thingMany: "{n} things",
+      nextIn: "next one in {n} min", nextAt: "next one at {t}", todayDot: "Today · ",
+      nothing: "Nothing scheduled.", organizeThisDay: "Organize this day", allDay: "All day", bdayOf: "{n}'s birthday", tapGifts: "Tap to see gift ideas", now: "Now",
+      swipeHint: "Swipe a task → to mark it done, or ← to move it to tomorrow", swDone: "✓ Done", swLater: "Tomorrow →", markedPending: "Marked as not done",
+      doneMsg: "✓ {t}: done", movedTomorrow: "↪️ {t}: moved to tomorrow", tipLabel: "Tip: ",
+      oneHour: "1 hour", nMinutes: "{n} minutes", nMin: "{n} min", before: "{list} before", fromTo: "{d} · {a} to {b}",
+      exampleNote: "This is an example. It goes away when you schedule your first task.", notifyYou: "I'll remind you {x}.", markPending: "Mark as not done", markDone: "✓ Mark as done",
+      moveTomorrow: "Move to tomorrow", previewAlert: "Preview the reminder", addGcal: "Add to Google Calendar", del: "Delete", doneBtn: "Done",
+      todayLower: "today", inN: "in {n} min", isNow: "it's now", wasAt: "was at {t}", done: "✓ Done", againIn: "⏰ I'll remind you again in {x}", plusHour: "+1 hour", plusMin: "+{n} min",
+      seeInAgenda: "See in agenda", close: "Close",
+      whatToDo: "What do you need to do?", adding: "Adding...", findingTime: "Finding the best time...", addedN: "Added {n} things", hourLbl: "Time", suggestHint: "(leave it empty and I'll suggest one)",
+      writeFirst: "First write what you need to do.", thinkingDay: "Thinking about how to organize your day...", task: "Task", chooseTimes: "Pick a time for each task.",
+      suggested: "Suggested", dontSchedule: "Don't schedule", suggestedX: "Suggested: {t}. ", scheduledOne: "Done: scheduled 1 task.", scheduledMany: "Done: scheduled {n} tasks.", noneChosen: "You didn't pick any task.",
+      missedN: "You missed {n}", didIt: "I did it",
+      thinking: "Thinking...", okDone: "Done.", actCreate: "{e} Create \"{t}\" on {d} at {h}", actBday: "🎂 Save {n}'s birthday: {d}", actMove: "Move \"{t}\" to {d} at {h}", actDel: "Delete \"{t}\"",
+      chatEmpty: "Ask anything about your schedule, or ask it to create or move things. It always asks you to confirm.", doneHeading: "Done", doIt: "Should I do it?", yesDo: "Yes, do it", no: "No",
+      cPlanToday: "☀️ Today's plan", qPlanToday: "Make me today's plan in order, with breaks.", cLeft: "⏭️ What's left today?", qLeft: "What do I still have to do today?",
+      cFree: "🧘 My afternoon is free", qFree: "My afternoon is free. What do you suggest based on my schedule?", cTomorrow: "🌙 What's tomorrow?", qTomorrow: "What do I have tomorrow?",
+      cLateOne: "↪️ Move 1 overdue to tomorrow", cLateMany: "↪️ Move {n} overdue to tomorrow", qLate: "Move what I didn't do to tomorrow.", cGift: "🎁 Gift for {n}", cWeek: "📅 Sum up my week", qWeek: "Sum up my week.",
+      listen: "Listen", stop: "Stop",
+      whenToday: "today", whenTomorrow: "tomorrow", whenDayAfter: "the day after tomorrow", whenInDays: "in {n} days",
+      nudge: "🎂 **{w}** is **{n}**'s birthday.\nWant to pick a gift together? I'll look up what's trending.",
+      giftYes: "🎁 Yes, gift ideas", onlyMsg: "💌 Just the message", notNow: "Not now", writeMsgFor: "Write me a message for {n}", giftIdeasFor: "Yes, gift ideas for {n}",
+      writingMsg: "✍️ Writing the message...", searchingTrends: "🔎 Looking up what's trending...", copied: "Copied ✓", selectCopy: "Select and copy", copyMsg: "Copy message",
+      ideasFor: "🎁 Ideas for {n}", message: "💌 Message",
+      noBdays: "No birthdays yet. Tap + or tell the chat: \"Ana's birthday is May 3\".", turnsAge: " · turns {n}", todayExcl: "today!", dayOne: "day", dayMany: "days",
+      giftIdeasBtn: "🎁 Gift ideas", confirmDelBday: "Delete {n}'s birthday?",
+      reminder: "Reminder", inHourCap: "In 1 hour", inMinCap: "In {n} min", previewTag: " · preview", nowLower: "now", atCap: "At {t}", snooze10: "Snooze 10 min",
+      stopDictation: "Stop dictation", listening: "Listening... tap to finish", noDictate: "This browser can't dictate.", noMic: "You didn't allow the microphone.", transcribing: "Transcribing...",
+      pushClosed: "Reminders with the app closed", pushNotReady: "They aren't ready on the server yet.", pushNoBrowser: "This browser doesn't allow notifications. Try an up-to-date Chrome or Safari.",
+      pushOn: "✅ Reminders on", pushOnText: "They arrive even with the app closed. Tapping one opens buttons to snooze or mark it done.",
+      sending: "Sending...", checkNotifs: "Done, check your notifications.", sendTest: "Send a test reminder", activating: "Turning on...",
+      noPermission: "You didn't allow it. You can turn it on in your phone's Settings > Notifications.", allowNotifs: "Allow notifications", steps3: "Turn on reminders in 3 steps",
+      step1: "Add it to your home screen", step1Text: "In Safari tap Share (the square with the arrow) and choose \"Add to Home Screen\".",
+      step2: "Open it from the new icon", step2Text: "That way it works like an app and can remind you.", step3: "Allow notifications",
+      step3Denied: "You blocked them before. Turn them on in your phone's Settings > Notifications > Pendi.", step3Text: "It will ask whether the app can notify you. Tap Allow.",
+      missAi: "the AI", missDb: "cloud saving", missPush: "reminders", notReady: "⚠️ Something isn't ready",
+      missingX: "{x} still needs setting up. If you installed the app, tap \"Version\" at the bottom of this screen 5 times to see the details.", keepOne: "Keep at least one reminder",
+      ob1Title: "Your agenda that thinks with you", ob1Text: "Tell me what's on your plate, by voice or typing. I'll suggest when to do it and remind you ahead of time, with a tip.", start: "Get started",
+      ob2Title: "When do you work best?", ob2Text: "That way I put the hard stuff at your best time.", morningE: "☀️ Morning", afternoonE: "🌤️ Afternoon", nightE: "🌙 Evening",
+      ob3Title: "Turn on reminders", ob3Text: "I'll remind you {x} each thing, even with the app closed.", enableNotifs: "Turn on reminders",
+      missingStep: "One step missing", missingStepText: "In Vercel, open your project, go to Settings > Environment Variables and add APP_PASSWORD with the password you want. Then tap Redeploy.",
+      missingStepNote: "That password protects your agenda and your AI key.", password: "Password", enterPw: "Type your password to sign in.", enter: "Sign in", wrongPw: "Wrong password.",
+    },
+    pt: {
+      agenda: "Agenda", today: "Hoje", month: "Mês", week: "Semana", prevDay: "Dia anterior", nextDay: "Próximo dia", prevMonth: "Mês anterior", nextMonth: "Próximo mês",
+      tabOrganize: "Organizar", tabChat: "Chat", tabBdays: "Aniversários", tabBdaysShort: "Aniversários", tabSettings: "Ajustes", sections: "Seções", add: "Adicionar",
+      orgTitle: "Esvazie a cabeça", orgIntro: "Me conte tudo o que você tem pendente. Eu sugiro horários e você escolhe.", dictate: "Ditar", tapTalk: "Toque e fale",
+      dumpPh: "Ou escreva aqui. Ex.: amanhã tenho que ir ao banco, gravar um vídeo de ASMR e ligar para a minha mãe", whichDay: "Para qual dia", organizeBtn: "Organizar meu dia",
+      scheduleChosen: "Agendar o escolhido", discard: "Descartar",
+      chatTitle: "Fale com o seu calendário", chatPh: "Escreva ou dite...", send: "Enviar",
+      addBday: "Adicionar aniversário", bdIntro: "Eu aviso 2 dias antes e no próprio dia, com ideias de presente. Você também pode me contar no chat.", name: "Nome",
+      likesPh: "Gostos (opcional): café, anime, futebol...", save: "Salvar", cancel: "Cancelar", bdayDate: "Data do aniversário", chooseBdayDate: "Escolha a data do aniversário",
+      setNotices: "Avisos", remindBefore: "Me avisar antes", quiet: "Horário de silêncio", from: "Das", to: "às", sound: "Som dentro do app", previewNotice: "Ver como fica um aviso",
+      quietFoot: "Durante o horário de silêncio você não recebe nenhum aviso.", routine: "Minha rotina", bestAt: "Rendo melhor de", morning: "manhã", afternoon: "tarde", night: "noite",
+      appearance: "Aparência", theme: "Tema", system: "Igual ao meu celular", light: "Claro", dark: "Escuro", language: "Idioma",
+      format: "Formato", clock: "Relógio", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Datas", dmy: "27/10/2026 (dia/mês)", mdy: "10/27/2026 (mês/dia)",
+      account: "Conta", logout: "Sair neste dispositivo", version: "Versão", adminSuffix: " · administrador", adminOn: "Modo administrador ativado", adminOff: "Modo administrador desativado",
+      chooseDate: "Escolher data", otherDay: "Outro dia", tomorrow: "Amanhã",
+      errRate: "A IA gratuita chegou ao limite por enquanto. Tente de novo em um minuto.", errNoAi: "Falta conectar o Gemini (veja Ajustes).", errJson: "A IA respondeu algo que não entendi. Tente de novo.",
+      errAuth: "Sua sessão não é válida. Entre de novo.", errNet: "Não foi possível conectar. Tente de novo.",
+      ex1Title: "Gravar vídeo de ASMR", ex1Tip: "Procure o cômodo mais silencioso e faça um teste de microfone de 30 segundos.", ex2Title: "Ir ao banco", ex2Tip: "Leve seu documento e confira o horário de fechamento.", exampleTag: " · exemplo",
+      freeDay: "Dia livre", allDone: "Tudo pronto ✓", doneOne: "{n} coisa feita", doneMany: "{n} coisas feitas", thingOne: "{n} coisa", thingMany: "{n} coisas",
+      nextIn: "a próxima em {n} min", nextAt: "a próxima às {t}", todayDot: "Hoje · ",
+      nothing: "Nada agendado.", organizeThisDay: "Organizar este dia", allDay: "O dia todo", bdayOf: "Aniversário de {n}", tapGifts: "Toque para ver ideias de presente", now: "Agora",
+      swipeHint: "Deslize uma tarefa → para marcá-la como feita, ou ← para passá-la para amanhã", swDone: "✓ Feito", swLater: "Amanhã →", markedPending: "Marcada como pendente",
+      doneMsg: "✓ {t}: feito", movedTomorrow: "↪️ {t}: passou para amanhã", tipLabel: "Dica: ",
+      oneHour: "1 hora", nMinutes: "{n} minutos", nMin: "{n} min", before: "{list} antes", fromTo: "{d} · das {a} às {b}",
+      exampleNote: "É um exemplo. Some quando você agendar sua primeira tarefa.", notifyYou: "Eu aviso {x}.", markPending: "Marcar como pendente", markDone: "✓ Marcar como feito",
+      moveTomorrow: "Passar para amanhã", previewAlert: "Ver como será o aviso", addGcal: "Adicionar ao Google Agenda", del: "Apagar", doneBtn: "Pronto",
+      todayLower: "hoje", inN: "em {n} min", isNow: "é agora", wasAt: "era às {t}", done: "✓ Feito", againIn: "⏰ Aviso de novo em {x}", plusHour: "+1 hora", plusMin: "+{n} min",
+      seeInAgenda: "Ver na agenda", close: "Fechar",
+      whatToDo: "O que você precisa fazer?", adding: "Adicionando...", findingTime: "Procurando o melhor horário...", addedN: "Adicionei {n} coisas", hourLbl: "Hora", suggestHint: "(se não colocar, eu sugiro uma)",
+      writeFirst: "Primeiro escreva o que você precisa fazer.", thinkingDay: "Pensando em como organizar seu dia...", task: "Tarefa", chooseTimes: "Escolha um horário para cada tarefa.",
+      suggested: "Sugerida", dontSchedule: "Não agendar", suggestedX: "Sugerida: {t}. ", scheduledOne: "Pronto: agendei 1 tarefa.", scheduledMany: "Pronto: agendei {n} tarefas.", noneChosen: "Você não escolheu nenhuma tarefa.",
+      missedN: "Ficaram para trás {n}", didIt: "Já fiz",
+      thinking: "Pensando...", okDone: "Pronto.", actCreate: "{e} Criar \"{t}\" em {d} às {h}", actBday: "🎂 Salvar o aniversário de {n}: {d}", actMove: "Mover \"{t}\" para {d} às {h}", actDel: "Apagar \"{t}\"",
+      chatEmpty: "Pergunte o que quiser sobre sua agenda ou peça para criar ou mover coisas. Ela sempre pede confirmação.", doneHeading: "Feito", doIt: "Posso fazer?", yesDo: "Sim, faça", no: "Não",
+      cPlanToday: "☀️ Plano de hoje", qPlanToday: "Monte meu plano de hoje em ordem, com pausas.", cLeft: "⏭️ O que falta hoje?", qLeft: "O que ainda tenho para fazer hoje?",
+      cFree: "🧘 Estou com a tarde livre", qFree: "Estou com a tarde livre. O que você recomenda pela minha agenda?", cTomorrow: "🌙 O que tenho amanhã?", qTomorrow: "O que tenho amanhã?",
+      cLateOne: "↪️ Passar 1 atrasada para amanhã", cLateMany: "↪️ Passar {n} atrasadas para amanhã", qLate: "Passe para amanhã o que eu não fiz.", cGift: "🎁 Presente para {n}", cWeek: "📅 Resumo da minha semana", qWeek: "Resuma minha semana.",
+      listen: "Ouvir", stop: "Parar",
+      whenToday: "hoje", whenTomorrow: "amanhã", whenDayAfter: "depois de amanhã", whenInDays: "em {n} dias",
+      nudge: "🎂 **{w}** é o aniversário de **{n}**.\nQuer escolher um presente juntos? Eu procuro o que está em alta.",
+      giftYes: "🎁 Sim, ideias de presente", onlyMsg: "💌 Só a mensagem", notNow: "Agora não", writeMsgFor: "Escreva uma mensagem para {n}", giftIdeasFor: "Sim, ideias de presente para {n}",
+      writingMsg: "✍️ Escrevendo a mensagem...", searchingTrends: "🔎 Procurando o que está em alta...", copied: "Copiado ✓", selectCopy: "Selecione e copie", copyMsg: "Copiar mensagem",
+      ideasFor: "🎁 Ideias para {n}", message: "💌 Mensagem",
+      noBdays: "Ainda não há aniversários. Toque em + ou diga ao chat: \"o aniversário da Ana é 3 de maio\".", turnsAge: " · faz {n}", todayExcl: "hoje!", dayOne: "dia", dayMany: "dias",
+      giftIdeasBtn: "🎁 Ideias de presente", confirmDelBday: "Apagar o aniversário de {n}?",
+      reminder: "Lembrete", inHourCap: "Em 1 hora", inMinCap: "Em {n} min", previewTag: " · prévia", nowLower: "agora", atCap: "Às {t}", snooze10: "Adiar 10 min",
+      stopDictation: "Parar ditado", listening: "Estou ouvindo... toque para terminar", noDictate: "Este navegador não permite ditar.", noMic: "Você não permitiu o microfone.", transcribing: "Transcrevendo...",
+      pushClosed: "Avisos com o app fechado", pushNotReady: "Ainda não estão prontos no servidor.", pushNoBrowser: "Este navegador não permite avisos. Use o Chrome ou o Safari atualizados.",
+      pushOn: "✅ Avisos ativados", pushOnText: "Chegam mesmo com o app fechado. Ao tocar em um, ele abre com botões para adiar ou marcar como feito.",
+      sending: "Enviando...", checkNotifs: "Pronto, confira suas notificações.", sendTest: "Mandar um aviso de teste", activating: "Ativando...",
+      noPermission: "Você não deu permissão. Dá para ativar em Ajustes do celular > Notificações.", allowNotifs: "Permitir avisos", steps3: "Ative os avisos em 3 passos",
+      step1: "Adicione à tela de início", step1Text: "No Safari toque em Compartilhar (o quadradinho com a seta) e escolha \"Adicionar à Tela de Início\".",
+      step2: "Abra pelo ícone novo", step2Text: "Assim funciona como um app e pode te avisar.", step3: "Permita os avisos",
+      step3Denied: "Você bloqueou antes. Ative em Ajustes do celular > Notificações > Pendi.", step3Text: "Ele vai perguntar se o app pode te avisar. Toque em Permitir.",
+      missAi: "a inteligência artificial", missDb: "salvar na nuvem", missPush: "os avisos", notReady: "⚠️ Algo não está pronto",
+      missingX: "Falta configurar {x}. Se foi você quem instalou o app, toque 5 vezes em \"Versão\" no fim desta tela para ver os detalhes.", keepOne: "Deixe pelo menos um aviso",
+      ob1Title: "Sua agenda que pensa com você", ob1Text: "Me conte o que você tem pendente, falando ou escrevendo. Eu sugiro quando fazer e aviso antes, com uma dica.", start: "Começar",
+      ob2Title: "Quando você rende melhor?", ob2Text: "Assim coloco o mais difícil no seu melhor momento.", morningE: "☀️ Manhã", afternoonE: "🌤️ Tarde", nightE: "🌙 Noite",
+      ob3Title: "Ative os avisos", ob3Text: "Eu aviso {x} de cada coisa, mesmo com o app fechado.", enableNotifs: "Ativar avisos",
+      missingStep: "Falta um passo", missingStepText: "Na Vercel, abra seu projeto, vá em Settings > Environment Variables e adicione APP_PASSWORD com a senha que quiser. Depois toque em Redeploy.",
+      missingStepNote: "Essa senha protege sua agenda e sua chave de IA.", password: "Senha", enterPw: "Digite sua senha para entrar.", enter: "Entrar", wrongPw: "Senha incorreta.",
+    },
+    fr: {
+      agenda: "Agenda", today: "Aujourd'hui", month: "Mois", week: "Semaine", prevDay: "Jour précédent", nextDay: "Jour suivant", prevMonth: "Mois précédent", nextMonth: "Mois suivant",
+      tabOrganize: "Organiser", tabChat: "Chat", tabBdays: "Anniversaires", tabBdaysShort: "Anniv.", tabSettings: "Réglages", sections: "Sections", add: "Ajouter",
+      orgTitle: "Vide ta tête", orgIntro: "Dis-moi tout ce que tu as à faire. Je te propose des horaires et tu choisis.", dictate: "Dicter", tapTalk: "Touche et parle",
+      dumpPh: "Ou écris-le ici. Ex. : demain je dois aller à la banque, tourner une vidéo ASMR et appeler maman", whichDay: "Pour quel jour", organizeBtn: "Organiser ma journée",
+      scheduleChosen: "Planifier la sélection", discard: "Ignorer",
+      chatTitle: "Parle à ton calendrier", chatPh: "Écris ou dicte...", send: "Envoyer",
+      addBday: "Ajouter un anniversaire", bdIntro: "Je te préviens 2 jours avant et le jour même, avec des idées de cadeau. Tu peux aussi me le dire dans le chat.", name: "Nom",
+      likesPh: "Goûts (facultatif) : café, anime, foot...", save: "Enregistrer", cancel: "Annuler", bdayDate: "Date d'anniversaire", chooseBdayDate: "Choisis la date d'anniversaire",
+      setNotices: "Rappels", remindBefore: "Me prévenir avant", quiet: "Heures calmes", from: "De", to: "à", sound: "Son dans l'appli", previewNotice: "Voir à quoi ressemble un rappel",
+      quietFoot: "Pendant les heures calmes, tu ne reçois aucun rappel.", routine: "Ma routine", bestAt: "Je suis plus efficace le", morning: "matin", afternoon: "après-midi", night: "soir",
+      appearance: "Apparence", theme: "Thème", system: "Comme mon téléphone", light: "Clair", dark: "Sombre", language: "Langue",
+      format: "Format", clock: "Horloge", clock12: "12 heures (3:52 PM)", clock24: "24 heures (15:52)", dates: "Dates", dmy: "27/10/2026 (jour/mois)", mdy: "10/27/2026 (mois/jour)",
+      account: "Compte", logout: "Se déconnecter sur cet appareil", version: "Version", adminSuffix: " · administrateur", adminOn: "Mode administrateur activé", adminOff: "Mode administrateur désactivé",
+      chooseDate: "Choisir une date", otherDay: "Autre jour", tomorrow: "Demain",
+      errRate: "L'IA gratuite a atteint sa limite pour le moment. Réessaie dans une minute.", errNoAi: "Gemini n'est pas encore connecté (voir Réglages).", errJson: "L'IA a répondu quelque chose que je n'ai pas compris. Réessaie.",
+      errAuth: "Ta session n'est pas valide. Reconnecte-toi.", errNet: "Connexion impossible. Réessaie.",
+      ex1Title: "Tourner une vidéo ASMR", ex1Tip: "Trouve la pièce la plus calme et fais un test micro de 30 secondes.", ex2Title: "Aller à la banque", ex2Tip: "Prends ta pièce d'identité et vérifie l'heure de fermeture.", exampleTag: " · exemple",
+      freeDay: "Journée libre", allDone: "Tout est fait ✓", doneOne: "{n} chose faite", doneMany: "{n} choses faites", thingOne: "{n} chose", thingMany: "{n} choses",
+      nextIn: "la prochaine dans {n} min", nextAt: "la prochaine à {t}", todayDot: "Aujourd'hui · ",
+      nothing: "Rien de prévu.", organizeThisDay: "Organiser ce jour", allDay: "Toute la journée", bdayOf: "Anniversaire de {n}", tapGifts: "Touche pour voir des idées de cadeau", now: "Maintenant",
+      swipeHint: "Glisse une tâche → pour la marquer faite, ou ← pour la passer à demain", swDone: "✓ Fait", swLater: "Demain →", markedPending: "Marquée à faire",
+      doneMsg: "✓ {t} : fait", movedTomorrow: "↪️ {t} : passé à demain", tipLabel: "Conseil : ",
+      oneHour: "1 heure", nMinutes: "{n} minutes", nMin: "{n} min", before: "{list} avant", fromTo: "{d} · de {a} à {b}",
+      exampleNote: "C'est un exemple. Il disparaît quand tu planifies ta première tâche.", notifyYou: "Je te préviens {x}.", markPending: "Marquer à faire", markDone: "✓ Marquer comme fait",
+      moveTomorrow: "Passer à demain", previewAlert: "Voir le rappel", addGcal: "Ajouter à Google Agenda", del: "Supprimer", doneBtn: "OK",
+      todayLower: "aujourd'hui", inN: "dans {n} min", isNow: "c'est maintenant", wasAt: "c'était à {t}", done: "✓ Fait", againIn: "⏰ Je te préviens à nouveau dans {x}", plusHour: "+1 heure", plusMin: "+{n} min",
+      seeInAgenda: "Voir dans l'agenda", close: "Fermer",
+      whatToDo: "Qu'est-ce que tu dois faire ?", adding: "Ajout...", findingTime: "Je cherche le meilleur moment...", addedN: "J'ai ajouté {n} choses", hourLbl: "Heure", suggestHint: "(si tu ne la mets pas, j'en propose une)",
+      writeFirst: "Écris d'abord ce que tu dois faire.", thinkingDay: "Je réfléchis à ta journée...", task: "Tâche", chooseTimes: "Choisis une heure pour chaque tâche.",
+      suggested: "Suggérée", dontSchedule: "Ne pas planifier", suggestedX: "Suggérée : {t}. ", scheduledOne: "C'est fait : 1 tâche planifiée.", scheduledMany: "C'est fait : {n} tâches planifiées.", noneChosen: "Tu n'as choisi aucune tâche.",
+      missedN: "{n} en retard", didIt: "C'est fait",
+      thinking: "Je réfléchis...", okDone: "C'est fait.", actCreate: "{e} Créer « {t} » le {d} à {h}", actBday: "🎂 Enregistrer l'anniversaire de {n} : {d}", actMove: "Déplacer « {t} » au {d} à {h}", actDel: "Supprimer « {t} »",
+      chatEmpty: "Pose n'importe quelle question sur ton agenda ou demande-lui de créer ou déplacer des choses. Elle te demande toujours de confirmer.", doneHeading: "Fait", doIt: "Je le fais ?", yesDo: "Oui, vas-y", no: "Non",
+      cPlanToday: "☀️ Plan du jour", qPlanToday: "Fais-moi le plan d'aujourd'hui dans l'ordre, avec des pauses.", cLeft: "⏭️ Qu'est-ce qu'il me reste ?", qLeft: "Qu'est-ce qu'il me reste à faire aujourd'hui ?",
+      cFree: "🧘 J'ai l'après-midi libre", qFree: "J'ai l'après-midi libre. Qu'est-ce que tu me conseilles selon mon agenda ?", cTomorrow: "🌙 Qu'ai-je demain ?", qTomorrow: "Qu'est-ce que j'ai demain ?",
+      cLateOne: "↪️ Passer 1 tâche en retard à demain", cLateMany: "↪️ Passer {n} tâches en retard à demain", qLate: "Passe à demain ce que je n'ai pas fait.", cGift: "🎁 Cadeau pour {n}", cWeek: "📅 Résumé de ma semaine", qWeek: "Résume ma semaine.",
+      listen: "Écouter", stop: "Arrêter",
+      whenToday: "aujourd'hui", whenTomorrow: "demain", whenDayAfter: "après-demain", whenInDays: "dans {n} jours",
+      nudge: "🎂 **{w}**, c'est l'anniversaire de **{n}**.\nOn choisit un cadeau ensemble ? Je cherche ce qui est à la mode.",
+      giftYes: "🎁 Oui, des idées de cadeau", onlyMsg: "💌 Juste le message", notNow: "Pas maintenant", writeMsgFor: "Écris-moi un message pour {n}", giftIdeasFor: "Oui, des idées de cadeau pour {n}",
+      writingMsg: "✍️ J'écris le message...", searchingTrends: "🔎 Je cherche ce qui est à la mode...", copied: "Copié ✓", selectCopy: "Sélectionne et copie", copyMsg: "Copier le message",
+      ideasFor: "🎁 Idées pour {n}", message: "💌 Message",
+      noBdays: "Pas encore d'anniversaires. Touche + ou dis au chat : « l'anniversaire d'Ana est le 3 mai ».", turnsAge: " · {n} ans", todayExcl: "aujourd'hui !", dayOne: "jour", dayMany: "jours",
+      giftIdeasBtn: "🎁 Idées de cadeau", confirmDelBday: "Supprimer l'anniversaire de {n} ?",
+      reminder: "Rappel", inHourCap: "Dans 1 heure", inMinCap: "Dans {n} min", previewTag: " · aperçu", nowLower: "maintenant", atCap: "À {t}", snooze10: "Reporter 10 min",
+      stopDictation: "Arrêter la dictée", listening: "Je t'écoute... touche pour terminer", noDictate: "Ce navigateur ne permet pas de dicter.", noMic: "Tu n'as pas autorisé le micro.", transcribing: "Transcription...",
+      pushClosed: "Rappels avec l'appli fermée", pushNotReady: "Ils ne sont pas encore prêts sur le serveur.", pushNoBrowser: "Ce navigateur ne permet pas les notifications. Essaie Chrome ou Safari à jour.",
+      pushOn: "✅ Rappels activés", pushOnText: "Ils arrivent même quand l'appli est fermée. En touchant un rappel, des boutons s'ouvrent pour reporter ou marquer comme fait.",
+      sending: "Envoi...", checkNotifs: "C'est fait, regarde tes notifications.", sendTest: "Envoyer un rappel test", activating: "Activation...",
+      noPermission: "Tu n'as pas donné l'autorisation. Tu peux l'activer dans Réglages du téléphone > Notifications.", allowNotifs: "Autoriser les rappels", steps3: "Active les rappels en 3 étapes",
+      step1: "Ajoute-la à ton écran d'accueil", step1Text: "Dans Safari, touche Partager (le carré avec la flèche) et choisis « Sur l'écran d'accueil ».",
+      step2: "Ouvre-la depuis la nouvelle icône", step2Text: "Comme ça, elle marche comme une appli et peut te prévenir.", step3: "Autorise les rappels",
+      step3Denied: "Tu les as bloqués avant. Active-les dans Réglages du téléphone > Notifications > Pendi.", step3Text: "Elle va demander si l'appli peut te prévenir. Touche Autoriser.",
+      missAi: "l'intelligence artificielle", missDb: "la sauvegarde dans le cloud", missPush: "les rappels", notReady: "⚠️ Quelque chose n'est pas prêt",
+      missingX: "Il reste à configurer {x}. Si c'est toi qui as installé l'appli, touche 5 fois « Version » en bas de cet écran pour voir les détails.", keepOne: "Garde au moins un rappel",
+      ob1Title: "Ton agenda qui réfléchit avec toi", ob1Text: "Dis-moi ce que tu as à faire, à la voix ou par écrit. Je te propose quand le faire et je te préviens avant, avec un conseil.", start: "Commencer",
+      ob2Title: "Quand es-tu le plus efficace ?", ob2Text: "Comme ça je mets le plus difficile à ton meilleur moment.", morningE: "☀️ Matin", afternoonE: "🌤️ Après-midi", nightE: "🌙 Soir",
+      ob3Title: "Active les rappels", ob3Text: "Je te préviens {x} chaque chose, même quand l'appli est fermée.", enableNotifs: "Activer les rappels",
+      missingStep: "Il manque une étape", missingStepText: "Dans Vercel, ouvre ton projet, va dans Settings > Environment Variables et ajoute APP_PASSWORD avec le mot de passe de ton choix. Puis touche Redeploy.",
+      missingStepNote: "Ce mot de passe protège ton agenda et ta clé d'IA.", password: "Mot de passe", enterPw: "Écris ton mot de passe pour entrer.", enter: "Entrer", wrongPw: "Mot de passe incorrect.",
+    },
+  };
+  // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
+  function detectLang() {
+    for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
+    return "en";
+  }
+  let lang = "es";
+  const setLang = () => {
+    let saved = "system"; try { saved = (JSON.parse(localStorage.getItem("settings")) || {}).lang || "system"; } catch {}
+    lang = LANGS[saved] ? saved : detectLang();
+  };
+  setLang();
+  const tr = (k, vars) => String((I18N[lang] && I18N[lang][k]) ?? I18N.es[k] ?? k).replace(/\{(\w+)\}/g, (_, v) => (vars && vars[v] != null ? vars[v] : ""));
+  const loc = () => LOCALE[lang];
+  // Fills every element marked data-i18n (text), data-i18n-ph (placeholder) or data-i18n-aria (label).
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach((n) => { n.textContent = tr(n.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-ph]").forEach((n) => { n.placeholder = tr(n.dataset.i18nPh); });
+    document.querySelectorAll("[data-i18n-aria]").forEach((n) => { n.setAttribute("aria-label", tr(n.dataset.i18nAria)); });
+  }
+  // Day and month names come from the phone's own date formatting, in the chosen language.
+  const fmt = (d, o) => new Intl.DateTimeFormat(loc(), o).format(d);
+  const dayName = (d) => fmt(d, { weekday: "long" });
+  const dayLetter = (d) => fmt(d, { weekday: "narrow" });
+  const dayMonth = (m, d) => fmt(new Date(2000, m - 1, d), { day: "numeric", month: "long" });
+  const andList = (items) => (Intl.ListFormat ? new Intl.ListFormat(loc(), { type: "conjunction" }).format(items) : items.join(", "));
   const CATS = { trabajo: "Trabajo", personal: "Personal", casa: "Casa", salud: "Salud", creativo: "Creativo", social: "Social", otro: "Otro" };
   const pad = (n) => String(n).padStart(2, "0");
   const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const fromYmd = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const at = (date, time) => { const d = fromYmd(date); const [h, m] = (time || "09:00").split(":").map(Number); d.setHours(h, m, 0, 0); return d; };
-  const niceDate = (s) => { const d = fromYmd(s); return DAYS_LONG[d.getDay()] + " " + d.getDate() + " de " + MONTHS[d.getMonth()]; };
+  const niceDate = (s) => fmt(fromYmd(s), { weekday: "long", day: "numeric", month: "long" });
   const hm = (d) => pad(d.getHours()) + ":" + pad(d.getMinutes());
   const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const cat = (c) => (CATS[c] ? c : "otro");
@@ -494,7 +776,7 @@ h1 { font-size: 46px; }
   // A date picker that shows our format: a pill with the text, over an invisible native date input.
   function dateField(input, opts = {}) {
     const label = el("span", {});
-    const show = () => { const v = input.value; label.textContent = opts.label ? opts.label(v) : v ? fmtDate(v) : opts.placeholder || "Elegir fecha"; label.className = v || opts.label ? "" : "ph"; };
+    const show = () => { const v = input.value; label.textContent = opts.label ? opts.label(v) : v ? fmtDate(v) : opts.placeholder || tr("chooseDate"); label.className = v || opts.label ? "" : "ph"; };
     input.type = "date"; input.addEventListener("change", show); input.addEventListener("input", show);
     const box = el("label", { class: "datef" + (opts.block ? " block" : "") }, "📅 ", label, input);
     box.refresh = show; show();
@@ -514,13 +796,14 @@ h1 { font-size: 46px; }
     transcribe: (audio) => call("/api/ai", { audio }).then((j) => String((j.data && j.data.texto) || "")),
   };
   function errText(e) {
-    if (e && e.error === "rate_limited") return "La IA gratis llegó a su límite por ahora. Intenta en un minuto.";
-    if (e && e.error === "no_ai") return "Falta conectar Gemini (mira Ajustes).";
-    if (e && e.error === "invalid_json") return "La IA respondió algo que no entendí. Intenta de nuevo.";
-    if (e && e.status === 401) return "Tu sesión no es válida. Vuelve a entrar.";
-    return (e && e.message) || "No se pudo conectar. Intenta de nuevo.";
+    if (e && e.error === "rate_limited") return tr("errRate");
+    if (e && e.error === "no_ai") return tr("errNoAi");
+    if (e && e.error === "invalid_json") return tr("errJson");
+    if (e && e.status === 401) return tr("errAuth");
+    return (e && e.status ? e.message : "") || tr("errNet");
   }
 
+  const VERSION = "0.5";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -528,8 +811,8 @@ h1 { font-size: 46px; }
   function examples() {
     const t = ymd(new Date()), m = ymd(addDays(new Date(), 1));
     return [
-      { id: "ex1", kind: "task", example: true, title: "Grabar video de ASMR", date: m, time: "10:00", dur: 60, cat: "creativo", tip: "Busca el cuarto más callado y haz una prueba de micrófono de 30 segundos." },
-      { id: "ex2", kind: "task", example: true, title: "Ir al banco", date: t, time: "16:00", dur: 45, cat: "personal", tip: "Lleva tu documento y revisa el horario de cierre." },
+      { id: "ex1", kind: "task", example: true, title: tr("ex1Title"), date: m, time: "10:00", dur: 60, cat: "creativo", tip: tr("ex1Tip") },
+      { id: "ex2", kind: "task", example: true, title: tr("ex2Title"), date: t, time: "16:00", dur: 45, cat: "personal", tip: tr("ex2Tip") },
     ];
   }
   const visibleTasks = () => (state.tasks.length ? state.tasks : examples());
@@ -551,6 +834,8 @@ h1 { font-size: 46px; }
     saveLocal();
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (state.settings.tz !== tz) saveSettings({ tz });
+    setLang(); applyLang();
+    if (state.settings.uiLang !== lang) saveSettings({ uiLang: lang });
   }
   function saveLocal() { ls.set("tasks", state.tasks); ls.set("bdays", state.bdays); ls.set("settings", state.settings); }
   async function put(row) {
@@ -583,20 +868,20 @@ h1 { font-size: 46px; }
     if (bdaysOn(x).length && !cats.includes("social")) cats.push("social");
     return el("button", { class: "wd" + (xk === today ? " today" : "") + (outside ? " out" : ""), "aria-pressed": String(xk === k), "aria-label": niceDate(xk),
         onclick: () => { state.anchor = x; renderCal(); } },
-      monthView ? null : el("span", { class: "l" }, DAYS[x.getDay()].slice(0, 1)),
+      monthView ? null : el("span", { class: "l" }, dayLetter(x)),
       el("span", { class: "n" }, x.getDate()),
       el("span", { class: "dots" }, cats.map((c) => el("i", { style: `--c: var(--c-${c})` }))));
   }
   function daySummary(k, items) {
     const open = items.filter((t) => !t.done);
-    if (!items.length) return "Día libre";
-    if (!open.length) return el("span", {}, el("b", {}, "Todo listo ✓"), ` · ${items.length} ${items.length === 1 ? "cosa hecha" : "cosas hechas"}`);
-    const parts = [el("b", {}, `${open.length} ${open.length === 1 ? "cosa" : "cosas"}`)];
+    if (!items.length) return tr("freeDay");
+    if (!open.length) return el("span", {}, el("b", {}, tr("allDone")), " · " + tr(items.length === 1 ? "doneOne" : "doneMany", { n: items.length }));
+    const parts = [el("b", {}, tr(open.length === 1 ? "thingOne" : "thingMany", { n: open.length }))];
     if (k === ymd(new Date())) {
       const next = open.map((t) => ({ t, s: at(t.date, t.time) })).filter((x) => x.s > new Date()).sort((a, b) => a.s - b.s)[0];
       if (next) {
         const m = Math.round((next.s - Date.now()) / 60000);
-        parts.push(` · la próxima ${m < 60 ? `en ${Math.max(1, m)} min` : `a las ${clock(next.t.time)}`}: ${icon(next.t)} ${next.t.title}`);
+        parts.push(` · ${m < 60 ? tr("nextIn", { n: Math.max(1, m) }) : tr("nextAt", { t: clock(next.t.time) })}: ${icon(next.t)} ${next.t.title}`);
       }
     }
     return el("span", {}, parts);
@@ -604,18 +889,18 @@ h1 { font-size: 46px; }
   function renderCal() {
     const today = ymd(new Date()), k = ymd(state.anchor);
     const d = state.anchor;
-    $("eyebrow").textContent = (k === today ? "Hoy · " : "") + DAYS_LONG[d.getDay()];
-    $("title").textContent = d.getDate() + " de " + MONTHS[d.getMonth()];
-    $("viewBtn").textContent = monthView ? "Semana" : "Mes";
+    $("eyebrow").textContent = (k === today ? tr("todayDot") : "") + dayName(d);
+    $("title").textContent = dayMonth(d.getMonth() + 1, d.getDate());
+    $("viewBtn").textContent = tr(monthView ? "week" : "month");
     $("viewBtn").setAttribute("aria-pressed", String(monthView));
-    $("prevBtn").setAttribute("aria-label", monthView ? "Mes anterior" : "Día anterior");
-    $("nextBtn").setAttribute("aria-label", monthView ? "Mes siguiente" : "Día siguiente");
+    $("prevBtn").setAttribute("aria-label", tr(monthView ? "prevMonth" : "prevDay"));
+    $("nextBtn").setAttribute("aria-label", tr(monthView ? "nextMonth" : "nextDay"));
     const list = visibleTasks();
 
     const week = $("week"); week.replaceChildren();
     week.className = monthView ? "month" : "week";
     if (monthView) {
-      ["L", "M", "M", "J", "V", "S", "D"].forEach((l) => week.append(el("div", { class: "wd" }, el("span", { class: "l" }, l))));
+      [0, 1, 2, 3, 4, 5, 6].forEach((i) => week.append(el("div", { class: "wd" }, el("span", { class: "l" }, dayLetter(new Date(2024, 0, 1 + i))))));
       const first = new Date(d.getFullYear(), d.getMonth(), 1);
       const start = addDays(first, -((first.getDay() + 6) % 7));
       for (let i = 0; i < 42; i++) {
@@ -633,32 +918,32 @@ h1 { font-size: 46px; }
     const items = list.filter((t) => t.date === k).sort((a, b) => a.time.localeCompare(b.time));
     $("summary").replaceChildren(daySummary(k, items));
     if (!items.length && !bds.length) {
-      box.append(el("div", { class: "list" }, el("div", { class: "empty" }, el("div", {}, "Nada agendado."),
-        el("button", { class: "btn small", onclick: () => { setDump(k); showTab("organize"); } }, "Organizar este día"))));
+      box.append(el("div", { class: "list" }, el("div", { class: "empty" }, el("div", {}, tr("nothing")),
+        el("button", { class: "btn small", onclick: () => { setDump(k); showTab("organize"); } }, tr("organizeThisDay")))));
       return;
     }
     const ul = el("div", { class: "list" });
     for (const b of bds) ul.append(el("button", { class: "item", style: "--c: var(--c-social)", onclick: () => showTab("bdays") },
-      el("span", { class: "t" }, "Todo el día"), el("span", { class: "bar" }), el("span", {}, el("div", { class: "ti" }, "🎂 Cumpleaños de " + b.name), el("div", { class: "tip" }, "Toca para ver ideas de regalo"))));
+      el("span", { class: "t" }, tr("allDay")), el("span", { class: "bar" }), el("span", {}, el("div", { class: "ti" }, "🎂 " + tr("bdayOf", { n: b.name })), el("div", { class: "tip" }, tr("tapGifts")))));
     const now = Date.now();
     let lineDone = k !== today;
     for (const t of items) {
       const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000);
-      if (!lineDone && s.getTime() > now) { ul.append(el("div", { class: "nowline" }, el("span", {}, "Ahora · " + clock(hm(new Date()))))); lineDone = true; }
+      if (!lineDone && s.getTime() > now) { ul.append(el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date()))))); lineDone = true; }
       const live = s.getTime() <= now && now < e.getTime();
       const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : ""), style: `--c: var(--c-${cat(t.cat)})`,
           onclick: () => { if (!row.dragged) openSheet(t); } },
         el("span", { class: "t" }, clock(t.time), el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
-        el("span", {}, el("div", { class: "ti" }, `${icon(t)} ${t.title}`), t.tip ? el("div", { class: "tip" }, t.tip) : null));
+        el("span", {}, el("div", { class: "ti", "data-example": t.example ? tr("exampleTag") : null }, `${icon(t)} ${t.title}`), t.tip ? el("div", { class: "tip" }, t.tip) : null));
       ul.append(t.example ? row : swipeable(row, t));
     }
-    if (!lineDone) ul.append(el("div", { class: "nowline" }, el("span", {}, "Ahora · " + clock(hm(new Date())))));
+    if (!lineDone) ul.append(el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date())))));
     box.append(ul);
-    if (state.tasks.length && !ls.get("swiped", false)) box.append(el("div", { class: "hint", style: "margin-top:8px" }, "Desliza una tarea → para marcarla hecha, o ← para pasarla a mañana"));
+    if (state.tasks.length && !ls.get("swiped", false)) box.append(el("div", { class: "hint", style: "margin-top:8px" }, tr("swipeHint")));
   }
   // Swipe right = done, swipe left = move to tomorrow.
   function swipeable(row, t) {
-    const wrap = el("div", { class: "swipe" }, el("div", { class: "under" }, el("span", { class: "l" }, "✓ Hecho"), el("span", { class: "r" }, "Mañana →")), row);
+    const wrap = el("div", { class: "swipe" }, el("div", { class: "under" }, el("span", { class: "l" }, tr("swDone")), el("span", { class: "r" }, tr("swLater"))), row);
     let x0 = 0, y0 = 0, dx = 0, on = false, id = null;
     row.addEventListener("pointerdown", (e) => { if (e.button) return; x0 = e.clientX; y0 = e.clientY; dx = 0; on = false; id = e.pointerId; row.dragged = false; });
     row.addEventListener("pointermove", (e) => {
@@ -671,8 +956,8 @@ h1 { font-size: 46px; }
     const end = () => {
       if (id === null) return;
       id = null; wrap.classList.remove("dragging");
-      if (on && dx > 90) { ls.set("swiped", true); put({ ...t, done: !t.done, snooze: null }); notice(t.done ? "Marcada como pendiente" : `✓ ${t.title}: hecho`); return; }
-      if (on && dx < -90) { ls.set("swiped", true); put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(`↪️ ${t.title}: pasó a mañana`); return; }
+      if (on && dx > 90) { ls.set("swiped", true); put({ ...t, done: !t.done, snooze: null }); notice(t.done ? tr("markedPending") : tr("doneMsg", { t: t.title })); return; }
+      if (on && dx < -90) { ls.set("swiped", true); put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(tr("movedTomorrow", { t: t.title })); return; }
       row.style.transform = ""; wrap.classList.remove("go-done", "go-later");
       setTimeout(() => { row.dragged = false; }, 50);
     };
@@ -690,10 +975,10 @@ h1 { font-size: 46px; }
   function gcalLink(t) {
     const s = at(t.date, t.time), e = new Date(s.getTime() + t.dur * 60000);
     const f = (d) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
-    return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(t.title) + "&dates=" + f(s) + "/" + f(e) + "&details=" + encodeURIComponent(t.tip ? "Consejo: " + t.tip : "");
+    return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(t.title) + "&dates=" + f(s) + "/" + f(e) + "&details=" + encodeURIComponent(t.tip ? tr("tipLabel") + t.tip : "");
   }
   const remindList = () => (Array.isArray(state.settings.remind) && state.settings.remind.length ? state.settings.remind : [60, 30, 10]).slice().sort((a, b) => b - a);
-  const remindText = () => remindList().map((m) => (m === 60 ? "1 hora" : `${m} minutos`)).join(", ").replace(/, ([^,]*)$/, " y $1") + " antes";
+  const remindText = () => tr("before", { list: andList(remindList().map((m) => (m === 60 ? tr("oneHour") : tr("nMinutes", { n: m })))) });
   function closeSheet() { $("sheet").hidden = true; $("sheet").replaceChildren(); }
   function showSheet(sh) { const bg = $("sheet"); bg.replaceChildren(sh); bg.hidden = false; }
   function openSheet(t) {
@@ -701,65 +986,65 @@ h1 { font-size: 46px; }
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)),
-        el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${niceDate(t.date)} · de ${clock(t.time)} a ${clock(hm(end))}`))),
+        el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
-      el("div", { class: "muted" }, t.example ? "Es un ejemplo. Desaparece cuando agendes tu primera tarea." : "Te aviso " + remindText() + "."),
+      el("div", { class: "muted" }, t.example ? tr("exampleNote") : tr("notifyYou", { x: remindText() })),
       el("div", { class: "actions" },
-        t.example ? null : el("button", { onclick: () => { put({ ...t, done: !t.done, snooze: null }); closeSheet(); } }, t.done ? "Marcar como pendiente" : "✓ Marcar como hecho"),
-        t.example ? null : el("button", { onclick: () => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); closeSheet(); notice(`↪️ ${t.title}: pasó a mañana`); } }, "Pasar a mañana"),
-        el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, "Ver cómo será el aviso"),
-        el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, "Agregar a Google Calendar"),
-        t.example ? null : el("button", { class: "danger", onclick: () => { remove(t); closeSheet(); } }, "Borrar")),
-      el("button", { class: "btn", onclick: closeSheet }, "Listo")));
+        t.example ? null : el("button", { onclick: () => { put({ ...t, done: !t.done, snooze: null }); closeSheet(); } }, tr(t.done ? "markPending" : "markDone")),
+        t.example ? null : el("button", { onclick: () => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); closeSheet(); notice(tr("movedTomorrow", { t: t.title })); } }, tr("moveTomorrow")),
+        el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
+        el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
+        t.example ? null : el("button", { class: "danger", onclick: () => { remove(t); closeSheet(); } }, tr("del"))),
+      el("button", { class: "btn", onclick: closeSheet }, tr("doneBtn"))));
   }
   // Opened by tapping a notification: the task in big, with one-tap answers.
   function openQuick(t) {
     if (!t) return;
     const mins = Math.round((at(t.date, t.time) - Date.now()) / 60000);
-    const when = mins > 0 ? (mins >= 90 ? (t.date === ymd(new Date()) ? "hoy" : niceDate(t.date)) : `en ${mins} min`) : mins > -(t.dur || 30) ? "es ahora" : `era a las ${clock(t.time)}`;
+    const when = mins > 0 ? (mins >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: mins })) : mins > -(t.dur || 30) ? tr("isNow") : tr("wasAt", { t: clock(t.time) });
     const then = (fn) => () => { fn(); closeSheet(); };
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${clock(t.time)} · ${when}`))),
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       el("div", { class: "qa" },
-        t.done ? null : el("button", { class: "big", onclick: then(() => { markDone(t.id); notice(`✓ ${t.title}: hecho`); }) }, "✓ Hecho"),
-        [10, 30, 60].map((m) => el("button", { onclick: then(() => { snooze(t.id, m); notice(`⏰ Te aviso otra vez en ${m === 60 ? "1 hora" : m + " min"}`); }) }, m === 60 ? "+1 hora" : `+${m} min`))),
+        t.done ? null : el("button", { class: "big", onclick: then(() => { markDone(t.id); notice(tr("doneMsg", { t: t.title })); }) }, tr("done")),
+        [10, 30, 60].map((m) => el("button", { onclick: then(() => { snooze(t.id, m); notice(tr("againIn", { x: m === 60 ? tr("oneHour") : tr("nMin", { n: m }) })); }) }, m === 60 ? tr("plusHour") : tr("plusMin", { n: m })))),
       el("div", { class: "actions" },
-        el("button", { onclick: then(() => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(`↪️ ${t.title}: pasó a mañana`); }) }, "Pasar a mañana"),
-        el("button", { onclick: () => { state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, "Ver en la agenda")),
-      el("button", { class: "btn", onclick: closeSheet }, "Cerrar")));
+        el("button", { onclick: then(() => { put({ ...t, date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }); notice(tr("movedTomorrow", { t: t.title })); }) }, tr("moveTomorrow")),
+        el("button", { onclick: () => { state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, tr("seeInAgenda"))),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // Quick add from the + button: say or type it; if there is no time, the AI picks a good one.
   function openAdd() {
     const day = el("input", { id: "addDate" }); day.value = ymd(new Date());
     const seg = el("div", { class: "seg" });
-    const text = el("input", { class: "field", id: "addIn", placeholder: "¿Qué tienes que hacer?", autocomplete: "off", style: "background:var(--group);flex:1" });
-    const mic = el("button", { type: "button", class: "mic", "data-mic": "addIn", "aria-label": "Dictar", onclick: () => toggleMic(mic) }, micSvg());
+    const text = el("input", { class: "field", id: "addIn", placeholder: tr("whatToDo"), autocomplete: "off", style: "background:var(--group);flex:1" });
+    const mic = el("button", { type: "button", class: "mic", "data-mic": "addIn", "aria-label": tr("dictate"), onclick: () => toggleMic(mic) }, micSvg());
     const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" });
     const st = el("div", { class: "status", role: "status" });
-    const go = el("button", { class: "btn primary" }, "Agregar");
-    const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": "Agregar", onsubmit: async (e) => {
+    const go = el("button", { class: "btn primary" }, tr("add"));
+    const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("add"), onsubmit: async (e) => {
         e.preventDefault();
         const what = text.value.trim(); if (!what) { text.focus(); return; }
-        go.disabled = true; st.className = "status"; st.textContent = time.value ? "Agregando..." : "Buscando la mejor hora...";
+        go.disabled = true; st.className = "status"; st.textContent = tr(time.value ? "adding" : "findingTime");
         const added = await quickAdd(what, day.value, time.value).catch((err) => { st.className = "status err"; st.textContent = errText(err); return null; });
         go.disabled = false;
         if (!added) return;
         closeSheet(); state.anchor = fromYmd(added[0].date); render();
-        notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${clock(added[0].time)}` : `Agregué ${added.length} cosas`);
+        notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${clock(added[0].time)}` : tr("addedN", { n: added.length }));
       } },
-      el("div", { class: "grabber" }), el("h2", {}, "Agregar"),
+      el("div", { class: "grabber" }), el("h2", {}, tr("add")),
       el("div", { class: "row", style: "flex-wrap:nowrap" }, mic, text),
       seg,
-      el("label", { class: "row muted" }, "Hora", time, el("span", {}, "(si no la pones, te sugiero una)")),
-      st, el("div", { class: "row" }, go, el("button", { type: "button", class: "btn", onclick: closeSheet }, "Cancelar")));
+      el("label", { class: "row muted" }, tr("hourLbl"), time, el("span", {}, tr("suggestHint"))),
+      st, el("div", { class: "row" }, go, el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
     showSheet(form); daySeg(seg, day); text.focus();
   }
   async function quickAdd(what, date, time) {
     let tareas = [];
     try {
-      const res = await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
+      const res = await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: títulos y consejos van en ese idioma.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
 ${time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
@@ -783,15 +1068,15 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
   // Hoy / Mañana / Otro día, bound to a date input.
   function daySeg(box, input) {
     const today = ymd(new Date()), tomorrow = ymd(addDays(new Date(), 1));
-    const df = dateField(input, { label: (v) => (v === today || v === tomorrow || !v ? "Otro día" : fmtDate(v)) });
+    const df = dateField(input, { label: (v) => (v === today || v === tomorrow || !v ? tr("otherDay") : fmtDate(v)) });
     const set = (v) => { input.value = v; input.dispatchEvent(new Event("change")); };
     const paint = () => {
       box.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.v === input.value)));
       df.classList.toggle("on", input.value !== today && input.value !== tomorrow);
     };
     box.replaceChildren(
-      el("button", { type: "button", class: "chip", "data-v": today, onclick: () => set(today) }, "Hoy"),
-      el("button", { type: "button", class: "chip", "data-v": tomorrow, onclick: () => set(tomorrow) }, "Mañana"), df);
+      el("button", { type: "button", class: "chip", "data-v": today, onclick: () => set(today) }, tr("today")),
+      el("button", { type: "button", class: "chip", "data-v": tomorrow, onclick: () => set(tomorrow) }, tr("tomorrow")), df);
     input.addEventListener("change", paint); paint();
   }
   $("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) closeSheet(); });
@@ -799,7 +1084,7 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
 
   // ---------- organize ----------
   const energy = () => state.settings.energy || "mañana";
-  const dumpDate = el("input", { id: "dumpDate", "aria-label": "Otro día" });
+  const dumpDate = el("input", { id: "dumpDate", "aria-label": tr("otherDay") });
   dumpDate.value = ymd(addDays(new Date(), 1));
   const setDump = (v) => { dumpDate.value = v; dumpDate.dispatchEvent(new Event("change")); };
   function agendaText(fromDate, days) {
@@ -807,18 +1092,18 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
     for (let i = 0; i < days; i++) {
       const d = ymd(addDays(start, i));
       const items = state.tasks.filter((t) => t.date === d).sort((a, b) => a.time.localeCompare(b.time));
-      out.push(d + " (" + DAYS_LONG[addDays(start, i).getDay()] + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.time} ${t.title} (${t.dur} min${t.done ? ", hecho" : ""})`).join("; ") : "libre"));
+      out.push(d + " (" + dayName(addDays(start, i)) + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.time} ${t.title} (${t.dur} min${t.done ? ", hecho" : ""})`).join("; ") : "libre"));
     }
     return out.join("\n");
   }
-  const nowLine = () => { const n = new Date(); return `Hoy es ${DAYS_LONG[n.getDay()]} ${ymd(n)}, son las ${hm(n)}.`; };
+  const nowLine = () => { const n = new Date(); return `Hoy es ${dayName(n)} ${ymd(n)}, son las ${hm(n)}.`; };
 
   async function organize() {
     const text = $("dump").value.trim();
-    if (!text) { $("dumpStatus").textContent = "Escribe primero lo que tienes que hacer."; return; }
+    if (!text) { $("dumpStatus").textContent = tr("writeFirst"); return; }
     const date = dumpDate.value || ymd(addDays(new Date(), 1));
-    $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = "Pensando cómo organizar tu día...";
-    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
+    $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = tr("thinkingDay");
+    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: el resumen, los títulos, los porqués y los consejos van en ese idioma.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Organiza este texto en tareas para el día ${date}. Si el texto menciona otro día para alguna tarea, usa ese día.
 Agenda ya ocupada (no choques con esto):
@@ -835,13 +1120,13 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
       if (!tareas.length) throw { error: "invalid_json" };
       state.proposals = tareas.map((t) => ({
-        title: String(t.titulo || "Tarea"), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
+        title: String(t.titulo || tr("task")), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
         dur: Math.max(5, Number(t.duracion) || 30),
         options: (Array.isArray(t.opciones) ? t.opciones : []).map(String).filter((x) => /^\d{1,2}:\d{2}$/.test(x)).map((x) => x.padStart(5, "0")).slice(0, 3),
         rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), skip: false,
       })).filter((p) => p.options.length);
       state.proposals.forEach((p) => { p.pick = p.options[Math.min(p.rec, p.options.length - 1)]; });
-      $("dumpStatus").textContent = res.resumen ? String(res.resumen) : "Elige una hora para cada tarea.";
+      $("dumpStatus").textContent = res.resumen ? String(res.resumen) : tr("chooseTimes");
       renderProposals();
     } catch (e) { $("dumpStatus").className = "status err"; $("dumpStatus").textContent = errText(e); }
     finally { $("organize").disabled = false; }
@@ -853,12 +1138,12 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     ps.forEach((p, i) => {
       box.append(el("div", { class: "card", style: `--c: var(--c-${p.cat})` },
         el("h3", {}, el("span", { class: "dot" }), `${i + 1}. ${icon(p)} ${p.title}`),
-        el("div", { class: "muted" }, `${niceDate(p.date)} · ${p.dur} min · ${CATS[p.cat]}`),
+        el("div", { class: "muted" }, `${niceDate(p.date)} · ${p.dur} min`),
         el("div", { class: "chips" },
-          p.options.map((o, j) => el("button", { class: "chip" + (j === p.rec ? " rec" : ""), "aria-pressed": String(!p.skip && p.pick === o), title: j === p.rec ? "Sugerida" : null,
-            onclick: () => { p.pick = o; p.skip = false; renderProposals(); } }, o)),
-          el("button", { class: "chip", "aria-pressed": String(p.skip), onclick: () => { p.skip = !p.skip; renderProposals(); } }, "No agendar")),
-        p.why ? el("div", { class: "muted" }, "Sugerida: " + p.options[Math.min(p.rec, p.options.length - 1)] + ". " + p.why) : null,
+          p.options.map((o, j) => el("button", { class: "chip" + (j === p.rec ? " rec" : ""), "aria-pressed": String(!p.skip && p.pick === o), title: j === p.rec ? tr("suggested") : null,
+            onclick: () => { p.pick = o; p.skip = false; renderProposals(); } }, clock(o))),
+          el("button", { class: "chip", "aria-pressed": String(p.skip), onclick: () => { p.skip = !p.skip; renderProposals(); } }, tr("dontSchedule"))),
+        p.why ? el("div", { class: "muted" }, tr("suggestedX", { t: clock(p.options[Math.min(p.rec, p.options.length - 1)]) }) + p.why) : null,
         p.tip ? el("div", { class: "tipbox" }, p.tip) : null));
     });
   }
@@ -867,28 +1152,28 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, done: false, created: Date.now() });
     state.proposals = null; renderProposals(); $("dump").value = "";
     $("dumpStatus").className = "status";
-    $("dumpStatus").textContent = ps.length ? `Listo: agendé ${ps.length} ${ps.length === 1 ? "tarea" : "tareas"}.` : "No elegiste ninguna tarea.";
+    $("dumpStatus").textContent = ps.length ? tr(ps.length === 1 ? "scheduledOne" : "scheduledMany", { n: ps.length }) : tr("noneChosen");
     if (ps[0]) { state.anchor = fromYmd(ps[0].date); if (isPhone()) showTab("cal"); render(); }
   }
   function renderOverdue() {
     const box = $("overdue"); box.replaceChildren();
     const late = state.tasks.filter((t) => !t.done && t.date < ymd(new Date()));
     if (!late.length) return;
-    box.append(el("h2", {}, "Se te pasaron " + late.length));
+    box.append(el("h2", {}, tr("missedN", { n: late.length })));
     for (const t of late.slice(0, 6)) box.append(el("div", { class: "card", style: `--c: var(--c-${cat(t.cat)})` },
       el("h3", {}, el("span", { class: "dot" }), `${icon(t)} ${t.title}`), el("div", { class: "muted" }, niceDate(t.date) + " · " + clock(t.time)),
       el("div", { class: "row" },
-        el("button", { class: "btn small", onclick: () => put({ ...t, date: ymd(addDays(new Date(), 1)) }) }, "Pasar a mañana"),
-        el("button", { class: "btn small", onclick: () => put({ ...t, done: true }) }, "Ya lo hice"))));
+        el("button", { class: "btn small", onclick: () => put({ ...t, date: ymd(addDays(new Date(), 1)) }) }, tr("moveTomorrow")),
+        el("button", { class: "btn small", onclick: () => put({ ...t, done: true }) }, tr("didIt")))));
   }
 
   // ---------- chat ----------
   async function sendChat(q) {
     q = (q || "").trim(); if (!q) return;
     state.chat.push({ role: "user", content: q });
-    const thinking = { role: "assistant", content: "Pensando...", temp: true }; state.chat.push(thinking); renderChat();
+    const thinking = { role: "assistant", content: tr("thinking"), temp: true }; state.chat.push(thinking); renderChat();
     $("chatSend").disabled = true;
-    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español, breve y fácil de leer.
+    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]} (la respuesta y los títulos y consejos de las acciones), breve y fácil de leer.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Agenda de los próximos 7 días (cada evento tiene un id):
@@ -905,7 +1190,7 @@ Si no hay acciones, usa "acciones":[].`;
     try {
       const res = await ai.json([{ role: "user", content: rules }, ...turns]);
       state.chat.splice(state.chat.indexOf(thinking), 1);
-      state.chat.push({ role: "assistant", content: String((res && res.respuesta) || "Listo.") });
+      state.chat.push({ role: "assistant", content: String((res && res.respuesta) || tr("okDone")) });
       const acts = (Array.isArray(res && res.acciones) ? res.acciones : []).filter((a) => a && (a.tipo === "crear" || (a.tipo === "cumple" && a.nombre && Number(a.mes) >= 1 && Number(a.mes) <= 12 && Number(a.dia) >= 1 && Number(a.dia) <= 31) || state.tasks.some((t) => t.id === String(a.id))));
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
@@ -915,16 +1200,16 @@ Si no hay acciones, usa "acciones":[].`;
   }
   function describe(a) {
     const t = state.tasks.find((x) => x.id === String(a.id));
-    if (a.tipo === "crear") return `${emojiOnly(a.emoji) || "➕"} Crear "${a.titulo}" el ${niceDate(a.fecha)} a las ${a.hora}`;
-    if (a.tipo === "cumple") return `🎂 Guardar el cumpleaños de ${a.nombre}: ${a.dia} de ${MONTHS[a.mes - 1]}`;
-    if (a.tipo === "mover") return `Mover "${t.title}" al ${niceDate(a.fecha || t.date)} a las ${clock(a.hora || t.time)}`;
-    return `Borrar "${t.title}"`;
+    if (a.tipo === "crear") return tr("actCreate", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha), h: clock(String(a.hora || "").padStart(5, "0")) });
+    if (a.tipo === "cumple") return tr("actBday", { n: a.nombre, d: dayMonth(Number(a.mes), Number(a.dia)) });
+    if (a.tipo === "mover") return tr("actMove", { t: t.title, d: niceDate(a.fecha || t.date), h: clock(a.hora ? String(a.hora).padStart(5, "0") : t.time) });
+    return tr("actDel", { t: t.title });
   }
   async function applyActions(msg) {
     for (const a of msg.actions) {
       const okDate = /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || ""), okTime = /^\d{1,2}:\d{2}$/.test(a.hora || "");
       if (a.tipo === "cumple") await put({ id: uid("b"), kind: "bday", name: String(a.nombre).slice(0, 60), month: Number(a.mes), day: Number(a.dia), year: Number(a.anio) > 1900 ? Number(a.anio) : null, notes: String(a.gustos || "") });
-      if (a.tipo === "crear" && okDate && okTime) await put({ id: uid("t"), kind: "task", title: String(a.titulo || "Tarea"), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: a.hora.padStart(5, "0"), dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), done: false, created: Date.now() });
+      if (a.tipo === "crear" && okDate && okTime) await put({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: a.hora.padStart(5, "0"), dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), done: false, created: Date.now() });
       const t = state.tasks.find((x) => x.id === String(a.id));
       if (a.tipo === "mover" && t) await put({ ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, done: false });
       if (a.tipo === "borrar" && t) await remove(t);
@@ -933,13 +1218,13 @@ Si no hay acciones, usa "acciones":[].`;
   }
   function renderChat() {
     const log = $("chatlog"); log.replaceChildren();
-    if (!state.chat.length) log.append(el("div", { class: "muted" }, "Pregúntale lo que quieras sobre tu agenda o pídele que cree o mueva cosas. Siempre te pide confirmar."));
+    if (!state.chat.length) log.append(el("div", { class: "muted" }, tr("chatEmpty")));
     for (const m of state.chat) {
-      if (m.actions) log.append(el("div", { class: "card" }, el("b", {}, m.applied ? "Hecho" : "¿Lo hago?"),
+      if (m.actions) log.append(el("div", { class: "card" }, el("b", {}, tr(m.applied ? "doneHeading" : "doIt")),
         el("ul", { style: "margin:0;padding-left:18px" }, m.actions.map((a) => el("li", {}, describe(a)))),
         m.applied ? null : el("div", { class: "row" },
-          el("button", { class: "btn small primary", onclick: () => applyActions(m) }, "Sí, hazlo"),
-          el("button", { class: "btn small", onclick: () => { state.chat.splice(state.chat.indexOf(m), 1); renderChat(); } }, "No"))));
+          el("button", { class: "btn small primary", onclick: () => applyActions(m) }, tr("yesDo")),
+          el("button", { class: "btn small", onclick: () => { state.chat.splice(state.chat.indexOf(m), 1); renderChat(); } }, tr("no")))));
       else if (m.role === "user") log.append(el("div", { class: "msg me" }, m.content));
       else if (m.content) log.append(el("div", { class: "msg ai" }, md(m.content), m.temp ? null : speakBtn(m.content)));
       if (m.chips && !m.used) log.append(el("div", { class: "chips" }, m.chips.map((c) => el("button", { class: "chip", onclick: () => { m.used = true; c.run(); } }, c.label))));
@@ -954,13 +1239,13 @@ Si no hay acciones, usa "acciones":[].`;
     const late = state.tasks.filter((t) => !t.done && t.date < today).length;
     const left = state.tasks.filter((t) => !t.done && t.date === today && at(t.date, t.time) > new Date()).length;
     const chips = [];
-    if (h < 12) chips.push(["☀️ Plan de hoy", "Hazme el plan de hoy en orden, con pausas."]);
-    else if (h < 19) chips.push(left ? ["⏭️ ¿Qué me queda hoy?", "¿Qué me queda por hacer hoy?"] : ["🧘 Tengo la tarde libre", "Tengo la tarde libre. ¿Qué me recomiendas hacer según mi agenda?"]);
-    chips.push(["🌙 ¿Qué tengo mañana?", "¿Qué tengo mañana?"]);
-    if (late) chips.push([`↪️ Mover ${late} ${late === 1 ? "atrasada" : "atrasadas"} a mañana`, "Mueve lo que no hice a mañana."]);
+    if (h < 12) chips.push([tr("cPlanToday"), tr("qPlanToday")]);
+    else if (h < 19) chips.push(left ? [tr("cLeft"), tr("qLeft")] : [tr("cFree"), tr("qFree")]);
+    chips.push([tr("cTomorrow"), tr("qTomorrow")]);
+    if (late) chips.push([tr(late === 1 ? "cLateOne" : "cLateMany", { n: late }), tr("qLate")]);
     const soon = state.bdays.map((b) => ({ b, n: nextBday(b) })).filter((x) => x.n.days <= 7).sort((x, y) => x.n.days - y.n.days)[0];
-    if (soon) chips.push([`🎁 Regalo para ${soon.b.name}`, () => giftInChat(soon.b)]);
-    chips.push(["📅 Resumen de mi semana", "Resúmeme mi semana."]);
+    if (soon) chips.push([tr("cGift", { n: soon.b.name }), () => giftInChat(soon.b)]);
+    chips.push([tr("cWeek"), tr("qWeek")]);
     box.replaceChildren(...chips.slice(0, 4).map(([label, q]) => el("button", { class: "chip", onclick: () => (typeof q === "function" ? q() : sendChat(q)) }, label)));
   }
   // Reads an answer aloud with the phone's own voice (free, works offline).
@@ -971,13 +1256,13 @@ Si no hay acciones, usa "acciones":[].`;
       if (speaking === b) { speechSynthesis.cancel(); return; }
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(String(text).replace(/\*\*/g, "").replace(/\p{Extended_Pictographic}|\uFE0F|\u200D|\p{Regional_Indicator}/gu, "").replace(/^\s*[-•]\s*/gm, ""));
-      const voices = speechSynthesis.getVoices().filter((v) => /^es/i.test(v.lang));
-      u.voice = voices.find((v) => /paulina|m[oó]nica|marisol|helena|elvira|sabina|google español/i.test(v.name)) || voices[0] || null;
-      u.lang = (u.voice && u.voice.lang) || "es-ES"; u.rate = 1.02;
-      const reset = () => { if (speaking === b) speaking = null; b.lastChild.textContent = "Escuchar"; };
+      const voices = speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith(lang));
+      u.voice = voices.find((v) => v.lang.toLowerCase() === loc().toLowerCase() || /paulina|m[oó]nica|marisol|helena|elvira|sabina|google español/i.test(v.name)) || voices[0] || null;
+      u.lang = (u.voice && u.voice.lang) || loc(); u.rate = 1.02;
+      const reset = () => { if (speaking === b) speaking = null; b.lastChild.textContent = tr("listen"); };
       u.onend = reset; u.onerror = reset;
-      speaking = b; b.lastChild.textContent = "Detener"; speechSynthesis.speak(u);
-    } }, speakerSvg(), el("span", {}, "Escuchar"));
+      speaking = b; b.lastChild.textContent = tr("stop"); speechSynthesis.speak(u);
+    } }, speakerSvg(), el("span", {}, tr("listen")));
     return el("div", {}, b);
   }
   const speakerSvg = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.innerHTML = '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>'; return s; };
@@ -1006,12 +1291,12 @@ Si no hay acciones, usa "acciones":[].`;
       const n = nextBday(b);
       if (n.days > 2 || seen[b.id] === today) continue;
       seen[b.id] = today; added = true;
-      const when = n.days === 0 ? "hoy" : n.days === 1 ? "mañana" : "pasado mañana";
-      const msg = { role: "assistant", content: `🎂 **${when[0].toUpperCase() + when.slice(1)}** es el cumpleaños de **${b.name}**.\n¿Quieres que escojamos un regalo juntos? Te busco lo que está de moda.` };
+      const when = tr(n.days === 0 ? "whenToday" : n.days === 1 ? "whenTomorrow" : "whenDayAfter");
+      const msg = { role: "assistant", content: tr("nudge", { w: when[0].toUpperCase() + when.slice(1), n: b.name }) };
       msg.chips = [
-        { label: "🎁 Sí, ideas de regalo", run: () => giftInChat(b) },
-        { label: "💌 Solo el mensaje", run: () => giftInChat(b, true) },
-        { label: "Ahora no", run: () => renderChat() },
+        { label: tr("giftYes"), run: () => giftInChat(b) },
+        { label: tr("onlyMsg"), run: () => giftInChat(b, true) },
+        { label: tr("notNow"), run: () => renderChat() },
       ];
       state.chat.push(msg);
     }
@@ -1020,7 +1305,7 @@ Si no hay acciones, usa "acciones":[].`;
   }
   function giftInChat(b, onlyMsg) {
     const out = el("div", { class: "card" });
-    state.chat.push({ role: "user", content: onlyMsg ? `Escríbeme un mensaje para ${b.name}` : `Sí, ideas de regalo para ${b.name}` });
+    state.chat.push({ role: "user", content: tr(onlyMsg ? "writeMsgFor" : "giftIdeasFor", { n: b.name }) });
     state.chat.push({ role: "assistant", content: "", gift: out, temp: true });
     renderChat();
     giftIdeas(b, out, null, onlyMsg).then(renderChat);
@@ -1035,10 +1320,10 @@ Si no hay acciones, usa "acciones":[].`;
   }
   async function giftIdeas(b, out, btn, onlyMsg) {
     if (btn) btn.disabled = true;
-    out.replaceChildren(el("div", { class: "muted" }, onlyMsg ? "✍️ Escribiendo el mensaje..." : "🔎 Buscando qué está de moda..."));
+    out.replaceChildren(el("div", { class: "muted" }, tr(onlyMsg ? "writingMsg" : "searchingTrends")));
     const nb = nextBday(b);
-    const when = nb.days === 0 ? "hoy" : nb.days === 1 ? "mañana" : `en ${nb.days} días`;
-    const prompt = `Responde en español. ${nowLine()} ${when[0].toUpperCase() + when.slice(1)} es el cumpleaños de ${b.name}.
+    const when = nb.days === 0 ? "hoy" : nb.days === 1 ? "mañana" : `en ${nb.days} días`; // for the AI prompt, which is in Spanish
+    const prompt = `Responde en ${AI_LANG[lang]}: las ideas, los porqués y el mensaje van en ese idioma. ${nowLine()} ${when[0].toUpperCase() + when.slice(1)} es el cumpleaños de ${b.name}.
 Lo que sé de esta persona: ${b.notes || "nada en especial"}.
 ${onlyMsg ? "No hacen falta ideas de regalo (\"ideas\":[])." : `Busca qué regalos están de moda o son tendencia ahora mismo (redes sociales, tiendas) y dame 5 ideas variadas: una tendencia del momento, una económica, una divertida, una experiencia y una hecha a mano. Ten en cuenta sus gustos y que haya tiempo de conseguirla ${when}.`}
 Escribe también un mensaje de cumpleaños cálido y corto, listo para mandar por WhatsApp, con un emoji.
@@ -1047,31 +1332,31 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       const r = await ai.json(prompt, !onlyMsg);
       const msg = String(r.mensaje || "");
       const ideas = (Array.isArray(r.ideas) ? r.ideas : []).slice(0, 6).map((x) => (typeof x === "string" ? { idea: x } : x || {}));
-      const copy = el("button", { class: "btn small", onclick: async () => { try { await navigator.clipboard.writeText(msg); copy.textContent = "Copiado ✓"; } catch { copy.textContent = "Selecciona y copia"; } } }, "Copiar mensaje");
+      const copy = el("button", { class: "btn small", onclick: async () => { try { await navigator.clipboard.writeText(msg); copy.textContent = tr("copied"); } catch { copy.textContent = tr("selectCopy"); } } }, tr("copyMsg"));
       out.replaceChildren(el("div", { class: "tipbox", style: "display:grid;gap:6px" },
-        ideas.length ? el("b", {}, `🎁 Ideas para ${b.name}`) : null,
+        ideas.length ? el("b", {}, tr("ideasFor", { n: b.name })) : null,
         ideas.length ? el("ul", { style: "margin:0;padding:0;list-style:none;display:grid;gap:6px" }, ideas.map((x) =>
           el("li", {}, `${x.emoji || "🎁"} `, el("b", {}, String(x.idea || "")), x.porque ? el("div", { class: "muted" }, String(x.porque)) : null))) : null,
-        el("b", {}, "💌 Mensaje"), el("p", { style: "margin:0" }, msg), el("div", { class: "row" }, copy)));
+        el("b", {}, tr("message")), el("p", { style: "margin:0" }, msg), el("div", { class: "row" }, copy)));
     } catch (e) { out.replaceChildren(el("div", { class: "status err" }, errText(e))); }
     finally { if (btn) btn.disabled = false; }
   }
   function renderBdays() {
     const box = $("bdays"); box.replaceChildren();
-    if (!state.bdays.length) { box.append(el("div", { class: "card muted", style: "text-align:center" }, "Aún no hay cumpleaños. Toca + o dile al chat: \"el cumple de Ana es el 3 de mayo\".")); return; }
+    if (!state.bdays.length) { box.append(el("div", { class: "card muted", style: "text-align:center" }, tr("noBdays"))); return; }
     const colors = ["social", "personal", "trabajo", "creativo", "salud", "casa"];
     for (const { b, n } of state.bdays.map((b) => ({ b, n: nextBday(b) })).sort((x, y) => x.n.days - y.n.days)) {
       const out = el("div");
       const initials = b.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
       const color = colors[[...b.name].reduce((h, c) => h + c.charCodeAt(0), 0) % colors.length];
       const age = b.year ? n.date.getFullYear() - b.year : null;
-      const btn = el("button", { class: "btn small" + (n.days <= 2 ? " primary" : ""), onclick: () => giftIdeas(b, out, btn) }, "🎁 Ideas de regalo");
+      const btn = el("button", { class: "btn small" + (n.days <= 2 ? " primary" : ""), onclick: () => giftIdeas(b, out, btn) }, tr("giftIdeasBtn"));
       box.append(el("div", { class: "card" },
         el("div", { class: "person" },
           el("div", { class: "avatar", style: `--c: var(--c-${color})` }, initials || "?"),
-          el("div", {}, el("b", {}, b.name), el("div", { class: "muted" }, `${b.day} de ${MONTHS[b.month - 1]}${age ? ` · cumple ${age}` : ""}`)),
-          el("div", { class: "count" + (n.days <= 2 ? " soon" : "") }, n.days === 0 ? el("b", {}, "🎉") : el("b", {}, n.days), el("span", {}, n.days === 0 ? "¡hoy!" : n.days === 1 ? "día" : "días"))),
-        el("div", { class: "row" }, btn, el("button", { class: "btn small", onclick: () => { if (confirm(`¿Borrar el cumpleaños de ${b.name}?`)) remove(b); } }, "Borrar")), out));
+          el("div", {}, el("b", {}, b.name), el("div", { class: "muted" }, dayMonth(b.month, b.day) + (age ? tr("turnsAge", { n: age }) : ""))),
+          el("div", { class: "count" + (n.days <= 2 ? " soon" : "") }, n.days === 0 ? el("b", {}, "🎉") : el("b", {}, n.days), el("span", {}, tr(n.days === 0 ? "todayExcl" : n.days === 1 ? "dayOne" : "dayMany")))),
+        el("div", { class: "row" }, btn, el("button", { class: "btn small", onclick: () => { if (confirm(tr("confirmDelBday", { n: b.name }))) remove(b); } }, tr("del"))), out));
     }
   }
 
@@ -1094,7 +1379,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // Banner that leaves on its own after 10 s (a bar shows the time left; it pauses while you touch it). At most 3 at once.
   const TOAST_MS = 10000;
   function toast(t, mins, test) {
-    const label = mins === "snooze" ? "Recordatorio" : mins >= 55 ? "En 1 hora" : `En ${mins} min`;
+    const label = mins === "snooze" ? tr("reminder") : mins >= 55 ? tr("inHourCap") : tr("inMinCap", { n: mins });
     let left = TOAST_MS, since = Date.now(), timer = null;
     const close = () => { clearTimeout(timer); box.remove(); };
     const run = () => { since = Date.now(); timer = setTimeout(close, left); };
@@ -1106,12 +1391,12 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
         onclick: () => { close(); if (real) openQuick(state.tasks.find((x) => x.id === t.id)); },
         onpointerenter: (e) => e.pointerType === "mouse" && hold(), onpointerleave: (e) => e.pointerType === "mouse" && resume(), ontouchstart: hold, ontouchend: resume, ontouchcancel: resume },
       el("img", { src: "/icon-192.png", alt: "" }),
-      el("div", {}, el("div", { class: "meta" }, el("span", {}, "AGENDA" + (test ? " · vista previa" : "")), el("span", {}, "ahora")),
-        el("b", {}, `${icon(t)} ${label}: ${t.title}`), el("p", {}, `A las ${clock(t.time)}${t.tip ? " · " + t.tip : ""}`)),
+      el("div", {}, el("div", { class: "meta" }, el("span", {}, "PENDI" + (test ? tr("previewTag") : "")), el("span", {}, tr("nowLower"))),
+        el("b", {}, `${icon(t)} ${label}: ${t.title}`), el("p", {}, tr("atCap", { t: clock(t.time) }) + (t.tip ? " · " + t.tip : ""))),
       el("div", { class: "acts" },
-        act("Posponer 10 min", () => { if (real) snooze(t.id, 10); }),
-        act("Hecho", () => { if (real) markDone(t.id); }),
-        act("Cerrar", () => {})),
+        act(tr("snooze10"), () => { if (real) snooze(t.id, 10); }),
+        act(tr("doneHeading"), () => { if (real) markDone(t.id); }),
+        act(tr("close"), () => {})),
       el("span", { class: "life" }));
     const stack = $("toasts"); stack.prepend(box);
     while (stack.children.length > 3) stack.lastElementChild.remove();
@@ -1157,23 +1442,23 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (dictating) { const d = dictating; dictating = null; d.stop(); return; }
     const field = $(btn.dataset.mic), base = field.value ? field.value.replace(/\s*$/, " ") : "";
     const lab = btn.nextElementSibling && btn.nextElementSibling.classList.contains("miclabel") ? btn.nextElementSibling : null;
-    const setRec = (on) => { btn.classList.toggle("rec", on); btn.setAttribute("aria-label", on ? "Detener dictado" : "Dictar"); if (lab) lab.textContent = on ? "Te escucho... toca para terminar" : "Toca y habla"; };
+    const setRec = (on) => { btn.classList.toggle("rec", on); btn.setAttribute("aria-label", tr(on ? "stopDictation" : "dictate")); if (lab) lab.textContent = tr(on ? "listening" : "tapTalk"); };
     const write = (txt) => { field.value = base + txt; };
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const record = async () => {
-      if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = "Este navegador no permite dictar."; return; }
+      if (!navigator.mediaDevices || !window.MediaRecorder) { field.placeholder = tr("noDictate"); return; }
       let stream;
-      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { field.placeholder = "No diste permiso al micrófono."; return; }
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { field.placeholder = tr("noMic"); return; }
       const rec = new MediaRecorder(stream), parts = [];
       rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop()); setRec(false);
         const blob = new Blob(parts, { type: rec.mimeType || "audio/webm" });
         if (!blob.size) return;
-        btn.disabled = true; const ph = field.placeholder; field.placeholder = "Transcribiendo...";
+        btn.disabled = true; const ph = field.placeholder; field.placeholder = tr("transcribing");
         try {
           const data = await new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = ko; r.readAsDataURL(blob); });
-          const txt = await ai.transcribe({ mime: blob.type, data });
+          const txt = await ai.transcribe({ mime: blob.type, data, lang: AI_LANG[lang] });
           if (txt) write(txt); field.placeholder = ph;
         } catch (e) { field.placeholder = errText(e); }
         finally { btn.disabled = false; field.focus(); }
@@ -1183,7 +1468,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     };
     if (!SR) return record();
     const r = new SR(); let finalText = "", failed = false;
-    r.lang = "es-ES"; r.interimResults = true; r.continuous = true;
+    r.lang = loc() === "es" ? "es-ES" : loc(); r.interimResults = true; r.continuous = true;
     r.onresult = (e) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) { const s = e.results[i][0].transcript; if (e.results[i].isFinal) finalText += s; else interim += s; }
@@ -1202,8 +1487,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab");
     if (!accion && !tab) return false;
     history.replaceState(null, "", location.pathname);
-    if (accion === "snooze" && id) { snooze(id, 10); notice("⏰ Te aviso otra vez en 10 min"); }
-    else if (accion === "done" && id) { markDone(id); notice("✓ Hecho"); }
+    if (accion === "snooze" && id) { snooze(id, 10); notice(tr("againIn", { x: tr("nMin", { n: 10 }) })); }
+    else if (accion === "done" && id) { markDone(id); notice(tr("done")); }
     else if (accion === "open" && id) { const t = state.tasks.find((x) => x.id === id); if (t) { state.anchor = fromYmd(t.date); render(); openQuick(t); } }
     if (tab) { showTab(tab); return true; }
     return false;
@@ -1217,46 +1502,46 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   async function renderPush() {
     const box = $("pushBox"); box.replaceChildren();
     const st = state.status;
-    if (!st.push || !st.db) { box.append(el("b", {}, "Avisos con la app cerrada"), el("div", { class: "muted" }, "Todavía no están listos en el servidor.")); return; }
+    if (!st.push || !st.db) { box.append(el("b", {}, tr("pushClosed")), el("div", { class: "muted" }, tr("pushNotReady"))); return; }
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      if (!(isIOS && !standalone)) { box.append(el("b", {}, "Avisos con la app cerrada"), el("div", { class: "muted" }, "Este navegador no permite avisos. Prueba con Chrome o Safari actualizados.")); return; }
+      if (!(isIOS && !standalone)) { box.append(el("b", {}, tr("pushClosed")), el("div", { class: "muted" }, tr("pushNoBrowser"))); return; }
     }
     const reg = "serviceWorker" in navigator && !(isIOS && !standalone) ? await navigator.serviceWorker.ready : null;
     const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
     const status = el("div", { class: "status" });
     if (sub && Notification.permission === "granted") {
-      box.append(el("b", {}, "✅ Avisos activados"), el("div", { class: "muted" }, "Te llegan aunque la app esté cerrada. Al tocar uno se abre con botones para posponer o marcar hecho."),
-        el("button", { class: "btn small", style: "justify-self:start", onclick: async () => { status.textContent = "Enviando..."; try { await call("/api/subscribe", { sub: sub.toJSON(), test: true }); status.textContent = "Listo, revisa tus notificaciones."; } catch (e) { status.textContent = errText(e); } } }, "Mandar un aviso de prueba"), status);
+      box.append(el("b", {}, tr("pushOn")), el("div", { class: "muted" }, tr("pushOnText")),
+        el("button", { class: "btn small", style: "justify-self:start", onclick: async () => { status.textContent = tr("sending"); try { await call("/api/subscribe", { sub: sub.toJSON(), test: true, lang }); status.textContent = tr("checkNotifs"); } catch (e) { status.textContent = errText(e); } } }, tr("sendTest")), status);
       return;
     }
     const needInstall = isIOS && !standalone;
     const step = (state, title, text, extra) => el("div", { class: "step " + state }, el("span", { class: "n" }, state === "ok" ? "✓" : ""), el("div", {}, el("b", {}, title), text ? el("p", {}, text) : null, extra || null));
     const allow = el("button", { class: "btn primary small", style: "margin-top:8px", onclick: async () => {
-      status.textContent = "Activando...";
+      status.textContent = tr("activating");
       try {
-        if ((await Notification.requestPermission()) !== "granted") { status.textContent = "No diste permiso. Puedes activarlo en Ajustes del celular > Notificaciones."; return; }
+        if ((await Notification.requestPermission()) !== "granted") { status.textContent = tr("noPermission"); return; }
         const s = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(st.vapidPublicKey) });
-        await call("/api/subscribe", { sub: s.toJSON(), test: true });
+        await call("/api/subscribe", { sub: s.toJSON(), test: true, lang });
         renderPush();
       } catch (e) { status.textContent = errText(e); }
-    } }, "Permitir avisos");
+    } }, tr("allowNotifs"));
     const denied = !needInstall && "Notification" in window && Notification.permission === "denied";
-    box.append(el("b", {}, "Activa los avisos en 3 pasos"),
+    box.append(el("b", {}, tr("steps3")),
       el("div", { class: "steps" },
-        step(needInstall ? "now" : "ok", "Agrégala a tu pantalla de inicio", needInstall ? "En Safari toca Compartir (el cuadrito con la flecha) y elige \"Agregar a pantalla de inicio\"." : null),
-        step(needInstall ? "" : "ok", "Ábrela desde el ícono nuevo", needInstall ? "Así funciona como una app y puede avisarte." : null),
-        step(needInstall ? "" : "now", "Permite los avisos", denied ? "Los bloqueaste antes. Actívalos en Ajustes del celular > Notificaciones > Agenda." : needInstall ? null : "Te preguntará si dejas que la app te avise. Toca Permitir.", needInstall || denied ? null : allow)),
+        step(needInstall ? "now" : "ok", tr("step1"), needInstall ? tr("step1Text") : null),
+        step(needInstall ? "" : "ok", tr("step2"), needInstall ? tr("step2Text") : null),
+        step(needInstall ? "" : "now", tr("step3"), denied ? tr("step3Denied") : needInstall ? null : tr("step3Text"), needInstall || denied ? null : allow)),
       status);
   }
 
   // ---------- setup checklist ----------
   function renderSetup() {
     const st = state.status, box = $("setupBox"); box.replaceChildren();
-    const missing = [!st.ai && "la inteligencia artificial", !st.db && "guardar en la nube", !st.push && "los avisos"].filter(Boolean);
-    $("setupAlert").replaceChildren(missing.length && !st.offline ? el("div", { class: "card" }, el("b", {}, "⚠️ Algo no está listo"),
-      el("div", { class: "muted" }, `Falta configurar ${missing.join(", ").replace(/, ([^,]*)$/, " y $1")}. Si tú instalaste la app, toca 5 veces "Versión" al final de esta pantalla para ver los detalles.`)) : "");
+    const missing = [!st.ai && tr("missAi"), !st.db && tr("missDb"), !st.push && tr("missPush")].filter(Boolean);
+    $("setupAlert").replaceChildren(missing.length && !st.offline ? el("div", { class: "card" }, el("b", {}, tr("notReady")),
+      el("div", { class: "muted" }, tr("missingX", { x: andList(missing) }))) : "");
     $("adminBox").hidden = !ls.get("admin", false);
-    $("version").textContent = "Versión 0.4" + (ls.get("admin", false) ? " · administrador" : "");
+    $("version").textContent = tr("version") + " " + VERSION + (ls.get("admin", false) ? tr("adminSuffix") : "");
     const item = (ok, label, help) => el("div", { class: "check" }, el("span", { class: ok ? "ok" : "no" }, ok ? "✓" : "✗"), el("div", {}, el("b", {}, label), ok ? null : help));
     box.append(
       item(true, "Contraseña de la app"),
@@ -1274,6 +1559,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("datefmt").value = state.settings.datefmt || "es";
     $("clock").value = state.settings.clock || "12";
     $("theme").value = state.settings.theme || "system";
+    $("lang").value = LANGS[state.settings.lang] ? state.settings.lang : "system";
     applyTheme();
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
@@ -1281,9 +1567,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const wanted = remindList();
     $("remindChips").replaceChildren(...[60, 30, 10].map((m) => el("button", { class: "chip", "aria-pressed": String(wanted.includes(m)), onclick: () => {
       const next = wanted.includes(m) ? wanted.filter((x) => x !== m) : [...wanted, m];
-      if (!next.length) { notice("Deja al menos un aviso"); return; }
+      if (!next.length) { notice(tr("keepOne")); return; }
       saveSettings({ remind: next }); syncSettings();
-    } }, m === 60 ? "1 hora" : `${m} min`)));
+    } }, m === 60 ? tr("oneHour") : tr("nMin", { n: m }))));
     document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh());
   }
   const saveQuiet = () => { saveSettings({ quiet: { on: $("quietOn").checked, from: $("quietFrom").value, to: $("quietTo").value } }); syncSettings(); };
@@ -1294,16 +1580,16 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const finish = (tab) => { ls.set("onboarded", true); box.hidden = true; box.replaceChildren(); if (tab) showTab(tab); };
     const pager = () => el("div", { class: "pager" }, [0, 1, 2].map((j) => el("i", { class: j === i ? "on" : "" })));
     const slides = [
-      () => [el("div", { class: "big" }, "👋"), el("h2", {}, "Tu agenda que piensa contigo"),
-        el("p", {}, "Dime lo que tienes pendiente, con tu voz o escribiendo. Te propongo cuándo hacerlo y te aviso antes, con un consejo."),
-        el("button", { class: "btn primary", onclick: () => { i = 1; paint(); } }, "Empezar")],
-      () => [el("div", { class: "big" }, "⚡"), el("h2", {}, "¿Cuándo rindes mejor?"),
-        el("p", {}, "Así pongo lo difícil en tu mejor momento."),
-        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 2; paint(); } }, e === "mañana" ? "☀️ Mañana" : e === "tarde" ? "🌤️ Tarde" : "🌙 Noche")))],
-      () => [el("div", { class: "big" }, "🔔"), el("h2", {}, "Activa los avisos"),
-        el("p", {}, "Te aviso " + remindText() + " de cada cosa, aunque la app esté cerrada."),
-        el("button", { class: "btn primary", onclick: () => finish("settings") }, "Activar avisos"),
-        el("button", { class: "link", onclick: () => finish() }, "Ahora no")],
+      () => [el("div", { class: "big" }, "👋"), el("h2", {}, tr("ob1Title")),
+        el("p", {}, tr("ob1Text")),
+        el("button", { class: "btn primary", onclick: () => { i = 1; paint(); } }, tr("start"))],
+      () => [el("div", { class: "big" }, "⚡"), el("h2", {}, tr("ob2Title")),
+        el("p", {}, tr("ob2Text")),
+        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 2; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
+      () => [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")),
+        el("p", {}, tr("ob3Text", { x: remindText() })),
+        el("button", { class: "btn primary", onclick: () => finish("settings") }, tr("enableNotifs")),
+        el("button", { class: "link", onclick: () => finish() }, tr("notNow"))],
     ];
     const paint = () => box.replaceChildren(el("div", { class: "slide" }, ...slides[i](), pager()));
     box.hidden = false; paint();
@@ -1327,16 +1613,16 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function showGate(kind, msg) {
     const g = $("gate"); g.hidden = false; $("app").hidden = true; g.replaceChildren();
     if (kind === "nopass") {
-      g.append(el("div", { class: "card" }, el("h2", {}, "Falta un paso"),
-        el("p", {}, "En Vercel, abre tu proyecto, ve a Settings > Environment Variables y agrega APP_PASSWORD con la contraseña que quieras. Luego toca Redeploy."),
-        el("p", { class: "muted" }, "Esa contraseña protege tu agenda y tu clave de IA.")));
+      g.append(el("div", { class: "card" }, el("h2", {}, tr("missingStep")),
+        el("p", {}, tr("missingStepText")),
+        el("p", { class: "muted" }, tr("missingStepNote"))));
       return;
     }
-    const inp = el("input", { class: "field", type: "password", placeholder: "Contraseña", autocomplete: "current-password" });
+    const inp = el("input", { class: "field", type: "password", placeholder: tr("password"), autocomplete: "current-password" });
     const st = el("div", { class: "status err" }, msg || "");
     g.append(el("form", { class: "card", onsubmit: async (e) => { e.preventDefault(); pass = inp.value; ls.set("pass", pass); await boot(); } },
       el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, el("span", { class: "hl" }, "Pendi")),
-      el("p", { class: "muted" }, "Escribe tu contraseña para entrar."), inp, el("button", { class: "btn primary" }, "Entrar"), st));
+      el("p", { class: "muted" }, tr("enterPw")), inp, el("button", { class: "btn primary" }, tr("enter")), st));
     inp.focus();
   }
 
@@ -1344,7 +1630,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     try { state.status = await call("/api/status"); }
     catch { state.status = { password: true, authed: true, offline: true }; }
     if (!state.status.password) return showGate("nopass");
-    if (!state.status.authed) return showGate("login", pass ? "Contraseña incorrecta." : "");
+    if (!state.status.authed) return showGate("login", pass ? tr("wrongPw") : "");
     $("gate").hidden = true; $("app").hidden = false;
     await loadData();
     syncSettings();
@@ -1364,20 +1650,26 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("viewBtn").onclick = () => { monthView = !monthView; renderCal(); };
   $("fab").onclick = openAdd;
   daySeg($("dumpDay"), dumpDate);
-  const bDate = el("input", { id: "bDate", "aria-label": "Fecha de cumpleaños" });
-  $("bDateBox").append(dateField(bDate, { block: true, placeholder: "Fecha de cumpleaños" }));
+  const bDate = el("input", { id: "bDate", "aria-label": tr("bdayDate") });
+  $("bDateBox").append(dateField(bDate, { block: true, placeholder: tr("bdayDate") }));
   $("bdAdd").onclick = () => { $("bdForm").hidden = !$("bdForm").hidden; if (!$("bdForm").hidden) $("bName").focus(); };
   $("bdCancel").onclick = () => { $("bdForm").reset(); $("bdForm").hidden = true; document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh()); };
   $("datefmt").onchange = () => { saveSettings({ datefmt: $("datefmt").value }); syncSettings(); render(); };
   $("clock").onchange = () => { saveSettings({ clock: $("clock").value }); render(); };
   $("theme").onchange = () => { saveSettings({ theme: $("theme").value }); applyTheme(); };
+  // Changing the language repaints every screen; the server keeps it (uiLang) for the notifications it sends.
+  for (const [k, name] of Object.entries(LANGS)) $("lang").append(el("option", { value: k }, name));
+  $("lang").onchange = () => {
+    saveSettings({ lang: $("lang").value }); setLang(); saveSettings({ uiLang: lang });
+    applyLang(); syncSettings(); render(); renderChat(); renderSetup(); renderPush(); renderProposals();
+  };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   $("quietOn").onchange = saveQuiet; $("quietFrom").onchange = saveQuiet; $("quietTo").onchange = saveQuiet;
   // Hidden admin mode: tap the version 5 times.
   let taps = [];
   $("version").onclick = () => {
     taps = [...taps.filter((x) => Date.now() - x < 3000), Date.now()];
-    if (taps.length >= 5) { taps = []; ls.set("admin", !ls.get("admin", false)); renderSetup(); notice(ls.get("admin", false) ? "Modo administrador activado" : "Modo administrador desactivado"); }
+    if (taps.length >= 5) { taps = []; ls.set("admin", !ls.get("admin", false)); renderSetup(); notice(tr(ls.get("admin", false) ? "adminOn" : "adminOff")); }
   };
   $("organize").onclick = organize;
   $("scheduleAll").onclick = scheduleAll;
@@ -1385,11 +1677,11 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("chatForm").onsubmit = (e) => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
   $("energy").onchange = () => saveSettings({ energy: $("energy").value });
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
-  $("testToast").onclick = () => toast({ title: "Grabar video de ASMR", time: "10:00", cat: "creativo", tip: "Busca el cuarto más callado y haz una prueba de micrófono." }, 30, true);
+  $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
   $("logout").onclick = () => { ls.set("pass", ""); pass = ""; location.reload(); };
   $("bdForm").onsubmit = (e) => {
     e.preventDefault();
-    if (!bDate.value) { notice("Elige la fecha del cumpleaños"); return; }
+    if (!bDate.value) { notice(tr("chooseBdayDate")); return; }
     const [y, m, d] = bDate.value.split("-").map(Number);
     // The year is kept only when it looks like a birth year, so "cumple 30" can be shown.
     put({ id: uid("b"), kind: "bday", name: $("bName").value.trim(), month: m, day: d, year: y < new Date().getFullYear() ? y : null, notes: $("bNotes").value.trim() });
@@ -1400,6 +1692,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
   setInterval(checkReminders, 20000);
   setInterval(() => { if (!document.hidden) renderCal(); }, 60000);
+  applyLang();
   boot();
 })();
 </script>
