@@ -3,35 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Agenda Proactiva</title>
+<title>Pendi</title>
 <meta name="description" content="Tu calendario con IA: organiza tu día, te avisa antes y te recuerda los cumpleaños.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Agenda">
+<meta name="apple-mobile-web-app-title" content="Pendi">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#FFFBEA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15130D" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: Apple-style minimal. A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
+/* Identity: Pendi, sticky-note style (cream ground, yellow accent, ink outlines). Layout: A large-title day list with a week strip; assistant panes on the right (tab bar on phones). */
 :root {
-  --bg: #ffffff; --group: #f2f2f7; --cell: #ffffff; --ink: #1c1c1e; --muted: #8a8a8e; --sep: rgba(60, 60, 67, .16);
-  --accent: #007aff; --accent-ink: #ffffff; --red: #ff3b30; --focus: #007aff; --fill: rgba(120, 120, 128, .12);
-  --c-trabajo: #007aff; --c-personal: #af52de; --c-casa: #30b0c7; --c-salud: #34c759; --c-creativo: #ff9500; --c-social: #ff2d55; --c-otro: #8e8e93;
-  --banner: rgba(245, 245, 247, .82); --shadow: 0 10px 40px rgba(0, 0, 0, .14);
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Figtree", system-ui, "Segoe UI", sans-serif;
-  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Figtree", system-ui, "Segoe UI", sans-serif;
+  --bg: #FFFBEA; --group: #FFF4CC; --cell: #ffffff; --ink: #1E1E1E; --muted: #5F5B4E; --sep: rgba(30, 30, 30, .14);
+  --accent: #FFD23F; --accent-ink: #1E1E1E; --accent-text: #1E1E1E; --line: #1E1E1E; --red: #E5484D; --focus: #1E1E1E; --fill: rgba(30, 30, 30, .07);
+  --c-trabajo: #3E8EDE; --c-personal: #9B6BDF; --c-casa: #22A699; --c-salud: #2FA84F; --c-creativo: #F08A24; --c-social: #FF6F91; --c-otro: #8C877A;
+  --banner: rgba(255, 251, 234, .9); --shadow: 4px 4px 0 var(--line); --glow: 0 0 18px rgba(255, 210, 63, .55);
+  --font: "Space Grotesk", system-ui, "Segoe UI", sans-serif;
+  --display: "Space Grotesk", system-ui, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #000000; --group: #000000; --cell: #1c1c1e; --ink: #f5f5f7; --muted: #8d8d93; --sep: rgba(84, 84, 88, .5);
-    --accent: #0a84ff; --accent-ink: #ffffff; --red: #ff453a; --focus: #0a84ff; --fill: rgba(118, 118, 128, .24);
-    --c-trabajo: #0a84ff; --c-personal: #bf5af2; --c-casa: #40c8e0; --c-salud: #30d158; --c-creativo: #ff9f0a; --c-social: #ff375f; --c-otro: #98989d;
-    --banner: rgba(44, 44, 46, .82); --shadow: 0 10px 40px rgba(0, 0, 0, .6);
+    --bg: #15130D; --group: #15130D; --cell: #221F16; --ink: #FFF6D6; --muted: #B4AC93; --sep: rgba(255, 246, 214, .14);
+    --accent: #FFD23F; --accent-ink: #1E1E1E; --accent-text: #FFD23F; --line: #FFD23F; --red: #FF6B6B; --focus: #FFD23F; --fill: rgba(255, 246, 214, .09);
+    --c-trabajo: #6CB4FF; --c-personal: #C39BFF; --c-casa: #4FD1C1; --c-salud: #5BD47A; --c-creativo: #FFA552; --c-social: #FF8FAB; --c-otro: #A7A08A;
+    --banner: rgba(34, 31, 22, .92); --shadow: 0 0 0 1px rgba(255, 210, 63, .4), 0 10px 40px rgba(0, 0, 0, .6); --glow: 0 0 22px rgba(255, 210, 63, .45);
     color-scheme: dark;
   }
 }
@@ -49,11 +49,11 @@ svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width:
 .side { background: var(--group); border-left: 1px solid var(--sep); min-height: 0; display: grid; grid-template-rows: auto 1fr; }
 
 .top { display: flex; align-items: center; gap: 4px; min-height: 44px; }
-.link { border: 0; background: transparent; color: var(--accent); font-size: 17px; padding: 6px 4px; cursor: pointer; }
-.chev { border: 0; background: transparent; color: var(--accent); width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; border-radius: 50%; }
+.link { border: 0; background: transparent; color: var(--accent-text); font-size: 17px; padding: 6px 4px; cursor: pointer; }
+.chev { border: 0; background: transparent; color: var(--accent-text); width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; border-radius: 50%; }
 .chev:hover, .link:hover { opacity: .7; }
 .spacer { flex: 1; }
-.eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--red); }
+.eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; margin: 2px 0 0; text-wrap: balance; }
 
 .week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
@@ -62,9 +62,9 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .wd .n { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; font-size: 18px; font-variant-numeric: tabular-nums; }
 .wd .m { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); opacity: 0; }
 .wd .m.on { opacity: .6; }
-.wd.today .n { color: var(--red); font-weight: 600; }
+.wd.today .n { box-shadow: inset 0 0 0 2px var(--line); font-weight: 700; }
 .wd[aria-pressed="true"] .n { background: var(--ink); color: var(--bg); font-weight: 600; }
-.wd.today[aria-pressed="true"] .n { background: var(--red); color: #fff; }
+.wd.today[aria-pressed="true"] .n { background: var(--accent); color: var(--accent-ink); }
 
 .list { background: var(--cell); border-radius: 14px; overflow: hidden; }
 @media (prefers-color-scheme: light) { .list { box-shadow: 0 0 0 1px var(--sep); } }
@@ -78,7 +78,7 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .item .tip { color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .item.done .ti { text-decoration: line-through; color: var(--muted); }
 .item.example .ti::after { content: " · ejemplo"; color: var(--muted); font-weight: 400; }
-.item.now { background: color-mix(in srgb, var(--accent) 8%, var(--cell)); }
+.item.now { background: color-mix(in srgb, var(--accent) 22%, var(--cell)); }
 .empty { text-align: center; color: var(--muted); padding: 36px 16px; display: grid; gap: 10px; justify-items: center; }
 .section-label { font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); margin: 0 16px -10px; }
 
@@ -93,7 +93,7 @@ h1 { font-family: var(--display); font-size: 34px; line-height: 1.1; font-weight
 .field { width: 100%; border: 0; background: var(--cell); border-radius: 12px; padding: 12px 14px; min-width: 0; }
 textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.btn { border: 0; background: var(--fill); color: var(--accent); border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; }
+.btn { border: 0; background: var(--fill); color: var(--accent-text); border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; }
 .btn.primary { background: var(--accent); color: var(--accent-ink); }
 .btn.small { padding: 6px 14px; font-size: 14px; }
 .btn.danger { color: var(--red); }
@@ -105,14 +105,14 @@ textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-variant-numeric: tabular-nums; font-size: 15px; }
 .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.chip.rec:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.chip.rec:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 2px var(--line); }
 .tipbox { background: var(--group); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 @media (prefers-color-scheme: dark) { .tipbox { background: rgba(255, 255, 255, .06); } }
 .status { font-size: 14px; color: var(--muted); }
 .status.err { color: var(--red); }
 .chatlog { display: grid; gap: 6px; }
 .msg { border-radius: 18px; padding: 8px 14px; max-width: 85%; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me { background: var(--accent); color: #fff; justify-self: end; }
+.msg.me { background: var(--accent); color: var(--accent-ink); justify-self: end; }
 .msg.ai { background: var(--cell); justify-self: start; }
 .check { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
 .check .ok { color: var(--c-salud); font-weight: 700; }
@@ -131,7 +131,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .sheet h2 { margin: 0; font-family: var(--display); font-size: 24px; letter-spacing: -0.02em; }
 .sheet .when { color: var(--muted); }
 .sheet .actions { display: grid; gap: 1px; background: var(--sep); border-radius: 12px; overflow: hidden; }
-.sheet .actions > * { background: var(--group); border: 0; padding: 13px 16px; text-align: left; font-size: 16px; color: var(--accent); cursor: pointer; text-decoration: none; }
+.sheet .actions > * { background: var(--group); border: 0; padding: 13px 16px; text-align: left; font-size: 16px; color: var(--accent-text); cursor: pointer; text-decoration: none; }
 @media (prefers-color-scheme: dark) { .sheet .actions > * { background: #2c2c2e; } }
 .sheet .actions .danger { color: var(--red); }
 
@@ -144,11 +144,11 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .toast p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
 .toast { position: relative; overflow: hidden; }
 .toast .acts { grid-column: 1 / -1; display: flex; gap: 6px; }
-.toast .acts button { flex: 1; border: 0; background: var(--fill); color: var(--accent); border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.toast .acts button { flex: 1; border: 0; background: var(--fill); color: var(--accent-text); border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
 .toast .life { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--accent); opacity: .55; transform-origin: left; animation: life var(--life, 10s) linear forwards; }
 .toast.hold .life { animation-play-state: paused; }
 @keyframes life { to { transform: scaleX(0); } }
-.mic { border: 0; background: var(--fill); color: var(--accent); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
+.mic { border: 0; background: var(--fill); color: var(--accent-text); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
 .mic.rec { background: var(--red); color: #fff; }
 @media (prefers-reduced-motion: no-preference) { .mic.rec { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--red) 25%, transparent); } } }
 .msg.ai { white-space: normal; }
@@ -175,7 +175,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   .pane { padding: 12px max(16px, env(safe-area-inset-right, 0px)) 88px max(16px, env(safe-area-inset-left, 0px)); }
   .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--banner); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--sep); padding-bottom: env(safe-area-inset-bottom, 0px); position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; }
   .tabbar button { border: 0; background: transparent; padding: 6px 0 4px; font-size: 10px; font-weight: 500; color: var(--muted); display: grid; justify-items: center; gap: 1px; cursor: pointer; }
-  .tabbar button[aria-selected="true"] { color: var(--accent); }
+  .tabbar button[aria-selected="true"] { color: var(--accent-text); }
   .sheet-bg { place-items: end center; padding: 0; }
   .sheet { border-radius: 22px 22px 0 0; width: 100%; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
   @media (prefers-reduced-motion: no-preference) { .sheet { animation: up .3s cubic-bezier(.2, .9, .3, 1); } @keyframes up { from { transform: translateY(100%); } } }
@@ -185,8 +185,8 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .summary { color: var(--muted); font-size: 15px; margin-top: 4px; }
 .summary b { color: var(--ink); font-weight: 600; }
 .nowline { position: relative; height: 10px; }
-.nowline::before { content: ""; position: absolute; left: 16px; right: 0; top: 4px; height: 2px; background: var(--red); }
-.nowline::after { content: ""; position: absolute; left: 12px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+.nowline::before { content: ""; position: absolute; left: 16px; right: 0; top: 4px; height: 2px; background: var(--line); }
+.nowline::after { content: ""; position: absolute; left: 12px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--line); }
 .swipe { position: relative; overflow: hidden; }
 .swipe .under { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-weight: 600; color: #fff; }
 .swipe .under .l { opacity: 0; } .swipe .under .r { opacity: 0; }
@@ -204,13 +204,13 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
 
 /* floating add */
-.fab { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); display: grid; place-items: center; cursor: pointer; z-index: 26; }
+.fab { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 20px rgba(0, 0, 0, .25); display: grid; place-items: center; cursor: pointer; z-index: 26; }
 .fab svg { width: 28px; height: 28px; stroke-width: 2.2; }
 @media (min-width: 861px) { .fab { right: calc(400px + 24px); } }
 @media (max-width: 860px) { .fab { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); } }
 
 /* organize */
-.bigmic { width: 96px; height: 96px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; display: grid; place-items: center; cursor: pointer; justify-self: center; box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent); }
+.bigmic { width: 96px; height: 96px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; justify-self: center; box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent); }
 .bigmic svg { width: 40px; height: 40px; }
 .bigmic.rec { background: var(--red); }
 @media (prefers-reduced-motion: no-preference) { .bigmic.rec { animation: pulse 1.2s ease-in-out infinite; } }
@@ -228,12 +228,12 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 [data-pane="chat"]:not([hidden]) { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; grid-auto-rows: auto; padding-bottom: 0; overflow: hidden; }
 [data-pane="chat"] .chatscroll { overflow-y: auto; min-height: 0; display: grid; align-content: start; gap: 10px; padding-bottom: 8px; }
 [data-pane="chat"] form { position: sticky; bottom: 0; background: var(--group); padding: 8px 0 12px; flex-wrap: nowrap; }
-.speak { border: 0; background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; padding: 2px 0 0; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+.speak { border: 0; background: transparent; color: var(--accent-text); font-size: 13px; font-weight: 600; padding: 2px 0 0; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
 .speak svg { width: 16px; height: 16px; }
 
 /* birthdays */
 .phead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.addbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--fill); color: var(--accent); display: grid; place-items: center; cursor: pointer; flex: none; }
+.addbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--fill); color: var(--accent-text); display: grid; place-items: center; cursor: pointer; flex: none; }
 .addbtn svg { width: 20px; height: 20px; stroke-width: 2.2; }
 .person { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; }
 .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: var(--c, var(--c-social)); font-size: 16px; }
@@ -255,14 +255,14 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .steps { display: grid; gap: 10px; counter-reset: s; }
 .step { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
 .step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--fill); color: var(--muted); }
-.step.now .n { background: var(--accent); color: #fff; }
+.step.now .n { background: var(--accent); color: var(--accent-ink); }
 .step.ok .n { background: var(--c-salud); color: #fff; }
 .step.ok b { color: var(--muted); font-weight: 500; }
 .step p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
 
 /* quick actions + onboarding */
 .qa { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-.qa button { border: 0; border-radius: 14px; background: var(--fill); color: var(--accent); font-weight: 600; padding: 14px 4px; font-size: 15px; cursor: pointer; }
+.qa button { border: 0; border-radius: 14px; background: var(--fill); color: var(--accent-text); font-weight: 600; padding: 14px 4px; font-size: 15px; cursor: pointer; }
 .qa .big { grid-column: 1 / -1; background: var(--c-salud); color: #fff; font-size: 17px; padding: 16px; }
 .qhead { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; }
 .qhead .em { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 28px; background: color-mix(in srgb, var(--c) 18%, transparent); }
@@ -272,6 +272,15 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .onboard h2 { margin: 0; font-family: var(--display); font-size: 30px; letter-spacing: -0.02em; }
 .onboard p { margin: 0; color: var(--muted); font-size: 17px; }
 .pager { display: flex; gap: 6px; } .pager i { width: 7px; height: 7px; border-radius: 50%; background: var(--fill); } .pager i.on { background: var(--accent); }
+
+/* Pendi: ink outlines, offset "sticker" shadows, a slight tilt on the assistant's notes, yellow glow on primary actions. */
+.list, .card, .sheet { border: 2px solid var(--line); }
+@media (prefers-color-scheme: light) { .list { box-shadow: 4px 4px 0 var(--line); } .card { box-shadow: 3px 3px 0 var(--line); } }
+.btn.primary, .fab, .bigmic, .chip[aria-pressed="true"] { border: 2px solid var(--line); box-shadow: 3px 3px 0 var(--line), var(--glow); }
+.btn.primary:active, .fab:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+.msg.me { border: 2px solid var(--line); }
+.msg.ai { border: 2px solid var(--line); border-radius: 4px 18px 18px 18px; background: var(--group); }
+h1, .pane h2, .sheet h2 { letter-spacing: -0.035em; }
 </style>
 </head>
 <body>
@@ -693,7 +702,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
   async function quickAdd(what, date, time) {
     let tareas = [];
     try {
-      const res = await ai.json(`Eres el asistente de un calendario personal. Responde en español.
+      const res = await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
 ${time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
@@ -752,7 +761,7 @@ Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria
     if (!text) { $("dumpStatus").textContent = "Escribe primero lo que tienes que hacer."; return; }
     const date = dumpDate.value || ymd(addDays(new Date(), 1));
     $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = "Pensando cómo organizar tu día...";
-    const prompt = `Eres el asistente de un calendario personal. Responde en español.
+    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Organiza este texto en tareas para el día ${date}. Si el texto menciona otro día para alguna tarea, usa ese día.
 Agenda ya ocupada (no choques con esto):
@@ -822,7 +831,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     state.chat.push({ role: "user", content: q });
     const thinking = { role: "assistant", content: "Pensando...", temp: true }; state.chat.push(thinking); renderChat();
     $("chatSend").disabled = true;
-    const rules = `Eres el asistente de un calendario personal. Responde en español, breve, amable y fácil de leer.
+    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en español, breve y fácil de leer.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Agenda de los próximos 7 días (cada evento tiene un id):
@@ -1266,7 +1275,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const inp = el("input", { class: "field", type: "password", placeholder: "Contraseña", autocomplete: "current-password" });
     const st = el("div", { class: "status err" }, msg || "");
     g.append(el("form", { class: "card", onsubmit: async (e) => { e.preventDefault(); pass = inp.value; ls.set("pass", pass); await boot(); } },
-      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, "Agenda Proactiva"),
+      el("img", { src: "/icon-192.png", alt: "" }), el("h2", { style: "margin:0" }, "Pendi"),
       el("p", { class: "muted" }, "Escribe tu contraseña para entrar."), inp, el("button", { class: "btn primary" }, "Entrar"), st));
     inp.focus();
   }

@@ -1,4 +1,4 @@
-# Agenda Proactiva
+# Pendi
 
 Tu calendario con IA: le cuentas lo que tienes que hacer, te propone horarios, te avisa 1 hora, 30 y 10 minutos antes con un consejo, y te recuerda los cumpleaños 2 días antes con ideas de regalo.
 
