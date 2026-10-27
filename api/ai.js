@@ -1,7 +1,7 @@
 // Asks Gemini. Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
 // {input, image:{mime, data}} to read a photo (a flyer, an appointment, a screenshot),
 // or {audio:{mime, data}} (base64) to transcribe a voice note. Returns {data}.
-import { env, authed, deny, readBody } from "./_lib.js";
+import { env, who, deny, readBody } from "./_lib.js";
 
 // Google's free models get crowded ("high demand"), so each request tries several in turn:
 // GEMINI_MODEL first (if set), then the list below. With GROQ_API_KEY set, Groq answers text when all of them are busy.
@@ -11,7 +11,7 @@ const resting = new Map();
 const BUSY = new Set([429, 500, 502, 503, 504]);
 
 async function geminiOnce(model, key, body) {
-  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 25000);
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 15000);
   try {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: "POST",
@@ -54,6 +54,22 @@ async function groq(contents, json) {
   return { ok: r.ok, status: r.status, text: data.choices?.[0]?.message?.content || "", message: data.error && data.error.message };
 }
 
+// Speech to text with Groq's Whisper. Returns the text, or null when Groq isn't set up or fails.
+async function whisper(b64, mime) {
+  const key = env("GROQ_API_KEY");
+  if (!key) return null;
+  const ext = /mp4|m4a|aac/.test(mime) ? "m4a" : /ogg/.test(mime) ? "ogg" : /wav/.test(mime) ? "wav" : /mpeg|mp3/.test(mime) ? "mp3" : "webm";
+  const form = new FormData();
+  form.append("file", new Blob([Buffer.from(b64, "base64")], { type: mime }), `nota.${ext}`);
+  form.append("model", env("GROQ_STT_MODEL") || "whisper-large-v3-turbo");
+  form.append("response_format", "json");
+  form.append("temperature", "0");
+  const r = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: "POST", headers: { authorization: `Bearer ${key}` }, body: form }).catch(() => null);
+  if (!r || !r.ok) return null;
+  const data = await r.json().catch(() => null);
+  return data && typeof data.text === "string" ? data.text.trim() : null;
+}
+
 function parseJson(text) {
   try { return JSON.parse(text); } catch {}
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -64,15 +80,19 @@ function parseJson(text) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
-  if (!authed(req)) return deny(res);
+  if (!(await who(req))) return deny(res);
   const key = env("GEMINI_API_KEY");
   if (!key) return res.status(503).json({ error: "no_ai", message: "Falta configurar GEMINI_API_KEY en Vercel." });
   const { input, search, audio, image } = await readBody(req);
 
+  // Voice notes: Groq's Whisper first (fast, detects the language, even mixed), then Gemini.
   if (audio && audio.data) {
+    const mime = String(audio.mime || "audio/webm").split(";")[0];
+    const heard = await whisper(audio.data, mime);
+    if (heard !== null) return res.json({ data: { texto: heard } });
     const out = await gemini(key, { contents: [{ role: "user", parts: [
-      { inline_data: { mime_type: String(audio.mime || "audio/webm").split(";")[0], data: audio.data } },
-      { text: `Transcribe este audio tal como se dijo, en el idioma en que se habló (lo más probable: ${String(audio.lang || "español").slice(0, 60)}), sin traducir ni agregar nada. Si no se entiende nada, responde vacío.` },
+      { inline_data: { mime_type: mime, data: audio.data } },
+      { text: "Transcribe este audio palabra por palabra, en el idioma en que se habló (puede ser español, inglés u otro, o una mezcla), sin traducir, corregir ni agregar nada. Si no se entiende nada, responde vacío. Responde solo el texto." },
     ] }] });
     if (!out.ok) return res.status(BUSY.has(out.status) ? 429 : 502).json({ error: BUSY.has(out.status) ? "rate_limited" : "ai_error", message: out.message || "No pude transcribir." });
     return res.json({ data: { texto: out.text.trim() } });

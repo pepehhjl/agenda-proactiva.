@@ -1,11 +1,13 @@
 // Tells the app what is configured, so it can guide setup. Never returns secrets.
 import webpush from "web-push";
-import { env, authed, supa, vapidKeys, pushReady } from "./_lib.js";
+import { env, who, supa, vapidKeys, pushReady } from "./_lib.js";
 
 export default async function handler(req, res) {
   const password = !!env("APP_PASSWORD");
-  const ok = authed(req);
-  const out = { password, authed: ok };
+  const owner = await who(req);
+  const ok = !!owner;
+  // guest: this key opens a shared-invite agenda, so the admin tools stay hidden.
+  const out = { password, authed: ok, guest: ok && owner !== "main" };
   if (password && !ok) return res.json(out);
   out.ai = !!env("GEMINI_API_KEY");
   const sb = supa();
