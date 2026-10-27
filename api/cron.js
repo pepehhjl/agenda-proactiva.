@@ -1,6 +1,7 @@
 // Runs every minute (called by Supabase pg_cron). Sends reminders 60, 30 and 10 minutes before each task,
 // and birthday notices 2 days before and on the day, at 9:00 in the user's time zone.
 import { authed, deny, supa, pushReady, sendToAll } from "./_lib.js";
+import { texts, actionLabels } from "./_i18n.js";
 
 const THRESHOLDS = [60, 30, 10];
 const EMOJI = { trabajo: "💼", personal: "🙋", casa: "🏠", salud: "💪", creativo: "🎨", social: "🎉", otro: "📌" };
@@ -35,6 +36,8 @@ export default async function handler(req, res) {
   const now = Date.now();
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
+  const tr = texts(settings.uiLang);
+  const labels = actionLabels(settings.uiLang);
   // Which warnings the user wants (Ajustes > Avisos). Default: all three.
   const wanted = Array.isArray(settings.remind) && settings.remind.length ? THRESHOLDS.filter((x) => settings.remind.includes(x)) : THRESHOLDS;
   if (isQuiet(settings.quiet, localHm(new Date(now), tz))) return res.json({ sent: 0, quiet: true });
@@ -46,7 +49,7 @@ export default async function handler(req, res) {
     if (r.kind === "task" && !t.done && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
       const key = `${r.id}@snooze@${t.snooze}`;
       const past = t.start && Date.parse(t.start) <= now;
-      due.push({ check: key, keys: [key], payload: { title: `${icon(t)} Recordatorio: ${t.title}`, body: `${past ? "Era a las" : "Es a las"} ${clock(t.time, settings.clock)}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id } });
+      due.push({ check: key, keys: [key], payload: { title: `${icon(t)} ${tr("reminder")}: ${t.title}`, body: `${tr(past ? "wasAt" : "isAt", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, ...labels } });
     }
     if (r.kind === "task" && !t.done && t.start) {
       const mins = (Date.parse(t.start) - now) / 60000;
@@ -56,11 +59,11 @@ export default async function handler(req, res) {
       const smallest = hit[hit.length - 1];
       // Say the real time left (a task created 3 minutes ahead says "En 3 minutos", not "En 10").
       const left = Math.max(1, Math.round(mins));
-      const label = left >= 55 ? "En 1 hora" : `En ${left} min`;
+      const label = left >= 55 ? tr("inHour") : tr("inMin", { n: left });
       due.push({
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
-        payload: { title: `${icon(t)} ${label}: ${t.title}`, body: `A las ${clock(t.time, settings.clock)}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id },
+        payload: { title: `${icon(t)} ${label}: ${t.title}`, body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, ...labels },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
@@ -75,8 +78,8 @@ export default async function handler(req, res) {
       due.push({
         check: key, keys: [key],
         payload: days === 2
-          ? { title: `En 2 días cumple ${t.name} 🎂`, body: "¿Elegimos un regalo? Toca para ver ideas.", tag: r.id, url: "/?tab=chat" }
-          : { title: `Hoy cumple ${t.name} 🎉`, body: "Toca para ver un mensaje listo para enviarle.", tag: r.id, url: "/?tab=chat" },
+          ? { title: tr("bday2", { n: t.name }), body: tr("bday2Body"), tag: r.id, url: "/?tab=chat" }
+          : { title: tr("bday0", { n: t.name }), body: tr("bday0Body"), tag: r.id, url: "/?tab=chat" },
       });
     }
   }

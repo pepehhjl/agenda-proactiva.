@@ -14,7 +14,7 @@ self.addEventListener("push", (e) => {
     badge: "/icon-192.png",
     tag: d.tag,
     data: { url: d.url || "/", taskId: d.taskId || null },
-    actions: d.taskId ? [{ action: "snooze", title: "Posponer 10 min" }, { action: "done", title: "Hecho" }] : [],
+    actions: d.taskId ? [{ action: "snooze", title: d.snoozeLabel || "Posponer 10 min" }, { action: "done", title: d.doneLabel || "Hecho" }] : [],
   }));
 });
 
