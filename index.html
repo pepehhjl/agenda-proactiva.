@@ -344,10 +344,14 @@ h1 { font-size: 46px; }
 .sheet select { border: 0; background: var(--fill); border-radius: 8px; padding: 6px 10px; }
 .toast .undo { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 13px; cursor: pointer; }
 .confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; }
-.cheer { position: fixed; left: 50%; top: 38%; transform: translate(-50%, -50%); z-index: 61; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 18px; line-height: 1.3; padding: 16px 22px; border-radius: 20px; box-shadow: var(--glow); text-align: center; width: max-content; max-width: min(340px, 88vw); pointer-events: none; animation: cheer 2.6s ease forwards; }
-.cheer.big { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 30px; animation-duration: 3.6s; }
-@keyframes cheer { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.7); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } 18% { transform: translate(-50%, -50%) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%); } }
-@media (prefers-reduced-motion: reduce) { .cheer { animation-name: fade; } @keyframes fade { 0%, 85% { opacity: 1; } 100% { opacity: 0; } } }
+.cheerwrap { position: fixed; left: 0; right: 0; top: 34%; z-index: 61; display: flex; justify-content: center; padding: 0 16px; pointer-events: none; transition: transform .25s, opacity .25s; }
+.cheerwrap.out { opacity: 0; }
+.cheer { position: relative; overflow: hidden; pointer-events: auto; touch-action: none; cursor: grab; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 18px; line-height: 1.3; padding: 16px 22px 20px; border-radius: 20px; box-shadow: var(--glow); text-align: center; width: max-content; max-width: min(340px, 88vw); animation: cheer .5s ease both; }
+.cheer.big { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 30px; }
+.cheer .life { position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: var(--accent); transform-origin: left; animation: life var(--life, 5s) linear forwards; }
+.hold .life { animation-play-state: paused; }
+@keyframes cheer { 0% { opacity: 0; transform: scale(.7); } 60% { opacity: 1; transform: scale(1.04); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .cheer { animation: none; } }
 .weekstat { display: flex; align-items: baseline; gap: 10px; }
 .weekstat b { font-family: var(--display); font-size: 48px; font-weight: 400; line-height: 1; color: var(--accent-text); }
 .bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; }
@@ -362,6 +366,12 @@ h1 { font-size: 46px; }
 :root[data-theme="dark"] { --free: #5BD4A0; }
 .tl-free { left: 70px; right: 10px; border-color: color-mix(in srgb, var(--free) 45%, transparent); background: color-mix(in srgb, var(--free) 8%, transparent); color: var(--free); font-size: 15px; font-weight: 800; }
 .tl-free b { font-family: var(--display); font-weight: 400; font-size: 20px; letter-spacing: .04em; text-transform: uppercase; margin-right: 6px; }
+@keyframes slideL { from { opacity: .3; transform: translateX(40px); } }
+@keyframes slideR { from { opacity: .3; transform: translateX(-40px); } }
+#dayList.slide-l { animation: slideL .22s ease-out; }
+#dayList.slide-r { animation: slideR .22s ease-out; }
+/* With a sheet open, the bubbles move to the top so they never cover its buttons. */
+#sheet:not([hidden]) ~ .snacks { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
 .snacks { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; width: min(420px, calc(100vw - 24px)); z-index: 62; pointer-events: none; }
 .snack { pointer-events: auto; position: relative; overflow: hidden; display: flex; align-items: center; gap: 12px; padding: 12px 12px 14px 16px; border-radius: 18px; background: var(--cell); color: var(--ink); box-shadow: var(--shadow); touch-action: none; transition: transform .2s, opacity .2s; }
 .snack b { flex: 1; font-size: 15px; line-height: 1.3; }
@@ -832,7 +842,7 @@ html.kb .tabbar { display: none; }
   };
   // Round 2 texts: repeats, tasks without a time, search, undo, timeline, summaries, photos, celebrations, backup.
   Object.assign(I18N.es, {
-    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", noHeard: "No te escuché bien. Toca el micrófono e intenta otra vez.", quietFromL: "Desde", quietToL: "Hasta", quietSum: "No te llegarán avisos de {a} a {b}.", stop: "Parar", stopped: "Lo detuve. Pregunta otra cosa cuando quieras.", errAi: "La IA no respondió esta vez. Intenta de nuevo.", schedAll: "Agendar todo", schedSel: "Agendar {n} elegidas", schedSel1: "Agendar la elegida", discAll: "Descartar todo", discSel: "Descartar {n} elegidas", discSel1: "Descartar la elegida", tapPick: "Toca las sugerencias para elegir solo algunas.", moreOptions: "Más opciones",
+    search: "Buscar", searchPh: "Busca una tarea o un cumpleaños", noResults: "No encontré nada con eso", undo: "Deshacer", noHeard: "No te escuché bien. Toca el micrófono e intenta otra vez.", quietFromL: "Desde", quietToL: "Hasta", quietSum: "No te llegarán avisos de {a} a {b}.", stop: "Parar", stopped: "Lo detuve. Pregunta otra cosa cuando quieras.", errAi: "La IA no respondió esta vez. Intenta de nuevo.", schedAll: "Agendar todo", schedSel: "Agendar {n} elegidas", schedSel1: "Agendar la elegida", discAll: "Descartar todo", discSel: "Descartar {n} elegidas", discSel1: "Descartar la elegida", tapPick: "Toca las sugerencias para elegir solo algunas.", moreOptions: "Más opciones", edit: "Editar", editTask: "Editar tarea", nameLbl: "Nombre", emojiLbl: "Ícono", durLbl: "Duración", minShort: "min", noteLbl: "Consejo o nota", applyAll: "Aplicar a todas las repeticiones", edited: "Cambios guardados",
     deleted: "🗑️ {t}: borrada", deletedSeries: "🗑️ Borré esta y las que siguen", delOne: "Borrar solo esta", delSeries: "Borrar esta y las que siguen",
     repeat: "Repetir", rep_none: "No se repite", rep_daily: "Todos los días", rep_weekdays: "De lunes a viernes", rep_weekly: "Cada semana", rep_monthly: "Cada mes",
     repEvery: "Cada {d}", repMonthDay: "Cada mes, el día {n}", repeats: "Se repite",
@@ -857,7 +867,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "Sin internet: guardo todo y lo subo cuando vuelva", backOnline: "Conexión de vuelta: todo al día",
   });
   Object.assign(I18N.en, {
-    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", noHeard: "I couldn't hear that well. Tap the mic and try again.", quietFromL: "From", quietToL: "Until", quietSum: "No reminders from {a} to {b}.", stop: "Stop", stopped: "Stopped. Ask something else whenever you like.", errAi: "The AI didn't answer this time. Try again.", schedAll: "Schedule all", schedSel: "Schedule {n} selected", schedSel1: "Schedule the selected one", discAll: "Discard all", discSel: "Discard {n} selected", discSel1: "Discard the selected one", tapPick: "Tap suggestions to pick only some.", moreOptions: "More options",
+    search: "Search", searchPh: "Search for a task or a birthday", noResults: "Nothing found", undo: "Undo", noHeard: "I couldn't hear that well. Tap the mic and try again.", quietFromL: "From", quietToL: "Until", quietSum: "No reminders from {a} to {b}.", stop: "Stop", stopped: "Stopped. Ask something else whenever you like.", errAi: "The AI didn't answer this time. Try again.", schedAll: "Schedule all", schedSel: "Schedule {n} selected", schedSel1: "Schedule the selected one", discAll: "Discard all", discSel: "Discard {n} selected", discSel1: "Discard the selected one", tapPick: "Tap suggestions to pick only some.", moreOptions: "More options", edit: "Edit", editTask: "Edit task", nameLbl: "Name", emojiLbl: "Icon", durLbl: "Duration", minShort: "min", noteLbl: "Tip or note", applyAll: "Apply to all repeats", edited: "Changes saved",
     deleted: "🗑️ {t}: deleted", deletedSeries: "🗑️ Deleted this one and the ones after", delOne: "Delete only this one", delSeries: "Delete this and the ones after",
     repeat: "Repeat", rep_none: "Doesn't repeat", rep_daily: "Every day", rep_weekdays: "Monday to Friday", rep_weekly: "Every week", rep_monthly: "Every month",
     repEvery: "Every {d}", repMonthDay: "Every month, on day {n}", repeats: "Repeats",
@@ -882,7 +892,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "No internet: I'm saving everything and will upload it when it's back", backOnline: "Back online: all up to date",
   });
   Object.assign(I18N.pt, {
-    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções",
+    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções", edit: "Editar", editTask: "Editar tarefa", nameLbl: "Nome", emojiLbl: "Ícone", durLbl: "Duração", minShort: "min", noteLbl: "Dica ou nota", applyAll: "Aplicar a todas as repetições", edited: "Alterações salvas",
     deleted: "🗑️ {t}: apagada", deletedSeries: "🗑️ Apaguei esta e as seguintes", delOne: "Apagar só esta", delSeries: "Apagar esta e as seguintes",
     repeat: "Repetir", rep_none: "Não se repete", rep_daily: "Todos os dias", rep_weekdays: "De segunda a sexta", rep_weekly: "Toda semana", rep_monthly: "Todo mês",
     repEvery: "Toda {d}", repMonthDay: "Todo mês, no dia {n}", repeats: "Se repete",
@@ -907,7 +917,7 @@ html.kb .tabbar { display: none; }
     offlineNote: "Sem internet: guardo tudo e envio quando voltar", backOnline: "Conexão de volta: tudo em dia",
   });
   Object.assign(I18N.fr, {
-    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", noHeard: "Je n'ai pas bien entendu. Touche le micro et réessaie.", quietFromL: "De", quietToL: "Jusqu'à", quietSum: "Aucun rappel de {a} à {b}.", stop: "Arrêter", stopped: "J'ai arrêté. Pose une autre question quand tu veux.", errAi: "L'IA n'a pas répondu cette fois. Réessaie.", schedAll: "Tout planifier", schedSel: "Planifier les {n} choisies", schedSel1: "Planifier celle choisie", discAll: "Tout ignorer", discSel: "Ignorer les {n} choisies", discSel1: "Ignorer celle choisie", tapPick: "Touche les suggestions pour n'en choisir que certaines.", moreOptions: "Plus d'options",
+    search: "Rechercher", searchPh: "Cherche une tâche ou un anniversaire", noResults: "Rien trouvé", undo: "Annuler", noHeard: "Je n'ai pas bien entendu. Touche le micro et réessaie.", quietFromL: "De", quietToL: "Jusqu'à", quietSum: "Aucun rappel de {a} à {b}.", stop: "Arrêter", stopped: "J'ai arrêté. Pose une autre question quand tu veux.", errAi: "L'IA n'a pas répondu cette fois. Réessaie.", schedAll: "Tout planifier", schedSel: "Planifier les {n} choisies", schedSel1: "Planifier celle choisie", discAll: "Tout ignorer", discSel: "Ignorer les {n} choisies", discSel1: "Ignorer celle choisie", tapPick: "Touche les suggestions pour n'en choisir que certaines.", moreOptions: "Plus d'options", edit: "Modifier", editTask: "Modifier la tâche", nameLbl: "Nom", emojiLbl: "Icône", durLbl: "Durée", minShort: "min", noteLbl: "Conseil ou note", applyAll: "Appliquer à toutes les répétitions", edited: "Modifications enregistrées",
     deleted: "🗑️ {t} : supprimée", deletedSeries: "🗑️ Supprimé celle-ci et les suivantes", delOne: "Supprimer seulement celle-ci", delSeries: "Supprimer celle-ci et les suivantes",
     repeat: "Répéter", rep_none: "Ne se répète pas", rep_daily: "Tous les jours", rep_weekdays: "Du lundi au vendredi", rep_weekly: "Chaque semaine", rep_monthly: "Chaque mois",
     repEvery: "Chaque {d}", repMonthDay: "Chaque mois, le {n}", repeats: "Se répète",
@@ -1034,7 +1044,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.6.5";
+  const VERSION = "0.6.7";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1374,31 +1384,40 @@ html.kb .tabbar { display: none; }
   // Small message at the bottom, near the thumb, with a bar that shows when it leaves (2.5 s, or 6 s with "Deshacer").
   // Swipe it sideways or down to close it sooner; holding it pauses it.
   function notice(text, undo) {
-    const ms = undo ? 6000 : 2500;
+    const ms = undo ? 8000 : 2500;
+    let bye;
     const n = el("div", { class: "snack", role: "status", style: `--life:${ms}ms` }, el("b", {}, text),
       undo ? el("button", { class: "undo", onclick: (e) => { e.stopPropagation(); bye(); undo(); } }, tr("undo")) : null, el("i", { class: "life" }));
+    const box = $("snacks"); while (box.children.length > 2) box.firstChild.remove();
+    box.append(n);
+    bye = swipeAway(n, ms);
+  }
+  // Leaves by itself after ms; swipe it sideways or down to close it sooner; holding it pauses it.
+  // `grab` is the part you touch (defaults to the element itself).
+  function swipeAway(n, ms, grab = n) {
     let left = ms, t0 = Date.now(), timer = setTimeout(() => bye(), ms), x0 = 0, y0 = 0, id = null;
-    function bye(dx = 0, dy = 0) { clearTimeout(timer); n.style.transform = `translate(${dx}px,${dy}px)`; n.classList.add("out"); setTimeout(() => n.remove(), 200); }
-    n.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; id = e.pointerId; x0 = e.clientX; y0 = e.clientY; clearTimeout(timer); left -= Date.now() - t0; n.classList.add("hold"); n.style.transition = "none"; try { n.setPointerCapture(id); } catch {} });
-    n.addEventListener("pointermove", (e) => { if (id !== e.pointerId) return; const dx = e.clientX - x0, dy = Math.max(0, e.clientY - y0); n.style.transform = `translate(${dx}px,${dy}px)`; n.style.opacity = String(1 - Math.min(0.8, (Math.abs(dx) + dy) / 300)); });
+    function bye(dx = 0, dy = 0) { clearTimeout(timer); n.style.transform = `translate(${dx}px,${dy}px)`; n.classList.add("out"); setTimeout(() => n.remove(), 250); }
+    grab.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; id = e.pointerId; x0 = e.clientX; y0 = e.clientY; clearTimeout(timer); left -= Date.now() - t0; n.classList.add("hold"); n.style.transition = "none"; try { grab.setPointerCapture(id); } catch {} });
+    grab.addEventListener("pointermove", (e) => { if (id !== e.pointerId) return; const dx = e.clientX - x0, dy = Math.max(0, e.clientY - y0); n.style.transform = `translate(${dx}px,${dy}px)`; n.style.opacity = String(1 - Math.min(0.8, (Math.abs(dx) + dy) / 300)); });
     const up = (e) => {
       if (id !== e.pointerId) return; id = null; n.style.transition = ""; n.classList.remove("hold");
       const dx = e.clientX - x0, dy = e.clientY - y0;
       if (Math.abs(dx) > 70) return bye(Math.sign(dx) * innerWidth, 0);
-      if (dy > 40) return bye(0, 120);
+      if (dy > 40) return bye(0, 160);
       n.style.transform = ""; n.style.opacity = ""; t0 = Date.now(); timer = setTimeout(() => bye(), Math.max(1200, left));
     };
-    n.addEventListener("pointerup", up); n.addEventListener("pointercancel", up);
-    const box = $("snacks"); while (box.children.length > 2) box.firstChild.remove();
-    box.append(n);
+    grab.addEventListener("pointerup", up); grab.addEventListener("pointercancel", up);
+    return bye;
   }
   // Confetti and a phrase about the task; a bigger one when the whole day is done.
   function celebrate(t) {
     const today = ymd(new Date()), all = state.tasks.filter((x) => x.date === today);
     const dayDone = t.date === today && all.length > 1 && all.every((x) => x.done);
     confetti(dayDone ? 160 : 80);
-    const c = el("div", { class: "cheer" + (dayDone ? " big" : ""), role: "status" }, dayDone ? "🎉 " + tr("dayComplete") : t.cheer || tr("cheer" + (1 + Math.floor(Math.random() * 4)), { t: t.title }));
-    document.body.append(c); setTimeout(() => c.remove(), dayDone ? 3700 : 2700);
+    const ms = dayDone ? 7000 : 5000;
+    const c = el("div", { class: "cheer" + (dayDone ? " big" : ""), role: "status", style: `--life:${ms}ms` }, dayDone ? "🎉 " + tr("dayComplete") : t.cheer || tr("cheer" + (1 + Math.floor(Math.random() * 4)), { t: t.title }), el("i", { class: "life" }));
+    const wrap = el("div", { class: "cheerwrap" }, c);
+    document.body.append(wrap); swipeAway(wrap, ms, c);
   }
   function confetti(n) {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1450,6 +1469,7 @@ html.kb .tabbar { display: none; }
       })) : null,
       el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("notifyYou", { x: remindText() })),
       el("details", { class: "more" }, el("summary", {}, "⋯ " + tr("moreOptions")), el("div", { class: "actions" },
+        real ? el("button", { onclick: then(() => openEdit(t)) }, "✏️ " + tr("edit")) : null,
         real ? el("button", { onclick: then(() => change(t, { done: !t.done, snooze: null }, t.done ? tr("markedPending") : tr("doneMsg", { t: t.title }))) }, tr(t.done ? "markPending" : "markDone")) : null,
         real && t.anytime && !t.done ? el("button", { onclick: then(() => placeAnytime(t)) }, tr("findSlot")) : null,
         real ? el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
@@ -1459,7 +1479,50 @@ html.kb .tabbar { display: none; }
         t.anytime ? null : el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
         real ? el("button", { class: "danger", onclick: then(() => del(t)) }, tr(s ? "delOne" : "del")) : null,
         real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null)),
-      el("button", { class: "btn", onclick: closeSheet }, tr("doneBtn"))));
+      el("div", { class: "row" }, real ? el("button", { class: "btn", onclick: () => openEdit(t) }, "✏️ " + tr("edit")) : null, el("button", { class: "btn primary", onclick: closeSheet }, tr("doneBtn")))));
+  }
+  // Every field of a task can be changed; in a series, "apply to all" also updates the pattern and the coming days.
+  function openEdit(t) {
+    const s = t.series && state.series.find((x) => x.id === t.series);
+    const title = el("input", { class: "field", id: "editIn", value: t.title, maxlength: 120, autocomplete: "off", style: "background:var(--group);flex:1" });
+    const mic = el("button", { type: "button", class: "mic", "data-mic": "editIn", "aria-label": tr("dictate"), onclick: () => toggleMic(mic) }, micSvg());
+    const emo = el("input", { class: "field", value: t.emoji || "", maxlength: 8, "aria-label": tr("emojiLbl"), style: "background:var(--group);width:3.2em;text-align:center;font-size:1.3em;padding:6px" });
+    const day = el("input", { id: "editDate" }); day.value = t.date;
+    const seg = el("div", { class: "seg" });
+    const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" }); time.value = t.anytime ? "" : t.time;
+    const anyChip = el("button", { type: "button", class: "chip", "aria-pressed": String(!!t.anytime), onclick: () => {
+      const on = anyChip.getAttribute("aria-pressed") !== "true"; anyChip.setAttribute("aria-pressed", String(on)); time.disabled = on; if (on) time.value = "";
+    } }, tr("anyTimeChip"));
+    time.disabled = !!t.anytime;
+    const durs = [5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240];
+    if (!durs.includes(t.dur || 30)) durs.push(t.dur); durs.sort((a, b) => a - b);
+    const dur = el("select", { "aria-label": tr("durLbl") }, durs.map((m) => el("option", { value: m, selected: m === (t.dur || 30) }, m < 60 || m % 60 ? m + " " + tr("minShort") : m / 60 + " h")));
+    const tip = el("textarea", { class: "field", rows: 2, maxlength: 300, style: "background:var(--group);resize:vertical" }); tip.value = t.tip || "";
+    const all = s ? el("input", { type: "checkbox" }) : null;
+    const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("editTask"), onsubmit: (e) => {
+        e.preventDefault();
+        if (dictating) { const d = dictating; dictating = null; d.stop(); }
+        const name = title.value.trim(); if (!name) { title.focus(); return; }
+        const anytime = anyChip.getAttribute("aria-pressed") === "true" || !time.value;
+        const patch = { title: name, emoji: emojiOnly(emo.value), time: anytime ? "" : time.value, anytime, dur: Number(dur.value) || 30, tip: tip.value.trim() };
+        closeSheet();
+        if (all && all.checked) {
+          const prevS = clone(s), prevT = state.tasks.filter((x) => x.series === s.id && x.date >= t.date && !x.done).map(clone);
+          put({ ...s, ...patch }, true);
+          prevT.forEach((x) => put({ ...x, ...patch, ...(x.id === t.id ? { date: day.value || t.date } : {}) }, true));
+          render(); notice(tr("edited"), () => { put(prevS, true); prevT.forEach((x) => put(x, true)); render(); });
+        } else change(t, { ...patch, date: day.value || t.date, snooze: null }, tr("edited"));
+        state.anchor = fromYmd(day.value || t.date); render();
+      } },
+      el("div", { class: "grabber" }), el("h2", {}, tr("editTask")),
+      el("div", { class: "row", style: "flex-wrap:nowrap" }, emo, title, mic),
+      seg,
+      el("label", { class: "row muted" }, tr("hourLbl"), time, anyChip),
+      el("label", { class: "row muted" }, tr("durLbl"), dur),
+      el("label", { class: "muted", style: "display:grid;gap:6px" }, tr("noteLbl"), tip),
+      all ? el("label", { class: "row muted" }, all, "🔁 " + tr("applyAll")) : null,
+      el("div", { class: "row" }, el("button", { class: "btn primary" }, tr("save")), el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
+    showSheet(form); daySeg(seg, day);
   }
   // Big task into small steps (AI); the steps are a checklist inside the task.
   async function splitSteps(t, btn) {
@@ -2282,12 +2345,14 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     bg.addEventListener("touchend", end); bg.addEventListener("touchcancel", end);
   })();
   // Swipe sideways to go to the next or previous tab (phones). Task rows keep their own swipe.
+  // In the calendar it changes the day (or the month); there the tab bar is where you swipe to change tabs.
   (() => {
     const order = ["cal", "organize", "chat", "bdays", "settings"];
-    let x0 = 0, y0 = 0, t0 = 0, ok = false;
+    let x0 = 0, y0 = 0, t0 = 0, ok = false, onBar = false;
     $("app").addEventListener("touchstart", (e) => {
       const t = e.target;
-      ok = isPhone() && e.touches.length === 1 && !document.documentElement.classList.contains("kb") && !t.closest(".swipe, input, select, textarea, .snack, .tl, .seg2, .week, .month");
+      ok = isPhone() && e.touches.length === 1 && !document.documentElement.classList.contains("kb") && !t.closest(".swipe, input, select, textarea, .snack, .seg2");
+      onBar = !!t.closest(".tabbar");
       x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
     }, { passive: true });
     $("app").addEventListener("touchend", (e) => {
@@ -2295,6 +2360,11 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
       if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2 || Date.now() - t0 > 700) return;
       const cur = document.querySelector(".tabbar button[aria-selected='true']"), i = order.indexOf(cur ? cur.dataset.tab : "cal");
+      if (i <= 0 && !onBar) {
+        $(dx < 0 ? "nextBtn" : "prevBtn").click();
+        const m = $("dayList"); m.classList.remove("slide-l", "slide-r"); void m.offsetWidth; m.classList.add(dx < 0 ? "slide-l" : "slide-r");
+        return;
+      }
       const next = order[i + (dx < 0 ? 1 : -1)];
       if (next) showTab(next);
     }, { passive: true });
