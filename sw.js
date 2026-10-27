@@ -2,10 +2,11 @@
 // and receives what is shared to Pendi from other apps (Android).
 // "Posponer" and "Hecho" (Android) open the app with the action in the address, and the app applies it.
 // A plain tap on a task notification opens the quick-action screen (iPhone has no buttons on web notifications).
-const CACHE = "pendi-v1";
-const SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
+const CACHE = "pendi-v2";
+const SHELL = ["/"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {})); self.skipWaiting(); });
-self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+// Old saved copies are dropped when a new version takes over.
+self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE && k !== "pendi-share").map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 
 // Pages and files come from the network first, so a new version shows on the next open; the saved copy is used
 // only without internet. The API is never cached: the app keeps its own copy of the data and sends changes later.
@@ -13,6 +14,8 @@ self.addEventListener("fetch", (e) => {
   const req = e.request, url = new URL(req.url);
   if (req.method === "POST" && url.pathname === "/share") return e.respondWith(shared(req));
   if (req.method !== "GET" || url.pathname.startsWith("/api/")) return;
+  // The phone reads the icons and the manifest straight from the server when the app is added to the home screen.
+  if (/\.(png|webmanifest)$/.test(url.pathname)) return;
   const font = /^fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
   if (url.origin !== self.location.origin && !font) return;
   e.respondWith(fromNetwork(req, font));
