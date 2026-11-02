@@ -11,6 +11,7 @@ const T = {
     eTitle: "🌙 Cierre del día", eOne: "Te queda 1 pendiente de hoy. ¿Lo paso a mañana?", eMany: "Te quedan {n} pendientes de hoy. ¿Los paso a mañana?",
     eDoneTitle: "🎉 ¡Día completo!", eDoneBody: "Hiciste todo lo de hoy. ¡A descansar!",
     wTitle: "📊 Tu semana", wBody: "Hiciste {d} de {t} cosas. La próxima semana trae {n}. Toca para verla.",
+    dueNow: "Es ahora", lateStill: "Sigue pendiente", morningOpenLead: "Ayer quedó sin cerrar: {x}.",
   },
   en: {
     reminder: "Reminder", inHour: "In 1 hour", inMin: "In {n} min", at: "At {t}", isAt: "It's at {t}", wasAt: "It was at {t}",
@@ -23,6 +24,7 @@ const T = {
     eTitle: "🌙 End of the day", eOne: "1 thing is left from today. Move it to tomorrow?", eMany: "{n} things are left from today. Move them to tomorrow?",
     eDoneTitle: "🎉 Day complete!", eDoneBody: "You did everything today. Time to rest!",
     wTitle: "📊 Your week", wBody: "You did {d} of {t} things. Next week brings {n}. Tap to see it.",
+    dueNow: "It's time", lateStill: "Still open", morningOpenLead: "Left open yesterday: {x}.",
   },
   pt: {
     reminder: "Lembrete", inHour: "Em 1 hora", inMin: "Em {n} min", at: "Às {t}", isAt: "É às {t}", wasAt: "Era às {t}",
@@ -35,6 +37,7 @@ const T = {
     eTitle: "🌙 Fim do dia", eOne: "Falta 1 coisa de hoje. Passo para amanhã?", eMany: "Faltam {n} coisas de hoje. Passo para amanhã?",
     eDoneTitle: "🎉 Dia completo!", eDoneBody: "Você fez tudo hoje. Hora de descansar!",
     wTitle: "📊 Sua semana", wBody: "Você fez {d} de {t} coisas. A próxima semana traz {n}. Toque para ver.",
+    dueNow: "É agora", lateStill: "Ainda pendente", morningOpenLead: "Ficou em aberto ontem: {x}.",
   },
   fr: {
     reminder: "Rappel", inHour: "Dans 1 heure", inMin: "Dans {n} min", at: "À {t}", isAt: "C'est à {t}", wasAt: "C'était à {t}",
@@ -47,6 +50,7 @@ const T = {
     eTitle: "🌙 Fin de journée", eOne: "Il te reste 1 chose d'aujourd'hui. Je la passe à demain ?", eMany: "Il te reste {n} choses d'aujourd'hui. Je les passe à demain ?",
     eDoneTitle: "🎉 Journée complète !", eDoneBody: "Tu as tout fait aujourd'hui. Repos !",
     wTitle: "📊 Ta semaine", wBody: "Tu as fait {d} choses sur {t}. La semaine prochaine en a {n}. Touche pour voir.",
+    dueNow: "C'est maintenant", lateStill: "Toujours en attente", morningOpenLead: "Resté ouvert hier : {x}.",
   },
 };
 

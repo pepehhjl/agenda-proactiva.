@@ -1,4 +1,5 @@
 // Runs every minute (called by Supabase pg_cron). Sends reminders 60, 30 and 10 minutes before each task,
+// one at its exact time and one more 30 minutes later while it is still open,
 // birthday notices 2 days before and on the day, at 9:00 in the user's time zone, and the morning, evening and
 // Sunday summaries at the times chosen in Ajustes > Resúmenes.
 import { authed, deny, supa, pushReady, sendToAll } from "./_lib.js";
@@ -72,6 +73,21 @@ async function remind(sb, owner, items) {
       const body = t.anytime ? t.tip || "" : `${tr(past ? "wasAt" : "isAt", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`;
       due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("reminder").toUpperCase()} · ${icon(t)} ${t.title}`, body, tag: r.id, taskId: r.id, urgency: "high", ...labels } });
     }
+    // Escalation: at the task's exact time, and once more 30 min later if it is still open (2 at most).
+    // Not after "Posponer": the postponed reminder takes over. Each has a 10-minute window, so quiet hours skip it.
+    if (r.kind === "task" && !t.done && t.start && !t.anytime && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
+      const ago = (now - Date.parse(t.start)) / 60000;
+      const step = ago >= 0 && ago < 10 ? "due" : ago >= 30 && ago < 40 ? "late" : null;
+      if (step) {
+        const key = `${r.id}@${t.start}#${step}`, when = clock(t.time, settings.clock), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
+        due.push({
+          check: key, keys: [key],
+          payload: step === "due"
+            ? { title: `⏰ ${tr("dueNow").toUpperCase()} · ${name}`, body: `${tr("at", { t: when })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, urgency: "high", ...labels }
+            : { title: `⚠️ ${tr("lateStill").toUpperCase()} · ${name}`, body: tr("wasAt", { t: when }), tag: r.id, taskId: r.id, urgency: "high", ...labels },
+        });
+      }
+    }
     // Tasks without a time get no countdown reminders.
     if (r.kind === "task" && !t.done && t.start && !t.anytime) {
       const mins = (Date.parse(t.start) - now) / 60000;
@@ -116,7 +132,10 @@ async function remind(sb, owner, items) {
     const star = open.find((t) => t.star);
     const body = !open.length ? tr("mFree")
       : (first ? tr(open.length === 1 ? "mOne" : "mMany", { n: open.length, t: clock(first.time, settings.clock), x: first.title }) : tr("mNoTime", { n: open.length })) + (star && star !== first ? " " + tr("mStar", { x: star.title }) : "");
-    brief(`brief@${todayK}@m`, { title: tr("mTitle"), body, url: "/" });
+    // First what yesterday left open (up to 5, with their time), then today.
+    const yday = tasks.filter((t) => t.date === dayKey(-1) && !t.done && !t.openSeen).sort((p, q) => (p.time || "99").localeCompare(q.time || "99"));
+    const lead = yday.length ? tr("morningOpenLead", { n: yday.length, x: yday.slice(0, 5).map((t) => t.title + (t.anytime || !t.time ? "" : ` (${clock(t.time, settings.clock)})`)).join(", ") + (yday.length > 5 ? "…" : "") }) + " " : "";
+    brief(`brief@${todayK}@m`, { title: tr("mTitle"), body: lead + body, url: "/" });
   }
   if (b.eOn !== false && within(b.e || "21:00") && today.length) {
     brief(`brief@${todayK}@e`, open.length
