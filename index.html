@@ -1064,7 +1064,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.8.0";
+  const VERSION = "0.8.1";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1712,8 +1712,8 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   // o: anytime (no time), rep (repeat), image (a photo to read).
   async function quickAdd(what, date, time, o = {}) {
     let tareas = [];
-    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","repetir":null}]}
-"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
+    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","repetir":null}]}
+"original" son las palabras exactas de la persona (o de la imagen) para esa tarea, copiadas sin traducir. "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
     try {
       const res = o.image ? await ai.see(`Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. Los títulos van en el idioma de la imagen o de la nota de la persona, sin traducir.
 ${nowLine()}
@@ -1730,12 +1730,15 @@ ${shape}`);
     if (o.image && !tareas.length) return [];
     // Without the AI (no internet, for example) it is saved as written, without a time unless one was chosen.
     if (!tareas.length) tareas = [{ titulo: what, fecha: date, hora: time }];
-    const out = [];
+    const out = [], titles = o.image ? [] : ownTitles(tareas, what);
     for (const t of tareas.slice(0, 8)) {
       const has = /^\d{1,2}:\d{2}$/.test(t.hora || ""), anytime = !!o.anytime || (!has && !time);
-      const row = { id: uid("t"), kind: "task", title: String(t.titulo || what).slice(0, 120), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha || "") ? t.fecha : date,
+      const title = o.image ? ownTitle(t.titulo, t.original, "") : titles[tareas.indexOf(t)];
+      const row = { id: uid("t"), kind: "task", title: (title || what || tr("task")).slice(0, 120), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha || "") ? t.fecha : date,
         time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), done: false, created: Date.now() };
-      out.push(await addTask(row, o.rep || repFromAi(t.repetir)));
+      // A repeat only when the person asked for one (the AI sometimes makes "take the pill" daily on its own).
+      const asked = /\b(cada|tod[oa]s? l[oa]s|diari|semanal|mensual|every|daily|weekly|monthly|weekdays|chaque|tous les|toutes les|quotidien|hebdo|mensuel|todo dia|todos os|toda semana|di[aá]rio)/i.test(what);
+      out.push(await addTask(row, o.rep || (asked || o.image ? repFromAi(t.repetir) : null)));
     }
     return out;
   }
@@ -1785,6 +1788,29 @@ ${shape}`);
   }
   // The person's own words stay as they wrote or dictated them: never translated, whatever the app language.
   const keepTitles = `Los títulos ("titulo") van en el mismo idioma y con las mismas palabras que usó la persona (solo puedes acortarlos o poner mayúscula inicial); nunca los traduzcas ni cambies de idioma, aunque el resto vaya en otro idioma.`;
+  // A title is the person's own when most of its words come from what they wrote or dictated (same word stem,
+  // so "pastillas" matches "pastilla" but "pill" never does). If the AI translated or reworded it into another
+  // language, the person's words are kept instead: its "original" fragment, or else the whole text.
+  const stems = (x) => (String(x || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").match(/[\p{L}\p{N}]{3,}/gu) || []).map((w) => w.slice(0, 5));
+  const ownWords = (title, src) => { const w = stems(title), s = new Set(stems(src)); return w.length > 0 && w.filter((x) => s.has(x)).length / w.length > 0.5; };
+  // useSrc: true falls back to the whole text, a string falls back to that string, false keeps the AI's title.
+  function ownTitle(title, src, orig, useSrc = true) {
+    title = String(title || "").trim(); src = String(src || "").trim(); orig = String(orig || "").trim();
+    if (!src) return title;
+    if (title.toLowerCase() === src.toLowerCase()) return src;
+    if (title && ownWords(title, src)) return title;
+    if (orig && ownWords(orig, src)) return orig.slice(0, 120);
+    return typeof useSrc === "string" ? useSrc.trim() : useSrc ? src.slice(0, 120) : title;
+  }
+  // Same for several tasks taken from one text: a translated title without a usable "original" gets the person's
+  // own phrase for it, the parts of the text ("ir al banco, llamar a mamá") that no other task already uses, in order.
+  function ownTitles(list, src) {
+    if (list.length < 2) return list.map((t) => ownTitle(t.titulo, src, t.original));
+    const out = list.map((t) => ownTitle(t.titulo, src, t.original, false)), bad = out.map((x) => !ownWords(x, src));
+    const parts = String(src).split(/[,;.\n]+|\s(?:y|e|and|et|puis|then|luego|después)\s/i).map((x) => x.trim()).filter((x) => stems(x).length && !out.some((t, i) => !bad[i] && ownWords(t, x)));
+    if (parts.length === bad.filter(Boolean).length) { let k = 0; bad.forEach((b, i) => { if (b) out[i] = parts[k++].slice(0, 120); }); }
+    return out;
+  }
   const nowLine = () => { const n = new Date(); return `Hoy es ${dayName(n)} ${ymd(n)}, son las ${hm(n)}.`; };
 
   async function organize() {
@@ -1803,14 +1829,15 @@ Texto de la persona:
 
 Para cada tarea da: título corto, un emoji que la represente, categoría (una de: trabajo, personal, casa, salud, creativo, social, otro), duración estimada en minutos, 3 opciones de hora distintas (mañana, tarde y noche si tiene sentido; formato HH:MM 24h; sin choques), cuál recomiendas y por qué en pocas palabras, y un consejo práctico breve (1-2 frases).
 Ordena las tareas en el orden recomendado.
-Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦"}]}
-"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea.`;
+Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦"}]}
+"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir.`;
     try {
       const res = await ai.json(prompt);
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
       if (!tareas.length) throw { error: "invalid_json" };
+      const titles = ownTitles(tareas, text);
       state.proposals = tareas.map((t) => ({
-        title: String(t.titulo || tr("task")), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
+        title: titles[tareas.indexOf(t)] || tr("task"), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
         dur: Math.max(5, Number(t.duracion) || 30),
         options: (Array.isArray(t.opciones) ? t.opciones : []).map(String).filter((x) => /^\d{1,2}:\d{2}$/.test(x)).map((x) => x.padStart(5, "0")).slice(0, 3),
         rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), skip: false,
@@ -1882,7 +1909,7 @@ Cumpleaños guardados: ${state.bdays.map((b) => `${b.name} (${b.day}/${b.month})
 
 Si pregunta qué tiene un día (hoy, mañana, el viernes...), enumera en "respuesta" todos los eventos reales de ese día con su hora, uno por línea, y pon ese día en "dia" (YYYY-MM-DD). "acciones" es solo para cambios, nunca para mostrar la agenda.
 Si la persona pide crear, mover o borrar eventos, o guardar un cumpleaños, propón las acciones; ella las confirmará. Nunca inventes ids ni crees eventos que ya existen.
-Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
+Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","original":"palabras exactas de la persona para ese evento, sin traducir","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
 En "cumple", "anio" y "gustos" son opcionales. En "crear", "hora" puede ir vacía si no tiene hora fija, y "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (0 domingo a 6 sábado) si se repite.
 Las tareas marcadas con ⭐ son importantes.
 Si no hay acciones, usa "acciones":[].`;
@@ -1898,6 +1925,10 @@ Si no hay acciones, usa "acciones":[].`;
       }
       state.chat.push({ role: "assistant", content: answer });
       const acts = (Array.isArray(res && res.acciones) ? res.acciones : []).filter((a) => a && ((a.tipo === "crear" && /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || "")) || (a.tipo === "cumple" && a.nombre && Number(a.mes) >= 1 && Number(a.mes) <= 12 && Number(a.dia) >= 1 && Number(a.dia) <= 31) || state.tasks.some((t) => t.id === String(a.id))));
+      // New tasks keep the person's own words (what they wrote in the last messages), never a translation.
+      const said = state.chat.filter((m) => m.role === "user").slice(-3).map((m) => m.content).join("\n"), creates = acts.filter((a) => a.tipo === "crear");
+      // A short "yes, do it" keeps the AI's title; a real request in another language wins over a translation.
+      for (const a of creates) a.titulo = ownTitle(a.titulo, said, a.original, creates.length === 1 && stems(q).length >= 2 && q.length <= 120 ? q : false);
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
       state.chat.splice(state.chat.indexOf(thinking), 1);
