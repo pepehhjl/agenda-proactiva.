@@ -291,6 +291,13 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .card, .group { border-top: 4px solid var(--accent); }
 :root[data-theme="light"] .list { box-shadow: 4px 4px 0 var(--line); } :root[data-theme="light"] .card, :root[data-theme="light"] .group { box-shadow: 3px 3px 0 var(--line); }
 .msg.me { border: 2px solid var(--edge); }
+/* Status strip: what is in progress now (or what comes next), ticking by itself. */
+.sbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-bottom: 12px; padding: 12px 14px; text-align: left; font: inherit; font-size: 15px; color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+.sbar b { background: var(--fill); color: var(--accent-text); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+.sbar.run { background: color-mix(in srgb, var(--accent) 22%, var(--cell)); }
+.sbar.run b { background: var(--accent); color: var(--accent-ink); }
+.sbar.over b { background: var(--red); color: #fff; }
+.sbar.none { color: var(--muted); cursor: default; }
 .msg.ai { border: 2px solid var(--edge); border-radius: 4px 18px 18px 18px; background: var(--cell); }
 
 /* Penumbra type: condensed uppercase titles, wide-tracked yellow labels. */
@@ -1125,6 +1132,14 @@ html.kb .tabbar { display: none; }
       goMsgLow: "👍 Vas-y. Marque-la ici quand c'est fait.", startedMsgLow: "▶ {t} : en cours. Clôture-la ici quand tu as fini." },
   };
   for (const k of Object.keys(P6)) Object.assign(I18N[k], P6[k]);
+  // Status strip on the day screen.
+  const P7 = {
+    es: { barRun: "⏱ EN CURSO", barLeft: "quedan {x}", barOver: "terminó hace {x}", barNext: "PRÓXIMA", barIn: "en {x}", barTomorrow: "mañana {t}", barNone: "Sin tareas próximas" },
+    en: { barRun: "⏱ IN PROGRESS", barLeft: "{x} left", barOver: "ended {x} ago", barNext: "NEXT", barIn: "in {x}", barTomorrow: "tomorrow {t}", barNone: "No upcoming tasks" },
+    pt: { barRun: "⏱ EM ANDAMENTO", barLeft: "faltam {x}", barOver: "terminou há {x}", barNext: "PRÓXIMA", barIn: "em {x}", barTomorrow: "amanhã {t}", barNone: "Sem tarefas próximas" },
+    fr: { barRun: "⏱ EN COURS", barLeft: "encore {x}", barOver: "terminée il y a {x}", barNext: "PROCHAINE", barIn: "dans {x}", barTomorrow: "demain {t}", barNone: "Aucune tâche à venir" },
+  };
+  for (const k of Object.keys(P7)) Object.assign(I18N[k], P7[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1235,7 +1250,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.11.0";
+  const VERSION = "0.12.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1470,6 +1485,7 @@ html.kb .tabbar { display: none; }
     const box = $("dayList"); box.replaceChildren();
     const open = k === today ? openCard() : null;
     if (open) box.append(open);
+    box.append(statusBar());
     const bds = bdaysOn(d);
     const items = list.filter((t) => t.date === k).sort((a, b) => a.time.localeCompare(b.time));
     $("summary").replaceChildren(daySummary(k, items));
@@ -1524,6 +1540,42 @@ html.kb .tabbar { display: none; }
         el("button", { class: "chev", "aria-label": tr("openCardDismiss"), title: tr("openCardDismiss"), onclick: () => change(t, { openSeen: true }, tr("openCardDismissed", { t: t.title })) }, "✕"))),
       el("button", { class: "btn small primary", onclick: moveAll }, tr("openCardMoveAll")));
   }
+  // Status strip: the task in progress (counting down to its real start + its duration; once that is over and it is
+  // still open, counting up), else the next task with a time today or tomorrow. It refreshes itself every second.
+  let bar = null;
+  function barTarget(now) {
+    const today = ymd(new Date(now)), tomorrow = ymd(addDays(new Date(now), 1));
+    const mine = state.tasks.filter((t) => !t.example && !F.closed(t));
+    const run = mine.filter((t) => t.startedAt && (t.date === today || ymd(new Date(t.startedAt)) === today))
+      .map((t) => ({ kind: "run", t, end: Date.parse(t.startedAt) + ((Number(t.dur) || 30) + F.EXTRA * (Number(t.ext) || 0)) * F.MIN }))
+      .sort((a, b) => a.end - b.end)[0];
+    if (run) return run;
+    const next = mine.filter((t) => !t.anytime && !t.startedAt && (t.date === today || t.date === tomorrow))
+      .map((t) => ({ kind: "next", t, s: at(t.date, t.time).getTime(), today: t.date === today })).filter((x) => x.s > now)
+      .sort((a, b) => a.s - b.s)[0];
+    return next || { kind: "none" };
+  }
+  // 12:05 or 1:02:05
+  const tick = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600); return (h ? h + ":" : "") + pad(Math.floor(s / 60) % 60) + ":" + pad(s % 60); };
+  function paintBar() {
+    if (!bar) return;
+    const now = Date.now(), x = barTarget(now), t = x.t;
+    let head = tr("barNone"), rest = [], cls = "none";
+    if (x.kind === "run") {
+      const left = x.end - now;
+      head = tr("barRun"); cls = left > 0 ? "run" : "run over";
+      rest = [t.title, left > 0 ? tr("barLeft", { x: tick(left) }) : tr("barOver", { x: tick(-left) })];
+      if (t.steps && t.steps.length) rest.push(tr("stepsProg", { d: t.steps.filter((s) => s.done).length, n: t.steps.length }));
+    } else if (x.kind === "next") {
+      head = tr("barNext"); cls = "next";
+      rest = [tr("barIn", { x: dur(Math.max(1, Math.ceil((x.s - now) / 60000))) }), t.title, x.today ? clock(t.time) : tr("barTomorrow", { t: clock(t.time) })];
+    }
+    bar.className = "card sbar " + cls;
+    bar.disabled = !t;
+    bar.onclick = t ? () => openSheet(t) : null;
+    bar.replaceChildren(...(x.kind === "none" ? [el("span", {}, head)] : [el("b", {}, head), el("span", {}, rest.join(" · "))]));
+  }
+  function statusBar() { bar = el("button", { type: "button" }); paintBar(); return bar; }
   // Where the task is in its closing cycle, as a small tag: en curso, por confirmar, sin confirmar, no se hizo...
   function stateText(t) {
     const ph = phaseOf(t, Date.now());
@@ -3109,6 +3161,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
   setInterval(checkReminders, 20000);
+  setInterval(() => { if (!document.hidden && bar && bar.isConnected) paintBar(); }, 1000);
   setInterval(() => { if (expandSeries()) render(); else if (!document.hidden) renderCal(); }, 60000);
   applyLang();
   boot();
