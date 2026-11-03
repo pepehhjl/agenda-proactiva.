@@ -111,6 +111,11 @@ textarea.field { min-height: 130px; resize: vertical; line-height: 1.45; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-variant-numeric: tabular-nums; font-size: 15px; }
 .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.lvcards { display: grid; gap: 10px; }
+.lvcard { text-align: left; border: 2px solid var(--sep); background: var(--fill); color: var(--ink); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; cursor: pointer; font: inherit; }
+.lvcard b { font-size: 16px; } .lvcard .d { font-size: 14px; color: var(--muted); line-height: 1.35; } .lvcard .n { font-size: 13px; font-weight: 700; }
+.lvcard[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 4px 14px rgba(242, 199, 68, .35); }
+.lvcard[aria-checked="true"] b::after { content: " ✓"; color: var(--accent-text); }
 .chip.rec:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 2px var(--line); }
 .tipbox { background: var(--group); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 :root[data-theme="dark"] .tipbox { background: rgba(255, 255, 255, .06); }
@@ -520,7 +525,7 @@ html.kb .tabbar { display: none; }
         <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
-          <div style="display:grid;gap:8px"><span data-i18n="remindBefore"></span><div class="chips" id="remindChips"></div></div>
+          <div style="display:grid;gap:8px"><span data-i18n="lvTitle"></span><div class="lvcards" id="levelCards" role="radiogroup"></div><span class="muted" data-i18n="lvFoot"></span></div>
           <label class="toggle"><span data-i18n="quiet"></span> <input type="checkbox" id="quietOn"></label>
           <div id="quietRow" hidden style="display:grid;gap:10px">
             <label class="qrow"><span data-i18n="quietFromL"></span> <input type="time" id="quietFrom" value="22:00"></label>
@@ -1031,7 +1036,7 @@ html.kb .tabbar { display: none; }
   // Phase 5 texts: reminders that never close a task, the closing question, check-in, "¿Cómo te fue?" and a new plan.
   const P5 = {
     es: { snoozeDots: "Posponer…", snoozeTitle: "¿Cuándo te aviso otra vez?", in10: "En 10 min", in30: "En 30 min", in60: "En 1 hora", in120: "En 2 horas", tomorrowAt: "Mañana a las {t}",
-      goNow: "Voy ahora", goMsg: "👍 Vamos. En 10 min te pregunto si ya está.", startBtn: "▶ Empezar", startedMsg: "▶ {t}: en curso. Te pregunto al terminar.",
+      goNow: "Voy ahora", goMsg: "👍 Vamos. En 10 min te pregunto si ya está.", startBtn: "▶ Empezar", startEarly: "▶ Empezar temprano", startedMsg: "▶ {t}: en curso. Te pregunto al terminar.",
       notNowBtn: "Ahora no", newTimeTitle: "¿A qué hora lo haces?", otherTime: "Otra hora", setTime: "Poner esa hora", movedTo: "↪️ {t}: {w}",
       skipToday: "Saltar hoy", skippedMsg: "{t}: saltada hoy",
       askInstant: "¿Ya hiciste “{t}”?", askTimed: "¿Ya terminaste “{t}”?", yesDefault: "Ya está", finished: "✔ Ya terminé", half: "A medias", more: "Sigo en eso · +15",
@@ -1042,7 +1047,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Insistir hasta que confirme", critOff: "🔕 Dejar de insistir", critOnMsg: "🔔 Te insistiré con {t} hasta que me confirmes",
       confirmTitle: "Por confirmar", confirmEmpty: "Nada por confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver la tarea", weekClosed: "cerradas en los últimos 7 días", weekGood: "😊 Salieron bien: {g}" },
     en: { snoozeDots: "Snooze…", snoozeTitle: "When should I remind you again?", in10: "In 10 min", in30: "In 30 min", in60: "In 1 hour", in120: "In 2 hours", tomorrowAt: "Tomorrow at {t}",
-      goNow: "On my way", goMsg: "👍 Go for it. I'll ask you in 10 min if it's done.", startBtn: "▶ Start", startedMsg: "▶ {t}: in progress. I'll ask when the time is up.",
+      goNow: "On my way", goMsg: "👍 Go for it. I'll ask you in 10 min if it's done.", startBtn: "▶ Start", startEarly: "▶ Start early", startedMsg: "▶ {t}: in progress. I'll ask when the time is up.",
       notNowBtn: "Not now", newTimeTitle: "What time will you do it?", otherTime: "Another time", setTime: "Set that time", movedTo: "↪️ {t}: {w}",
       skipToday: "Skip today", skippedMsg: "{t}: skipped today",
       askInstant: "Did you do “{t}”?", askTimed: "Have you finished “{t}”?", yesDefault: "Done it", finished: "✔ I'm done", half: "Halfway", more: "Still on it · +15",
@@ -1053,7 +1058,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Keep asking until I confirm", critOff: "🔕 Stop insisting", critOnMsg: "🔔 I'll keep asking about {t} until you confirm",
       confirmTitle: "To confirm", confirmEmpty: "Nothing to confirm 🎉", reopen: "↩ Reopen", seeTask: "See the task", weekClosed: "closed in the last 7 days", weekGood: "😊 Went well: {g}" },
     pt: { snoozeDots: "Adiar…", snoozeTitle: "Quando te aviso de novo?", in10: "Em 10 min", in30: "Em 30 min", in60: "Em 1 hora", in120: "Em 2 horas", tomorrowAt: "Amanhã às {t}",
-      goNow: "Vou agora", goMsg: "👍 Bora. Em 10 min te pergunto se já foi.", startBtn: "▶ Começar", startedMsg: "▶ {t}: em andamento. Te pergunto quando acabar o tempo.",
+      goNow: "Vou agora", goMsg: "👍 Bora. Em 10 min te pergunto se já foi.", startBtn: "▶ Começar", startEarly: "▶ Começar mais cedo", startedMsg: "▶ {t}: em andamento. Te pergunto quando acabar o tempo.",
       notNowBtn: "Agora não", newTimeTitle: "Que horas você faz?", otherTime: "Outro horário", setTime: "Usar esse horário", movedTo: "↪️ {t}: {w}",
       skipToday: "Pular hoje", skippedMsg: "{t}: pulada hoje",
       askInstant: "Você já fez “{t}”?", askTimed: "Você já terminou “{t}”?", yesDefault: "Já fiz", finished: "✔ Terminei", half: "Pela metade", more: "Ainda fazendo · +15",
@@ -1064,7 +1069,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Insistir até eu confirmar", critOff: "🔕 Parar de insistir", critOnMsg: "🔔 Vou insistir com {t} até você confirmar",
       confirmTitle: "Para confirmar", confirmEmpty: "Nada para confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver a tarefa", weekClosed: "fechadas nos últimos 7 dias", weekGood: "😊 Deram certo: {g}" },
     fr: { snoozeDots: "Reporter…", snoozeTitle: "Quand est-ce que je te le rappelle ?", in10: "Dans 10 min", in30: "Dans 30 min", in60: "Dans 1 heure", in120: "Dans 2 heures", tomorrowAt: "Demain à {t}",
-      goNow: "J'y vais", goMsg: "👍 Vas-y. Dans 10 min je te demande si c'est fait.", startBtn: "▶ Commencer", startedMsg: "▶ {t} : en cours. Je te demande à la fin.",
+      goNow: "J'y vais", goMsg: "👍 Vas-y. Dans 10 min je te demande si c'est fait.", startBtn: "▶ Commencer", startEarly: "▶ Commencer en avance", startedMsg: "▶ {t} : en cours. Je te demande à la fin.",
       notNowBtn: "Pas maintenant", newTimeTitle: "À quelle heure tu le fais ?", otherTime: "Une autre heure", setTime: "Mettre cette heure", movedTo: "↪️ {t} : {w}",
       skipToday: "Sauter aujourd'hui", skippedMsg: "{t} : sautée aujourd'hui",
       askInstant: "Tu as fait “{t}” ?", askTimed: "Tu as fini “{t}” ?", yesDefault: "C'est fait", finished: "✔ J'ai fini", half: "À moitié", more: "J'y suis encore · +15",
@@ -1076,6 +1081,50 @@ html.kb .tabbar { display: none; }
       confirmTitle: "À confirmer", confirmEmpty: "Rien à confirmer 🎉", reopen: "↩ Rouvrir", seeTask: "Voir la tâche", weekClosed: "clôturées ces 7 derniers jours", weekGood: "😊 Bien passées : {g}" },
   };
   for (const k of Object.keys(P5)) Object.assign(I18N[k], P5[k]);
+  // Reminder levels (Ajustes > Avisos, and per task in "Más opciones").
+  const P6 = {
+    es: { lvTitle: "Nivel de avisos", lv_low: "Baja", lv_mid: "Media", lv_high: "Alta", lvTag_low: "Solo lo esencial", lvTag_mid: "Recomendada", lvTag_high: "Que no se me pase nada",
+      lvDesc_low: "Un aviso 5 min antes de empezar. Sin preguntas después: cierras tus tareas aquí, en el cierre del día o en «Sin cerrar».",
+      lvDesc_mid: "Un aviso 10 min antes (desde ahí puedes empezar). Después, una sola pregunta para cerrarla: a los 10 min de su hora, o al cumplirse su duración si lleva tiempo. Si no respondes, queda «Sin confirmar» para el cierre del día.",
+      lvDesc_high: "Avisos 1 hora, 30 min y 10 min antes, y otro a la hora. Después, la pregunta para cerrarla y una repregunta si no respondes (en las tareas con duración, 30 min después).",
+      lvCount_low: "≈1 aviso por tarea", lvCount_mid: "≈2 avisos por tarea", lvCount_high: "≈5 avisos por tarea",
+      lvFoot: "Los resúmenes, los cumpleaños y «Insistir hasta que confirme» no dependen del nivel.",
+      taskLv: "Avisos de esta tarea", lvInherit: "Hereda ({x})", lvSetMsg: "🔔 Avisos de {t}: {x}",
+      lvNote_low: "Te aviso 5 minutos antes. Sin preguntas después: la cierras aquí.", lvNote_mid: "Te aviso 10 minutos antes y después te pregunto una vez si quedó hecha.",
+      lvNote_high: "Te aviso 1 hora, 30 minutos y 10 minutos antes y a la hora, y después te pregunto si quedó hecha.",
+      goMsgLow: "👍 Vamos. Márcala aquí cuando esté.", startedMsgLow: "▶ {t}: en curso. Ciérrala aquí cuando termines." },
+    en: { lvTitle: "Reminder level", lv_low: "Low", lv_mid: "Medium", lv_high: "High", lvTag_low: "Just the essentials", lvTag_mid: "Recommended", lvTag_high: "Don't let anything slip",
+      lvDesc_low: "One reminder 5 min before it starts. No questions afterwards: you close your tasks here, in the end-of-day review or under “Left open”.",
+      lvDesc_mid: "One reminder 10 min before (you can start from it). Then a single question to close it: 10 min after its time, or when its duration is up if it takes time. If you don't answer, it stays “Not confirmed” for the end-of-day review.",
+      lvDesc_high: "Reminders 1 hour, 30 min and 10 min before, and one at its time. Then the question to close it, and one more if you don't answer (for tasks with a duration, 30 min later).",
+      lvCount_low: "≈1 notification per task", lvCount_mid: "≈2 notifications per task", lvCount_high: "≈5 notifications per task",
+      lvFoot: "Summaries, birthdays and “Keep asking until I confirm” don't depend on the level.",
+      taskLv: "Reminders for this task", lvInherit: "Inherit ({x})", lvSetMsg: "🔔 Reminders for {t}: {x}",
+      lvNote_low: "I'll remind you 5 minutes before. No questions afterwards: you close it here.", lvNote_mid: "I'll remind you 10 minutes before and then ask you once if it's done.",
+      lvNote_high: "I'll remind you 1 hour, 30 minutes and 10 minutes before and at its time, and then ask you if it's done.",
+      goMsgLow: "👍 Go for it. Mark it here when it's done.", startedMsgLow: "▶ {t}: in progress. Close it here when you finish." },
+    pt: { lvTitle: "Nível de avisos", lv_low: "Baixo", lv_mid: "Médio", lv_high: "Alto", lvTag_low: "Só o essencial", lvTag_mid: "Recomendado", lvTag_high: "Que nada me escape",
+      lvDesc_low: "Um aviso 5 min antes de começar. Sem perguntas depois: você fecha suas tarefas aqui, no fim do dia ou em “Em aberto”.",
+      lvDesc_mid: "Um aviso 10 min antes (dali você pode começar). Depois, uma única pergunta para fechar: 10 min depois do horário, ou quando acabar a duração se ela leva tempo. Se você não responder, fica “Sem confirmar” para o fim do dia.",
+      lvDesc_high: "Avisos 1 hora, 30 min e 10 min antes, e outro na hora. Depois, a pergunta para fechar e mais uma se você não responder (nas tarefas com duração, 30 min depois).",
+      lvCount_low: "≈1 aviso por tarefa", lvCount_mid: "≈2 avisos por tarefa", lvCount_high: "≈5 avisos por tarefa",
+      lvFoot: "Os resumos, os aniversários e “Insistir até eu confirmar” não dependem do nível.",
+      taskLv: "Avisos desta tarefa", lvInherit: "Herda ({x})", lvSetMsg: "🔔 Avisos de {t}: {x}",
+      lvNote_low: "Eu aviso 5 minutos antes. Sem perguntas depois: você fecha aqui.", lvNote_mid: "Eu aviso 10 minutos antes e depois pergunto uma vez se ficou feito.",
+      lvNote_high: "Eu aviso 1 hora, 30 minutos e 10 minutos antes e na hora, e depois pergunto se ficou feito.",
+      goMsgLow: "👍 Bora. Marque aqui quando estiver feito.", startedMsgLow: "▶ {t}: em andamento. Feche aqui quando terminar." },
+    fr: { lvTitle: "Niveau de rappels", lv_low: "Bas", lv_mid: "Moyen", lv_high: "Élevé", lvTag_low: "L'essentiel", lvTag_mid: "Recommandé", lvTag_high: "Que rien ne m'échappe",
+      lvDesc_low: "Un rappel 5 min avant le début. Pas de questions ensuite : tu clôtures tes tâches ici, au bilan de fin de journée ou dans « Pas terminé ».",
+      lvDesc_mid: "Un rappel 10 min avant (tu peux commencer depuis celui-ci). Ensuite, une seule question pour la clôturer : 10 min après son heure, ou à la fin de sa durée si elle prend du temps. Sans réponse, elle reste « Non confirmée » pour le bilan de fin de journée.",
+      lvDesc_high: "Rappels 1 heure, 30 min et 10 min avant, et un à l'heure. Ensuite, la question pour la clôturer et une relance si tu ne réponds pas (pour les tâches avec une durée, 30 min après).",
+      lvCount_low: "≈1 rappel par tâche", lvCount_mid: "≈2 rappels par tâche", lvCount_high: "≈5 rappels par tâche",
+      lvFoot: "Les résumés, les anniversaires et « Insister jusqu'à ce que je confirme » ne dépendent pas du niveau.",
+      taskLv: "Rappels de cette tâche", lvInherit: "Hériter ({x})", lvSetMsg: "🔔 Rappels de {t} : {x}",
+      lvNote_low: "Je te préviens 5 minutes avant. Pas de questions ensuite : tu la clôtures ici.", lvNote_mid: "Je te préviens 10 minutes avant, puis je te demande une fois si c'est fait.",
+      lvNote_high: "Je te préviens 1 heure, 30 minutes et 10 minutes avant et à l'heure, puis je te demande si c'est fait.",
+      goMsgLow: "👍 Vas-y. Marque-la ici quand c'est fait.", startedMsgLow: "▶ {t} : en cours. Clôture-la ici quand tu as fini." },
+  };
+  for (const k of Object.keys(P6)) Object.assign(I18N[k], P6[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1186,7 +1235,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.10.0";
+  const VERSION = "0.11.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1219,6 +1268,8 @@ html.kb .tabbar { display: none; }
     }
     saveLocal();
     expandSeries();
+    // Reminder level: accounts from before keep what their old warnings did (see flow.js); a new account starts at "mid".
+    if (!F.LEVELS.includes(state.settings.level)) saveSettings({ level: state.settings.kind || state.tasks.length ? F.fromRemind(state.settings.remind) : "mid" });
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (state.settings.tz !== tz) saveSettings({ tz });
     setLang(); applyLang();
@@ -1475,7 +1526,7 @@ html.kb .tabbar { display: none; }
   }
   // Where the task is in its closing cycle, as a small tag: en curso, por confirmar, sin confirmar, no se hizo...
   function stateText(t) {
-    const ph = F.phase(t, Date.now());
+    const ph = phaseOf(t, Date.now());
     if (ph === "running") return tr("runningTag", { a: Math.max(1, Math.round((Date.now() - Date.parse(t.startedAt)) / 60000)), b: (Number(t.dur) || 30) + 15 * (Number(t.ext) || 0) });
     if (ph === "asking") return tr("toConfirm");
     if (ph === "unconfirmed") return tr("unconfirmed");
@@ -1617,8 +1668,11 @@ html.kb .tabbar { display: none; }
     const f = (d) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
     return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(t.title) + "&dates=" + f(s) + "/" + f(e) + "&details=" + encodeURIComponent(t.tip ? tr("tipLabel") + t.tip : "");
   }
-  const remindList = () => (Array.isArray(state.settings.remind) && state.settings.remind.length ? state.settings.remind : [60, 30, 10]).slice().sort((a, b) => b - a);
-  const remindText = () => tr("before", { list: andList(remindList().map((m) => (m === 60 ? tr("oneHour") : tr("nMinutes", { n: m })))) });
+  // The reminder level: the global one (Ajustes > Avisos) or the task's own; see flow.js.
+  const level = () => F.levelOf(state.settings);
+  const lvOf = (t) => F.levelFor(t, state.settings);
+  const phaseOf = (t, now) => F.phase(t, now, lvOf(t));
+  const remindText = () => tr("before", { list: andList(F.LEADS[level()].map((m) => (m === 60 ? tr("oneHour") : tr("nMinutes", { n: m })))) });
   function closeSheet() { $("sheet").hidden = true; $("sheet").replaceChildren(); }
   function showSheet(sh) {
     // The ✕ closes without saving or marking anything (like "Cancel").
@@ -1638,7 +1692,7 @@ html.kb .tabbar { display: none; }
         el("div", {}, el("h2", {}, (t.star ? "⭐ " : "") + t.title), el("div", { class: "when" }, t.anytime ? niceDate(t.date) + " · " + tr("anyTimeShort") : tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
       s ? el("div", { class: "muted" }, "🔁 " + repeatText(s)) : null,
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
-      el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("notifyYou", { x: remindText() })),
+      el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("lvNote_" + lvOf(t))),
       real && stateText(t) ? el("div", { class: "tipbox" }, stateText(t)) : null,
       real && hasSteps ? stepsBox(t) : real && !t.done ? split : null,
       el("details", { class: "more" }, el("summary", {}, "⋯ " + tr("moreOptions")), el("div", { class: "actions" },
@@ -1647,6 +1701,10 @@ html.kb .tabbar { display: none; }
         real ? el("button", { onclick: then(() => change(t, { ...F.fresh(t), date: ymd(addDays(fromYmd(t.date), 1)) }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
         real ? el("button", { onclick: then(() => change(t, { star: !t.star }, t.star ? null : tr("starOn", { t: t.title }))) }, tr(t.star ? "unstar" : "star")) : null,
         real && !t.anytime ? el("button", { onclick: then(() => change(t, { critical: !t.critical }, t.critical ? null : tr("critOnMsg", { t: t.title }))) }, tr(t.critical ? "critOff" : "critOn")) : null,
+        real && !t.anytime ? el("div", { style: "display:grid;gap:8px;padding:12px 16px" }, el("span", { class: "muted" }, tr("taskLv")),
+          el("div", { class: "chips" }, ["", ...F.LEVELS].map((v) => el("button", { type: "button", class: "chip", "aria-pressed": String((t.level || "") === v),
+            onclick: then(() => change(t, { level: v || null }, tr("lvSetMsg", { t: t.title, x: v ? tr("lv_" + v) : tr("lvInherit", { x: tr("lv_" + level()) }) }))) },
+            v ? tr("lv_" + v) : tr("lvInherit", { x: tr("lv_" + level()) }))))) : null,
         real && !F.closed(t) ? el("button", { onclick: then(() => answer(t, "skip")) }, tr("skipToday")) : null,
         t.anytime ? null : el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
         t.anytime ? null : el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
@@ -1654,7 +1712,7 @@ html.kb .tabbar { display: none; }
         real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null)),
       // Completing is its own big, explicit button; closing is the ✕.
       // A timed task can be started from here too; the check-in comes when its time is up.
-      real && canStart(t) ? el("button", { class: "btn", onclick: then(() => answer(t, "start")) }, tr("startBtn")) : null,
+      real && canStart(t) ? el("button", { class: "btn", onclick: then(() => answer(t, "start")) }, startLabel(t)) : null,
       real ? el("button", { class: "btn primary huge", onclick: () => { const cur = state.tasks.find((x) => x.id === t.id) || t; closeSheet(); answer(cur, F.closed(cur) ? "reopen" : "yes"); } }, tr(t.done ? "markUndoneMain" : F.closed(t) ? "reopen" : "markDoneMain")) : null,
       real ? el("div", { class: "row" }, el("button", { class: "btn", style: "flex:1", onclick: () => openEdit(t) }, "✏️ " + tr("edit"))) : null));
   }
@@ -1780,7 +1838,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     const today = ymd(new Date()), tomorrow = ymd(addDays(new Date(), 1)), left = state.tasks.filter((t) => t.date === today && !F.closed(t));
     if (!left.length) { notice("🎉 " + tr("dayComplete")); return; }
     // "Sin confirmar" shows up here once; after that it expires quietly (not in tomorrow's "Sin cerrar" card).
-    left.filter((t) => !t.openSeen && F.phase(t, Date.now()) === "unconfirmed").forEach((t) => put({ ...t, openSeen: true }, true));
+    left.filter((t) => !t.openSeen && phaseOf(t, Date.now()) === "unconfirmed").forEach((t) => put({ ...t, openSeen: true }, true));
     const moveAll = () => {
       const prev = left.map(clone);
       left.forEach((t) => put({ ...F.fresh(t), date: tomorrow }, true)); render(); closeSheet();
@@ -1817,7 +1875,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   function openQuick(t) {
     if (!t) return;
     t = state.tasks.find((x) => x.id === t.id) || t;
-    const ph = F.phase(t, Date.now());
+    const ph = phaseOf(t, Date.now());
     if (ph === "asking" || ph === "unconfirmed" || ph === "running") return openCheck(t);
     if (ph === "closed") return openSheet(t);
     const left = Math.round((at(t.date, t.time) - Date.now()) / 60000);
@@ -1830,7 +1888,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       timed
         ? el("div", { class: "qa" },
-          el("button", { class: "big", onclick: then(() => answer(t, "start")) }, tr("startBtn")),
+          el("button", { class: "big", onclick: then(() => answer(t, "start")) }, startLabel(t)),
           el("button", { onclick: then(() => openNotNow(t)) }, tr("notNowBtn")),
           el("button", { onclick: then(() => answer(t, "skip")) }, tr("skipToday")))
         : el("div", { class: "qa" },
@@ -1870,7 +1928,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   // The closing question ("¿Ya te tomaste la pastilla?" / "¿Ya terminaste…?"). Only a yes closes it as done.
   function openCheck(t) {
     t = state.tasks.find((x) => x.id === t.id) || t;
-    const timed = F.timed(t), ph = F.phase(t, Date.now()), go = (a) => () => { closeSheet(); answer(t, a); };
+    const timed = F.timed(t), ph = phaseOf(t, Date.now()), go = (a) => () => { closeSheet(); answer(t, a); };
     const q = timed ? tr("askTimed", { t: t.title }) : t.q || tr("askInstant", { t: t.title });
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": q, style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, q), el("div", { class: "when" }, `${timeOf(t)} · ${stateText(t) || t.title}`))),
@@ -1910,7 +1968,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   // From the grouped notification ("Tienes 3 cosas por confirmar"): today's and yesterday's open questions.
   function openConfirm() {
     const from = ymd(addDays(new Date(), -1)), now = Date.now();
-    const list = state.tasks.filter((t) => t.date >= from && t.date <= ymd(new Date()) && ["asking", "unconfirmed"].includes(F.phase(t, now)) && !t.openSeen);
+    const list = state.tasks.filter((t) => t.date >= from && t.date <= ymd(new Date()) && ["asking", "unconfirmed"].includes(phaseOf(t, now)) && !t.openSeen);
     if (!list.length) { notice(tr("confirmEmpty")); return; }
     if (list.length === 1) return openCheck(list[0]);
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("confirmTitle") }, el("div", { class: "grabber" }),
@@ -1919,7 +1977,10 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // A timed task of today (or one with no reminder yet) can be started while it is not running or closed.
-  const canStart = (t) => !t.example && !t.anytime && F.timed(t) && t.date === ymd(new Date()) && ["upcoming", "due"].includes(F.phase(t, Date.now()));
+  // Before its time it says "Empezar temprano" (it starts now and the check-in comes when its duration is up from now);
+  // at or after its time, "Empezar".
+  const startLabel = (t) => tr(Date.now() < at(t.date, t.time).getTime() ? "startEarly" : "startBtn");
+  const canStart = (t) => !t.example && !t.anytime && F.timed(t) && t.date === ymd(new Date()) && ["upcoming", "due"].includes(phaseOf(t, Date.now()));
   // Every answer goes through here (in the app or from a notification that could not reach the server).
   // A yes closes it with the real time it took; "¿Cómo te fue?" follows for timed tasks and calls; "No se hizo" asks for a new plan.
   function answer(t, a, quiet) {
@@ -1931,7 +1992,8 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     put(next);
     if (next.done && !cur.done) celebrate(next);
     if (quiet) return next;
-    const msg = { go: tr("goMsg"), start: tr("startedMsg", { t: next.title }), notyet: tr("askAgainMsg"), later: tr("askAgainMsg"), more: tr("moreMsg", { t: next.title }),
+    const low = !F.pushes(next, lvOf(next)).ask;
+    const msg = { go: tr(low ? "goMsgLow" : "goMsg"), start: tr(low ? "startedMsgLow" : "startedMsg", { t: next.title }), notyet: tr("askAgainMsg"), later: tr("askAgainMsg"), more: tr("moreMsg", { t: next.title }),
       skip: tr("skippedMsg", { t: next.title }), half: tr("halfMsg", { t: next.title }), reopen: tr("markedPending"), yes: tr("doneMsg", { t: next.title }) }[k === "finished" || k === "done" ? "yes" : k];
     if (msg && k !== "notdone") notice(msg, () => put(prev));
     if (yes && next.howAsked) openHow(next);
@@ -2245,7 +2307,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
   function renderOverdue() {
     const box = $("overdue"); box.replaceChildren();
     const yday = ymd(addDays(new Date(), -1)), now = Date.now();
-    const late = state.tasks.filter((t) => !F.closed(t) && t.date < ymd(new Date()) && !t.openSeen && !(t.date < yday && F.phase(t, now) === "unconfirmed"));
+    const late = state.tasks.filter((t) => !F.closed(t) && t.date < ymd(new Date()) && !t.openSeen && !(t.date < yday && phaseOf(t, now) === "unconfirmed"));
     if (!late.length) return;
     box.append(el("h2", {}, tr("missedN", { n: late.length })));
     for (const t of late.slice(0, 6)) box.append(el("div", { class: "card", style: `--c: var(--c-${cat(t.cat)})` },
@@ -2511,7 +2573,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function silence(id) {
     const t = state.tasks.find((x) => x.id === id); if (!t) return;
     const key = t.id + "@" + t.date + t.time + "#";
-    [60, 30, 10].forEach((th) => fired.add(key + th));
+    [60, 30, 10, 5].forEach((th) => fired.add(key + th));
     if (t.snooze) fired.add(t.id + "@snooze@" + t.snooze);
     ls.set("fired", [...fired].slice(-300));
   }
@@ -2524,7 +2586,6 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function checkReminders() {
     const now = Date.now();
     if (isQuiet()) return;
-    const wanted = remindList().sort((a, b) => b - a);
     for (const t of state.tasks) {
       if (F.closed(t) || t.anytime || t.startedAt) continue;
       if (t.snooze) {
@@ -2533,7 +2594,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       }
       const m = (at(t.date, t.time).getTime() - now) / 60000;
       if (m <= 0 || m > 60) continue;
-      const due = wanted.filter((th) => m <= th), smallest = due[due.length - 1];
+      const due = F.pushes(t, lvOf(t)).leads.filter((th) => m <= th), smallest = due[due.length - 1];
       if (!due.length) continue;
       const key = t.id + "@" + t.date + t.time + "#";
       if (!fired.has(key + smallest)) { due.forEach((th) => fired.add(key + th)); ls.set("fired", [...fired].slice(-300)); toast(t, Math.max(1, Math.round(m)), false); }
@@ -2800,12 +2861,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
     $("quietFrom").value = q.from || "22:00"; $("quietTo").value = q.to || "07:00";
     $("quietSum").textContent = tr("quietSum", { a: clock($("quietFrom").value), b: clock($("quietTo").value) });
-    const wanted = remindList();
-    $("remindChips").replaceChildren(...[60, 30, 10].map((m) => el("button", { class: "chip", "aria-pressed": String(wanted.includes(m)), onclick: () => {
-      const next = wanted.includes(m) ? wanted.filter((x) => x !== m) : [...wanted, m];
-      if (!next.length) { notice(tr("keepOne")); return; }
-      saveSettings({ remind: next }); syncSettings();
-    } }, m === 60 ? tr("oneHour") : tr("nMin", { n: m }))));
+    const lv = level();
+    $("levelCards").replaceChildren(...F.LEVELS.map((v) => el("button", { type: "button", class: "lvcard", role: "radio", "aria-checked": String(lv === v),
+      onclick: () => { saveSettings({ level: v }); syncSettings(); } },
+      el("b", {}, `${tr("lv_" + v).toUpperCase()} · ${tr("lvTag_" + v)}`), el("span", { class: "d" }, tr("lvDesc_" + v)), el("span", { class: "n" }, tr("lvCount_" + v)))));
     document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh());
   }
   const saveBrief = () => { saveSettings({ brief: { mOn: $("briefMOn").checked, m: $("briefM").value || "08:00", eOn: $("briefEOn").checked, e: $("briefE").value || "21:00", wOn: $("briefWOn").checked } }); syncSettings(); };

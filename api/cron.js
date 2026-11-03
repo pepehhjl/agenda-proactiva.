@@ -1,5 +1,6 @@
-// Runs every minute (called by Supabase pg_cron). Sends reminders 60, 30 and 10 minutes before each task
-// (as chosen in Ajustes), one at its exact time, then the closing question with a strict budget (see flow.js):
+// Runs every minute (called by Supabase pg_cron). Task notifications follow the level chosen in Ajustes > Avisos
+// (or the task's own level; see flow.js): low = 5 min before only; mid = 10 min before + one closing question;
+// high = 60, 30 and 10 minutes before, one at its exact time, then the closing question with a strict budget:
 // instant tasks get the question 10 min later, timed ones a check-in when their time is up, each repeated once
 // at most; several questions at once go out as one grouped notification;
 // birthday notices 2 days before and on the day, at 9:00 in the user's time zone, and the morning, evening and
@@ -10,7 +11,6 @@ import "../flow.js";
 
 const F = globalThis.PendiFlow;
 
-const THRESHOLDS = [60, 30, 10];
 const EMOJI = { trabajo: "💼", personal: "🙋", casa: "🏠", salud: "💪", creativo: "🎨", social: "🎉", otro: "📌" };
 const icon = (t) => t.emoji || EMOJI[t.cat] || "📌";
 
@@ -60,12 +60,12 @@ async function remind(sb, owner, items) {
   // Posponer and Ahora no open a small choice inside the installed app; the others work in the background.
   const btn = (k, title) => ({ action: k, title: title || tr("a_" + k) });
   const sign = (id) => ({ act: { o: owner, s: actSig(owner, id) } });
-  const remindBtns = (t) => (F.timed(t) ? [btn("start"), btn("notnow")] : [btn("snooze"), btn("go")]);
+  // Before the task's time, "▶ Empezar temprano": it starts now and the check-in comes when its duration is up from now.
+  const lvOf = (t) => F.levelFor(t, settings);
+  const remindBtns = (t) => (F.timed(t) ? [btn("start", now < Date.parse(t.start) ? tr("a_startEarly") : null), btn("notnow")] : [btn("snooze"), btn("go")]);
   const askBtns = (t) => (F.timed(t) ? [btn("finished"), ...((Number(t.ext) || 0) < F.MAX_EXT ? [btn("more")] : [])] : [btn("yes", t.yes), btn("notyet")]);
   const question = (t) => (F.timed(t) ? tr("askTimed", { x: t.title }) : t.q || tr("askInstant", { x: t.title }));
   const asks = []; // closing questions due now: grouped if there are several
-  // Which warnings the user wants (Ajustes > Avisos). Default: all three.
-  const wanted = Array.isArray(settings.remind) && settings.remind.length ? THRESHOLDS.filter((x) => settings.remind.includes(x)) : THRESHOLDS;
   const hmNow = localHm(new Date(now), tz);
   if (isQuiet(settings.quiet, hmNow)) return 0;
   const lp0 = localParts(new Date(now), tz);
@@ -89,7 +89,7 @@ async function remind(sb, owner, items) {
     // At the task's exact time: a reminder that informs and never closes it ("Es hora de…" with Posponer / Voy ahora,
     // or ▶ Empezar / Ahora no for a timed task). Not after "Posponer": the postponed reminder takes over.
     // A 10-minute window, so quiet hours skip it. The old "+30 min, still open" repeat is gone: the closing question replaces it.
-    if (live && t.start && !t.anytime && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
+    if (live && t.start && !t.anytime && F.pushes(t, lvOf(t)).at && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
       const ago = (now - Date.parse(t.start)) / 60000;
       if (ago >= 0 && ago < 10) {
         const key = `${r.id}@${t.start}#due`, when = clock(t.time, settings.clock), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
@@ -98,18 +98,19 @@ async function remind(sb, owner, items) {
     }
     // The closing question: once (ask), and once more at most (ask2). After that, silence: the task is
     // "Sin confirmar" in the app. Only a task marked "insistir" keeps asking, every 30 min for up to 3 hours.
-    if (r.kind === "task" && !F.closed(t) && t.start && !t.anytime) {
-      const p = F.plan(t), win = F.WINDOW * 60000;
+    // Level low: no question by push (unless the task insists); the task is closed inside the app.
+    if (r.kind === "task" && !F.closed(t) && t.start && !t.anytime && F.pushes(t, lvOf(t)).ask) {
+      const p = F.plan(t, lvOf(t)), win = F.WINDOW * 60000;
       const step = now >= p.ask && now < p.ask + win ? "ask" : now >= p.ask2 && now < p.ask2 + win ? "ask2"
         : t.critical && now >= p.until && now < p.until + 3 * 3600000 ? "crit" + Math.floor((now - p.until) / 1800000) : null;
       // A started task is not asked while its time runs.
-      if (step && F.phase(t, now) !== "running") asks.push({ t, key: `${r.id}@${t.start}#${step}` });
+      if (step && F.phase(t, now, lvOf(t)) !== "running") asks.push({ t, key: `${r.id}@${t.start}#${step}` });
     }
     // Tasks without a time (or already started) get no countdown reminders.
     if (r.kind === "task" && !F.closed(t) && !t.startedAt && t.start && !t.anytime) {
       const mins = (Date.parse(t.start) - now) / 60000;
       if (mins <= 0 || mins > 60) continue;
-      const hit = wanted.filter((th) => mins <= th);
+      const lv = lvOf(t), hit = F.pushes(t, lv).leads.filter((th) => mins <= th);
       if (!hit.length) continue;
       const smallest = hit[hit.length - 1];
       // Say the real time left (a task created 3 minutes ahead says "En 3 minutos", not "En 10").
@@ -119,7 +120,8 @@ async function remind(sb, owner, items) {
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
         // The time left in capitals after an alarm clock, so it stands out among other notifications.
-        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, actions: [btn("snooze")], ...sign(r.id) },
+        // Below "high" this is the only reminder, so it carries the reminder's buttons (▶ Empezar temprano for a timed task).
+        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, actions: lv === "high" ? [btn("snooze")] : remindBtns(t), ...sign(r.id) },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
