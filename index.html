@@ -338,9 +338,20 @@ h1 { font-size: 46px; }
 .tl-now { position: absolute; left: 60px; right: 0; height: 2px; background: var(--accent); z-index: 2; pointer-events: none; }
 .tl-now::before { content: ""; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
 .steps-list { display: grid; gap: 2px; }
-.steps-list label { display: flex; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; }
-.steps-list input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+.steps-list > summary { list-style: none; text-align: center; margin-bottom: 6px; }
+.steps-list > summary::-webkit-details-marker { display: none; }
+.steps-list .step { display: flex; align-items: center; gap: 6px; }
+.steps-list label { flex: 1; display: flex; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; min-width: 0; }
+.steps-list input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
 .steps-list .done span { text-decoration: line-through; color: var(--muted); }
+.steps-list .sdel { border: 0; background: transparent; color: var(--muted); width: 36px; height: 36px; border-radius: 50%; font-size: 15px; cursor: pointer; flex: none; }
+.steps-list form { display: flex; gap: 8px; margin-top: 6px; }
+.steps-list .regen { justify-self: start; font-size: 15px; padding: 10px 0; }
+/* Every sheet has a round ✕ at the top right: it closes without changing anything. */
+.sheet > .xclose { position: sticky; top: 0; grid-row: 1; grid-column: 1; justify-self: end; z-index: 3; width: 38px; height: 38px; margin: 0 -8px -38px 0; border-radius: 50%; border: 0; background: var(--fill); color: var(--ink); font-size: 17px; font-weight: 700; line-height: 1; display: grid; place-items: center; cursor: pointer; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.sheet > .grabber { grid-row: 1; grid-column: 1; }
+.sheet > h2:first-of-type, .sheet > .qhead { padding-right: 40px; }
+.btn.huge { width: 100%; font-size: 17px; padding: 17px 22px; }
 .sheet select { border: 0; background: var(--fill); border-radius: 8px; padding: 6px 10px; }
 .toast .undo { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 13px; cursor: pointer; }
 .confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; }
@@ -499,6 +510,12 @@ html.kb .tabbar { display: none; }
       <div class="pane" data-pane="settings" hidden>
         <h2 data-i18n="tabSettings"></h2>
         <div id="setupAlert"></div>
+        <h3 class="sub" data-i18n="youH"></h3>
+        <div class="group">
+          <label style="display:grid;gap:8px"><span data-i18n="yourName"></span>
+            <input class="field" id="myName" autocomplete="given-name" maxlength="40" style="background:var(--fill)" data-i18n-ph="yourNamePh"></label>
+        </div>
+        <p class="foot" data-i18n="nameFoot"></p>
         <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
@@ -861,7 +878,7 @@ html.kb .tabbar { display: none; }
     viewList: "Lista", viewHours: "Horas", freeGap: "Libre · {d}", durH: "{h} h{m}",
     runningLate: "Se me hizo tarde", qRunningLate: "Se me hizo tarde. Son las {t}. Reacomoda lo que me queda de hoy desde ahora y dime qué conviene pasar a mañana.",
     star: "⭐ Marcar como importante", unstar: "Quitar de importantes", starOn: "⭐ {t}: importante",
-    splitSteps: "🪜 Dividir en pasos", stepsTitle: "Pasos",
+    splitSteps: "🧩 Desglosar en pasos", stepsTitle: "Pasos",
     fromPhoto: "📷 Desde una foto", photoHint: "Un flyer, una cita o una captura", readingPhoto: "Leyendo la foto...", nothingFound: "No encontré fechas ni tareas en esa foto",
     actCreateAny: "{e} Crear \"{t}\" el {d}, sin hora",
     cheer1: "¡{t}: listo! Una cosa menos ✨", cheer2: "¡Bien ahí! {t} quedó hecho 💪", cheer3: "{t} ✓ ¡Así se hace! 🎉", cheer4: "¡Tachado! {t} ya es historia 🙌",
@@ -887,7 +904,7 @@ html.kb .tabbar { display: none; }
     viewList: "List", viewHours: "Hours", freeGap: "Free · {d}", durH: "{h} h{m}",
     runningLate: "I'm running late", qRunningLate: "I'm running late. It's {t}. Rearrange what's left of today starting now and tell me what to move to tomorrow.",
     star: "⭐ Mark as important", unstar: "Remove from important", starOn: "⭐ {t}: important",
-    splitSteps: "🪜 Break into steps", stepsTitle: "Steps",
+    splitSteps: "🧩 Break into steps", stepsTitle: "Steps",
     fromPhoto: "📷 From a photo", photoHint: "A flyer, an appointment or a screenshot", readingPhoto: "Reading the photo...", nothingFound: "I didn't find dates or tasks in that photo",
     actCreateAny: "{e} Create \"{t}\" on {d}, no set time",
     cheer1: "{t}: done! One less thing ✨", cheer2: "Nice! {t} is done 💪", cheer3: "{t} ✓ That's how it's done! 🎉", cheer4: "Crossed off! {t} is history 🙌",
@@ -913,7 +930,7 @@ html.kb .tabbar { display: none; }
     viewList: "Lista", viewHours: "Horas", freeGap: "Livre · {d}", durH: "{h} h{m}",
     runningLate: "Estou atrasado", qRunningLate: "Estou atrasado. São {t}. Reorganize o que me resta de hoje a partir de agora e diga o que vale passar para amanhã.",
     star: "⭐ Marcar como importante", unstar: "Tirar dos importantes", starOn: "⭐ {t}: importante",
-    splitSteps: "🪜 Dividir em passos", stepsTitle: "Passos",
+    splitSteps: "🧩 Dividir em passos", stepsTitle: "Passos",
     fromPhoto: "📷 De uma foto", photoHint: "Um folheto, uma consulta ou um print", readingPhoto: "Lendo a foto...", nothingFound: "Não encontrei datas nem tarefas nessa foto",
     actCreateAny: "{e} Criar \"{t}\" em {d}, sem hora",
     cheer1: "{t}: pronto! Uma coisa a menos ✨", cheer2: "Boa! {t} está feito 💪", cheer3: "{t} ✓ É assim que se faz! 🎉", cheer4: "Riscado! {t} já era 🙌",
@@ -939,7 +956,7 @@ html.kb .tabbar { display: none; }
     viewList: "Liste", viewHours: "Heures", freeGap: "Libre · {d}", durH: "{h} h{m}",
     runningLate: "Je suis en retard", qRunningLate: "Je suis en retard. Il est {t}. Réorganise ce qu'il me reste aujourd'hui à partir de maintenant et dis-moi quoi passer à demain.",
     star: "⭐ Marquer comme importante", unstar: "Retirer des importantes", starOn: "⭐ {t} : importante",
-    splitSteps: "🪜 Découper en étapes", stepsTitle: "Étapes",
+    splitSteps: "🧩 Découper en étapes", stepsTitle: "Étapes",
     fromPhoto: "📷 Depuis une photo", photoHint: "Un flyer, un rendez-vous ou une capture", readingPhoto: "Je lis la photo...", nothingFound: "Je n'ai trouvé ni date ni tâche sur cette photo",
     actCreateAny: "{e} Créer « {t} » le {d}, sans heure",
     cheer1: "{t} : fait ! Une chose de moins ✨", cheer2: "Bravo ! {t}, c'est fait 💪", cheer3: "{t} ✓ Bien joué ! 🎉", cheer4: "Rayé ! {t}, c'est de l'histoire 🙌",
@@ -987,6 +1004,26 @@ html.kb .tabbar { display: none; }
       probeResend: "Renvoyer ({n})", probeLater: "Je vérifierai plus tard", pushUnconfirmed: "⚠️ Rappels non confirmés", pushUnconfirmedText: "Le rappel de test n'a jamais été touché sur ce téléphone. Envoie-en un et touche-le quand il arrive." },
   };
   for (const k of Object.keys(P2)) Object.assign(I18N[k], P2[k]);
+  // 0.9.2 texts: explicit "mark as done", task steps, and the owner's name.
+  const P3 = {
+    es: { markDoneMain: "✔ Marcar como hecha", markUndoneMain: "↩ Marcar como no hecha", seeSteps: "Ver pasos", stepsProg: "{d}/{n} pasos", addStep: "Añadir", addStepPh: "Añadir un paso", delStep: "Borrar este paso",
+      regenSteps: "🔄 Pedir otros pasos", stepsRegen: "🧩 Pasos nuevos", allStepsDone: "🧩 ¡Todos los pasos listos! ¿Marco «{t}» como hecha?",
+      youH: "Tú", yourName: "Tu nombre", yourNamePh: "Cómo quieres que te llame", nameFoot: "Pendi te llama así al hablarte. Si lo dejas vacío, te habla de forma neutra.", nameSaved: "Guardado",
+      obNameTitle: "¿Cómo quieres que te llame?", obNameText: "Es opcional. Si lo dejas vacío, te hablo de forma neutra.", next: "Seguir", skip: "Saltar" },
+    en: { markDoneMain: "✔ Mark as done", markUndoneMain: "↩ Mark as not done", seeSteps: "See steps", stepsProg: "{d}/{n} steps", addStep: "Add", addStepPh: "Add a step", delStep: "Delete this step",
+      regenSteps: "🔄 Get new steps", stepsRegen: "🧩 New steps", allStepsDone: "🧩 All steps done! Mark “{t}” as done?",
+      youH: "You", yourName: "Your name", yourNamePh: "What should I call you?", nameFoot: "Pendi uses it when talking to you. Leave it empty and it talks to you neutrally.", nameSaved: "Saved",
+      obNameTitle: "What should I call you?", obNameText: "It's optional. If you leave it empty, I'll talk to you neutrally.", next: "Next", skip: "Skip" },
+    pt: { markDoneMain: "✔ Marcar como feita", markUndoneMain: "↩ Marcar como não feita", seeSteps: "Ver passos", stepsProg: "{d}/{n} passos", addStep: "Adicionar", addStepPh: "Adicionar um passo", delStep: "Apagar este passo",
+      regenSteps: "🔄 Pedir outros passos", stepsRegen: "🧩 Passos novos", allStepsDone: "🧩 Todos os passos prontos! Marco “{t}” como feita?",
+      youH: "Você", yourName: "Seu nome", yourNamePh: "Como você quer que eu te chame", nameFoot: "A Pendi usa esse nome ao falar com você. Se ficar vazio, ela fala de forma neutra.", nameSaved: "Salvo",
+      obNameTitle: "Como você quer que eu te chame?", obNameText: "É opcional. Se deixar vazio, eu falo de forma neutra.", next: "Seguir", skip: "Pular" },
+    fr: { markDoneMain: "✔ Marquer comme faite", markUndoneMain: "↩ Marquer comme non faite", seeSteps: "Voir les étapes", stepsProg: "{d}/{n} étapes", addStep: "Ajouter", addStepPh: "Ajouter une étape", delStep: "Supprimer cette étape",
+      regenSteps: "🔄 Proposer d'autres étapes", stepsRegen: "🧩 Nouvelles étapes", allStepsDone: "🧩 Toutes les étapes sont faites ! Je marque « {t} » comme faite ?",
+      youH: "Toi", yourName: "Ton prénom", yourNamePh: "Comment veux-tu que je t'appelle", nameFoot: "Pendi l'utilise pour te parler. Si tu le laisses vide, elle te parle de façon neutre.", nameSaved: "Enregistré",
+      obNameTitle: "Comment veux-tu que je t'appelle ?", obNameText: "C'est facultatif. Si tu le laisses vide, je te parle de façon neutre.", next: "Suivant", skip: "Passer" },
+  };
+  for (const k of Object.keys(P3)) Object.assign(I18N[k], P3[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1097,7 +1134,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.9.1";
+  const VERSION = "0.9.2";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1388,7 +1425,7 @@ html.kb .tabbar { display: none; }
   function taskRow(t) {
     const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000), now = Date.now();
     const live = !t.anytime && s.getTime() <= now && now < e.getTime();
-    const steps = t.steps && t.steps.length ? ` ${t.steps.filter((x) => x.done).length}/${t.steps.length}` : "";
+    const steps = t.steps && t.steps.length ? " · " + tr("stepsProg", { d: t.steps.filter((x) => x.done).length, n: t.steps.length }) : "";
     const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : "") + (t.star ? " star" : ""), style: `--c: var(--c-${cat(t.cat)})`,
         onclick: () => { if (!row.dragged) openSheet(t); } },
       el("span", { class: "t" }, t.anytime ? tr("anyTimeShort") : clock(t.time), t.anytime ? null : el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
@@ -1422,7 +1459,7 @@ html.kb .tabbar { display: none; }
     }
     for (const b of blocks) box.append(el("button", { class: "tl-b" + (b.t.done ? " done" : "") + (b.t.star ? " star" : "") + (b.e - b.s < 45 ? " short" : ""), onclick: () => openSheet(b.t),
         style: `--c: var(--c-${cat(b.t.cat)});top:${y(b.s) + 1}px;height:${y(b.e) - y(b.s) - 2}px;left:calc(64px + (100% - 70px) * ${b.c / n});width:calc((100% - 70px) / ${n} - 4px)` },
-      el("b", {}, `${b.t.star ? "⭐ " : ""}${icon(b.t)} ${b.t.title}`), el("span", {}, `${clock(b.t.time)} – ${clock(hhmm((b.s + (b.t.dur || 30)) % 1440))}`)));
+      el("b", {}, `${b.t.star ? "⭐ " : ""}${icon(b.t)} ${b.t.title}`), el("span", {}, `${clock(b.t.time)} – ${clock(hhmm((b.s + (b.t.dur || 30)) % 1440))}` + (b.t.steps && b.t.steps.length ? " · " + tr("stepsProg", { d: b.t.steps.filter((x) => x.done).length, n: b.t.steps.length }) : ""))));
     if (isToday && nowM >= a0 && nowM <= a1) box.append(el("div", { class: "tl-now", style: `top:${y(nowM)}px` }));
     return box;
   }
@@ -1455,11 +1492,11 @@ html.kb .tabbar { display: none; }
   function scrollToNow() {}
   // Small message at the bottom, near the thumb, with a bar that shows when it leaves (2.5 s, or 6 s with "Deshacer").
   // Swipe it sideways or down to close it sooner; holding it pauses it.
-  function notice(text, undo) {
+  function notice(text, undo, label) {
     const ms = undo ? 8000 : 2500;
     let bye;
     const n = el("div", { class: "snack", role: "status", style: `--life:${ms}ms` }, el("b", {}, text),
-      undo ? el("button", { class: "undo", onclick: (e) => { e.stopPropagation(); bye(); undo(); } }, tr("undo")) : null, el("i", { class: "life" }));
+      undo ? el("button", { class: "undo", onclick: (e) => { e.stopPropagation(); bye(); undo(); } }, label || tr("undo")) : null, el("i", { class: "life" }));
     const box = $("snacks"); while (box.children.length > 2) box.firstChild.remove();
     box.append(n);
     bye = swipeAway(n, ms);
@@ -1520,38 +1557,38 @@ html.kb .tabbar { display: none; }
   const remindList = () => (Array.isArray(state.settings.remind) && state.settings.remind.length ? state.settings.remind : [60, 30, 10]).slice().sort((a, b) => b - a);
   const remindText = () => tr("before", { list: andList(remindList().map((m) => (m === 60 ? tr("oneHour") : tr("nMinutes", { n: m })))) });
   function closeSheet() { $("sheet").hidden = true; $("sheet").replaceChildren(); }
-  function showSheet(sh) { const bg = $("sheet"); bg.replaceChildren(sh); bg.hidden = false; }
+  function showSheet(sh) {
+    // The ✕ closes without saving or marking anything (like "Cancel").
+    sh.prepend(el("button", { type: "button", class: "xclose", "aria-label": tr("close"), onclick: closeSheet }, "✕"));
+    const bg = $("sheet"); bg.replaceChildren(sh); bg.hidden = false;
+  }
   function openSheet(t) {
     const end = new Date(at(t.date, t.time).getTime() + t.dur * 60000);
     const s = t.series && state.series.find((x) => x.id === t.series);
     const real = !t.example;
     const then = (fn) => () => { closeSheet(); fn(); };
-    const split = el("button", { onclick: () => splitSteps(t, split) }, tr("splitSteps"));
+    const split = el("button", { class: "btn", onclick: async () => { const next = await genSteps(t, split); if (next) { openSteps.add(t.id); split.replaceWith(stepsBox(next)); } } }, tr("splitSteps"));
+    const hasSteps = t.steps && t.steps.length;
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)),
         el("div", {}, el("h2", {}, (t.star ? "⭐ " : "") + t.title), el("div", { class: "when" }, t.anytime ? niceDate(t.date) + " · " + tr("anyTimeShort") : tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
       s ? el("div", { class: "muted" }, "🔁 " + repeatText(s)) : null,
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
-      t.steps && t.steps.length ? el("div", { class: "steps-list" }, el("b", {}, tr("stepsTitle")), t.steps.map((st, i) => {
-        const lab = el("label", { class: st.done ? "done" : "" },
-          el("input", { type: "checkbox", checked: !!st.done, onchange: (e) => { lab.className = e.target.checked ? "done" : ""; toggleStep(t, i, e.target.checked); } }),
-          el("span", {}, st.t + (st.min ? ` · ${st.min} min` : "")));
-        return lab;
-      })) : null,
       el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("notifyYou", { x: remindText() })),
+      real && hasSteps ? stepsBox(t) : real && !t.done ? split : null,
       el("details", { class: "more" }, el("summary", {}, "⋯ " + tr("moreOptions")), el("div", { class: "actions" },
         real ? el("button", { onclick: then(() => openEdit(t)) }, "✏️ " + tr("edit")) : null,
-        real ? el("button", { onclick: then(() => change(t, { done: !t.done, snooze: null }, t.done ? tr("markedPending") : tr("doneMsg", { t: t.title }))) }, tr(t.done ? "markPending" : "markDone")) : null,
         real && t.anytime && !t.done ? el("button", { onclick: then(() => placeAnytime(t)) }, tr("findSlot")) : null,
         real ? el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
         real ? el("button", { onclick: then(() => change(t, { star: !t.star }, t.star ? null : tr("starOn", { t: t.title }))) }, tr(t.star ? "unstar" : "star")) : null,
-        real && !(t.steps && t.steps.length) && !t.done ? split : null,
         t.anytime ? null : el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
         t.anytime ? null : el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
         real ? el("button", { class: "danger", onclick: then(() => del(t)) }, tr(s ? "delOne" : "del")) : null,
         real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null)),
-      el("div", { class: "row" }, real ? el("button", { class: "btn", onclick: () => openEdit(t) }, "✏️ " + tr("edit")) : null, el("button", { class: "btn primary", onclick: closeSheet }, tr("doneBtn")))));
+      // Completing is its own big, explicit button; closing is the ✕.
+      real ? el("button", { class: "btn primary huge", onclick: () => { const cur = state.tasks.find((x) => x.id === t.id) || t; closeSheet(); change(cur, { done: !cur.done, snooze: null }, cur.done ? tr("markedPending") : tr("doneMsg", { t: cur.title })); } }, tr(t.done ? "markUndoneMain" : "markDoneMain")) : null,
+      real ? el("div", { class: "row" }, el("button", { class: "btn", style: "flex:1", onclick: () => openEdit(t) }, "✏️ " + tr("edit"))) : null));
   }
   // Every field of a task can be changed; in a series, "apply to all" also updates the pattern and the coming days.
   function openEdit(t) {
@@ -1596,22 +1633,54 @@ html.kb .tabbar { display: none; }
       el("div", { class: "row" }, el("button", { class: "btn primary" }, tr("save")), el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
     showSheet(form); daySeg(seg, day);
   }
-  // Big task into small steps (AI); the steps are a checklist inside the task.
-  async function splitSteps(t, btn) {
+  // Big task into small steps (AI); the steps are a checklist inside the task (never scheduled on their own).
+  const openSteps = new Set();
+  async function genSteps(t, btn) {
+    const label = btn.textContent;
     btn.disabled = true; btn.textContent = tr("thinking");
     try {
-      const r = await ai.json(`Responde en ${AI_LANG[lang]}. Divide esta tarea en 3 a 6 pasos pequeños y concretos, en orden, para empezar sin agobiarse. Tarea: "${t.title}"${t.tip ? ` (consejo: ${t.tip})` : ""}; dura unos ${t.dur || 30} minutos en total.
+      const r = await ai.json(`Divide esta tarea en 3 a 6 pasos pequeños, concretos y en orden, para empezar sin agobiarse. Escribe los pasos en el mismo idioma en que la persona escribió la tarea (si no se nota, en ${AI_LANG[lang]}). ${who()}
+Tarea: ${JSON.stringify(t.title)}${t.tip ? `\nNota de la persona: ${JSON.stringify(t.tip)}` : ""}
+Dura unos ${t.dur || 30} minutos en total.
 Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
-      const steps = (Array.isArray(r && r.pasos) ? r.pasos : []).slice(0, 8).map((p) => ({ t: String((p && p.paso) || (typeof p === "string" ? p : "")).slice(0, 100), min: Number(p && p.minutos) || null, done: false })).filter((p) => p.t);
+      const steps = (Array.isArray(r && r.pasos) ? r.pasos : Array.isArray(r) ? r : []).slice(0, 6).map((p) => ({ t: String((p && p.paso) || (typeof p === "string" ? p : "")).slice(0, 100), min: Number(p && p.minutos) || null, done: false })).filter((p) => p.t);
       if (!steps.length) throw { error: "invalid_json" };
-      const next = { ...t, steps }; put(next); openSheet(next);
-    } catch (e) { btn.disabled = false; btn.textContent = errText(e); }
+      const cur = state.tasks.find((x) => x.id === t.id) || t, next = { ...cur, steps };
+      put(next); return next;
+    } catch (e) { btn.disabled = false; btn.textContent = errText(e); setTimeout(() => { if (btn.isConnected) btn.textContent = label; }, 4000); return null; }
   }
-  function toggleStep(t, i, on) {
-    const cur = state.tasks.find((x) => x.id === t.id); if (!cur || !cur.steps) return;
-    const steps = cur.steps.map((s, j) => (j === i ? { ...s, done: on } : s));
-    if (steps.every((s) => s.done) && !cur.done) { closeSheet(); change(cur, { steps, done: true, snooze: null }, tr("doneMsg", { t: cur.title })); }
-    else put({ ...cur, steps });
+  // The checklist in the task sheet: tap a step to tick it, ✕ to remove it, add one by hand, or ask for new ones.
+  function stepsBox(t) {
+    const box = el("details", { class: "steps-list" });
+    const cur = () => state.tasks.find((x) => x.id === t.id) || t;
+    const set = (steps) => { saveSteps(cur(), steps); paint(); };
+    function paint() {
+      const c = cur(), steps = c.steps || [], d = steps.filter((x) => x.done).length;
+      const add = el("input", { class: "field", maxlength: 100, autocomplete: "off", placeholder: tr("addStepPh"), style: "background:var(--group);flex:1" });
+      const regen = el("button", { type: "button", class: "link regen", onclick: async () => {
+        const prev = clone(c.steps || []), next = await genSteps(c, regen);
+        if (next) { paint(); notice(tr("stepsRegen"), () => { put({ ...cur(), steps: prev }); if (box.isConnected) paint(); }); }
+      } }, tr("regenSteps"));
+      box.replaceChildren(
+        el("summary", { class: "btn" }, "🧩 " + tr("seeSteps") + ` · ${d}/${steps.length}`),
+        ...steps.map((st, i) => el("div", { class: "step" + (st.done ? " done" : "") },
+          el("label", {}, el("input", { type: "checkbox", checked: !!st.done, onchange: (e) => set(steps.map((x, j) => (j === i ? { ...x, done: e.target.checked } : x))) }),
+            el("span", {}, st.t + (st.min ? ` · ${st.min} min` : ""))),
+          el("button", { type: "button", class: "sdel", "aria-label": tr("delStep"), onclick: () => set(steps.filter((_, j) => j !== i)) }, "✕"))),
+        el("form", { onsubmit: (e) => { e.preventDefault(); const v = add.value.trim(); if (!v) return add.focus(); set([...steps, { t: v.slice(0, 100), min: null, done: false }].slice(0, 12)); box.querySelector("form input")?.focus(); } },
+          add, el("button", { class: "btn small", "aria-label": tr("addStep") }, "+ " + tr("addStep"))),
+        regen);
+      box.open = openSteps.has(t.id);
+    }
+    box.addEventListener("toggle", () => (box.open ? openSteps.add(t.id) : openSteps.delete(t.id)));
+    paint();
+    return box;
+  }
+  // Ticking the last step doesn't close the task by itself: Pendi suggests it, with a button.
+  function saveSteps(c, steps) {
+    const allNow = steps.length > 0 && steps.every((x) => x.done), allBefore = (c.steps || []).length > 0 && c.steps.every((x) => x.done);
+    put({ ...c, steps });
+    if (allNow && !allBefore && !c.done) notice(tr("allStepsDone", { t: c.title }), () => { closeSheet(); markDone(c.id); }, tr("markDoneMain"));
   }
   // Search across every task and birthday.
   function openSearch() {
@@ -1791,7 +1860,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       const res = o.image ? await ai.see(`Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. Los títulos van en el idioma de la imagen o de la nota de la persona, sin traducir.
 ${nowLine()}
 Mira esta imagen: puede ser un flyer, una cita, una invitación o la captura de un mensaje. Saca cada evento o cosa por hacer con su fecha y hora. Si no dice fecha, usa ${date}. Si no dice hora, deja "hora" vacía.${what ? `\nNota de la persona: """${what.slice(0, 500)}"""` : ""}
-${shape}`, o.image) : await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. ${keepTitles}
+${shape}`, o.image) : await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. ${keepTitles} ${who()}
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
 ${o.anytime ? "No pongas hora: deja \"hora\" vacía.\n" : time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
@@ -1862,6 +1931,13 @@ ${shape}`);
     return out.join("\n");
   }
   // The person's own words stay as they wrote or dictated them: never translated, whatever the app language.
+  // What the AI knows about the owner: the saved name, and never a guessed gender.
+  function who() {
+    const n = String(state.settings.name || "").trim().slice(0, 40);
+    const neutral = "Nunca supongas el género de la persona (tampoco por su nombre): háblale con formas neutras, sin adjetivos ni participios con género referidos a ella (por ejemplo, en vez de \"¿Estás listo?\" o \"¿Estás lista?\", di \"¿Todo preparado?\").";
+    return n ? `La persona se llama ${JSON.stringify(n)}: llámala así de vez en cuando, con naturalidad. ${neutral}`
+      : `No sabes cómo se llama la persona: no inventes un nombre ni se lo preguntes (si quiere, lo guarda en Ajustes). ${neutral}`;
+  }
   const keepTitles = `Los títulos ("titulo") van en el mismo idioma y con las mismas palabras que usó la persona (solo puedes acortarlos o poner mayúscula inicial); nunca los traduzcas ni cambies de idioma, aunque el resto vaya en otro idioma.`;
   // A title is the person's own when most of its words come from what they wrote or dictated (same word stem,
   // so "pastillas" matches "pastilla" but "pill" never does). If the AI translated or reworded it into another
@@ -1893,7 +1969,7 @@ ${shape}`);
     if (!text) { $("dumpStatus").textContent = tr("writeFirst"); return; }
     const date = dumpDate.value || ymd(addDays(new Date(), 1));
     $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = tr("thinkingDay");
-    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: el resumen, los porqués y los consejos van en ese idioma. ${keepTitles}
+    const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: el resumen, los porqués y los consejos van en ese idioma. ${keepTitles} ${who()}
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Organiza este texto en tareas para el día ${date}. Si el texto menciona otro día para alguna tarea, usa ese día.
 Agenda ya ocupada (no choques con esto):
@@ -1973,7 +2049,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     state.chat.push({ role: "user", content: q });
     const thinking = { role: "assistant", content: tr("thinking"), temp: true }; state.chat.push(thinking); renderChat();
     const ctl = new AbortController(); chatAbort = ctl; chatBusy(true);
-    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]} (la respuesta y los consejos de las acciones), breve y fácil de leer. ${keepTitles} Los eventos que ya están en la agenda se nombran con su título tal cual.
+    const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]} (la respuesta y los consejos de las acciones), breve y fácil de leer. ${keepTitles} ${who()} Los eventos que ya están en la agenda se nombran con su título tal cual.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
 ${nowLine()} La persona rinde mejor en la ${energy()}.
 Agenda de los próximos 7 días (cada evento tiene un id):
@@ -2137,7 +2213,7 @@ Si no hay acciones, usa "acciones":[].`;
     out.replaceChildren(el("div", { class: "muted" }, tr(onlyMsg ? "writingMsg" : "searchingTrends")));
     const nb = nextBday(b);
     const when = nb.days === 0 ? "hoy" : nb.days === 1 ? "mañana" : `en ${nb.days} días`; // for the AI prompt, which is in Spanish
-    const prompt = `Responde en ${AI_LANG[lang]}: las ideas, los porqués y el mensaje van en ese idioma. ${nowLine()} ${when[0].toUpperCase() + when.slice(1)} es el cumpleaños de ${b.name}.
+    const prompt = `Responde en ${AI_LANG[lang]}: las ideas, los porqués y el mensaje van en ese idioma. ${who()} ${nowLine()} ${when[0].toUpperCase() + when.slice(1)} es el cumpleaños de ${b.name}.
 Lo que sé de esta persona: ${b.notes || "nada en especial"}.
 ${onlyMsg ? "No hacen falta ideas de regalo (\"ideas\":[])." : `Busca qué regalos están de moda o son tendencia ahora mismo (redes sociales, tiendas) y dame 5 ideas variadas: una tendencia del momento, una económica, una divertida, una experiencia y una hecha a mano. Ten en cuenta sus gustos y que haya tiempo de conseguirla ${when}.`}
 Escribe también un mensaje de cumpleaños cálido y corto, listo para mandar por WhatsApp, con un emoji.
@@ -2485,6 +2561,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
 
   // ---------- settings ----------
   function syncSettings() {
+    if (document.activeElement !== $("myName")) $("myName").value = state.settings.name || "";
     $("energy").value = energy();
     $("sound").checked = state.settings.sound !== false;
     $("datefmt").value = state.settings.datefmt || "es";
@@ -2535,17 +2612,25 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function onboarding() {
     const box = $("onboard"); let i = 0;
     const finish = (tab) => { ls.set("onboarded", true); box.hidden = true; box.replaceChildren(); if (tab) showTab(tab); };
-    const pager = () => el("div", { class: "pager" }, [0, 1, 2].map((j) => el("i", { class: j === Math.min(i, 2) ? "on" : "" })));
+    const pager = () => el("div", { class: "pager" }, [0, 1, 2, 3].map((j) => el("i", { class: j === Math.min(i, 3) ? "on" : "" })));
     const slides = [
       () => [el("div", { class: "big" }, "👋"), el("h2", {}, tr("ob1Title")),
         el("p", {}, tr("ob1Text")),
         el("button", { class: "btn primary", onclick: () => { i = 1; paint(); } }, tr("start"))],
+      // Optional: the name Pendi uses; empty means neutral.
+      () => {
+        const name = el("input", { class: "field", autocomplete: "given-name", maxlength: 40, placeholder: tr("yourNamePh"), value: state.settings.name || "", style: "background:var(--cell);text-align:center;font-size:18px" });
+        return [el("div", { class: "big" }, "🙂"), el("h2", {}, tr("obNameTitle")), el("p", {}, tr("obNameText")),
+          el("form", { style: "display:grid;gap:12px;width:100%", onsubmit: (e) => { e.preventDefault(); const v = name.value.trim().slice(0, 40); if (v !== (state.settings.name || "")) saveSettings({ name: v }); syncSettings(); i = 2; paint(); } },
+            name, el("button", { class: "btn primary" }, tr("next"))),
+          el("button", { class: "link", onclick: () => { i = 2; paint(); } }, tr("skip"))];
+      },
       () => [el("div", { class: "big" }, "⚡"), el("h2", {}, tr("ob2Title")),
         el("p", {}, tr("ob2Text")),
-        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 2; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
+        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 3; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
       () => [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")),
         el("p", {}, tr("ob3Text", { x: remindText() })),
-        el("button", { class: "btn primary", onclick: () => { i = 3; paint(); } }, tr("enableNotifs")),
+        el("button", { class: "btn primary", onclick: () => { i = 4; paint(); } }, tr("enableNotifs")),
         el("button", { class: "link", onclick: later }, tr("probeLater"))],
       // The welcome ends when a real test reminder is tapped on this phone. It can be skipped, and then Ajustes keeps
       // saying the reminders are not confirmed.
@@ -2724,6 +2809,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v);
   };
   $("energy").onchange = () => saveSettings({ energy: $("energy").value });
+  $("myName").onchange = () => { const v = $("myName").value.trim().slice(0, 40); $("myName").value = v; if (v !== (state.settings.name || "")) { saveSettings({ name: v }); notice(tr("nameSaved")); } };
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
   $("logout").onclick = () => { ls.set("pass", ""); pass = ""; location.reload(); };
