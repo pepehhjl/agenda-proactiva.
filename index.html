@@ -270,6 +270,7 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 /* quick actions + onboarding */
 .qa { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .qa button { border: 0; border-radius: 14px; background: var(--fill); color: var(--accent-text); font-weight: 600; padding: 14px 4px; font-size: 15px; cursor: pointer; }
+.qa.two { grid-template-columns: 1fr 1fr; }
 .qa .big { grid-column: 1 / -1; background: var(--c-salud); color: #fff; font-size: 17px; padding: 16px; }
 .qhead { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; }
 .qhead .em { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 28px; background: color-mix(in srgb, var(--c) 18%, transparent); }
@@ -607,9 +608,12 @@ html.kb .tabbar { display: none; }
 <div class="toasts" id="toasts" aria-live="assertive"></div>
 <div class="snacks" id="snacks" aria-live="polite"></div>
 
+<script src="/flow.js?v=1"></script>
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+  // How a task closes (reminder → question → answer), shared with the server: see flow.js.
+  const F = window.PendiFlow;
   // ---------- languages ----------
   // Every text the person sees, per language. "{x}" marks are filled in by tr(). Add a language by adding a block here and in LANGS.
   const LANGS = { es: "Español", en: "English", pt: "Português", fr: "Français" };
@@ -665,7 +669,7 @@ html.kb .tabbar { display: none; }
       reminder: "Recordatorio", inHourCap: "En 1 hora", inMinCap: "En {n} min", previewTag: " · vista previa", nowLower: "ahora", atCap: "A las {t}", snooze10: "Posponer 10 min",
       stopDictation: "Detener dictado", listening: "Te escucho... toca para terminar", noDictate: "Este navegador no permite dictar.", noMic: "No diste permiso al micrófono.", transcribing: "Transcribiendo...",
       pushClosed: "Avisos con la app cerrada", pushNotReady: "Todavía no están listos en el servidor.", pushNoBrowser: "Este navegador no permite avisos. Prueba con Chrome o Safari actualizados.",
-      pushOn: "✅ Avisos activados", pushOnText: "Te llegan aunque la app esté cerrada. Al tocar uno se abre con botones para posponer o marcar hecho.",
+      pushOn: "✅ Avisos activados", pushOnText: "Te llegan aunque la app esté cerrada. Sus botones responden sin abrir la app; al tocar el aviso se abre Pendi.",
       sending: "Enviando...", checkNotifs: "Listo, revisa tus notificaciones.", sendTest: "Mandar un aviso de prueba", activating: "Activando...",
       noPermission: "No diste permiso. Puedes activarlo en Ajustes del celular > Notificaciones.", allowNotifs: "Permitir avisos", steps3: "Activa los avisos en 3 pasos",
       step1: "Agrégala a tu pantalla de inicio", step1Text: "En Safari toca Compartir (el cuadrito con la flecha) y elige \"Agregar a pantalla de inicio\".",
@@ -727,7 +731,7 @@ html.kb .tabbar { display: none; }
       reminder: "Reminder", inHourCap: "In 1 hour", inMinCap: "In {n} min", previewTag: " · preview", nowLower: "now", atCap: "At {t}", snooze10: "Snooze 10 min",
       stopDictation: "Stop dictation", listening: "Listening... tap to finish", noDictate: "This browser can't dictate.", noMic: "You didn't allow the microphone.", transcribing: "Transcribing...",
       pushClosed: "Reminders with the app closed", pushNotReady: "They aren't ready on the server yet.", pushNoBrowser: "This browser doesn't allow notifications. Try an up-to-date Chrome or Safari.",
-      pushOn: "✅ Reminders on", pushOnText: "They arrive even with the app closed. Tapping one opens buttons to snooze or mark it done.",
+      pushOn: "✅ Reminders on", pushOnText: "They arrive even with the app closed. Their buttons answer without opening the app; tapping the reminder opens Pendi.",
       sending: "Sending...", checkNotifs: "Done, check your notifications.", sendTest: "Send a test reminder", activating: "Turning on...",
       noPermission: "You didn't allow it. You can turn it on in your phone's Settings > Notifications.", allowNotifs: "Allow notifications", steps3: "Turn on reminders in 3 steps",
       step1: "Add it to your home screen", step1Text: "In Safari tap Share (the square with the arrow) and choose \"Add to Home Screen\".",
@@ -789,7 +793,7 @@ html.kb .tabbar { display: none; }
       reminder: "Lembrete", inHourCap: "Em 1 hora", inMinCap: "Em {n} min", previewTag: " · prévia", nowLower: "agora", atCap: "Às {t}", snooze10: "Adiar 10 min",
       stopDictation: "Parar ditado", listening: "Estou ouvindo... toque para terminar", noDictate: "Este navegador não permite ditar.", noMic: "Você não permitiu o microfone.", transcribing: "Transcrevendo...",
       pushClosed: "Avisos com o app fechado", pushNotReady: "Ainda não estão prontos no servidor.", pushNoBrowser: "Este navegador não permite avisos. Use o Chrome ou o Safari atualizados.",
-      pushOn: "✅ Avisos ativados", pushOnText: "Chegam mesmo com o app fechado. Ao tocar em um, ele abre com botões para adiar ou marcar como feito.",
+      pushOn: "✅ Avisos ativados", pushOnText: "Chegam mesmo com o app fechado. Os botões respondem sem abrir o app; ao tocar no aviso, o Pendi abre.",
       sending: "Enviando...", checkNotifs: "Pronto, confira suas notificações.", sendTest: "Mandar um aviso de teste", activating: "Ativando...",
       noPermission: "Você não deu permissão. Dá para ativar em Ajustes do celular > Notificações.", allowNotifs: "Permitir avisos", steps3: "Ative os avisos em 3 passos",
       step1: "Adicione à tela de início", step1Text: "No Safari toque em Compartilhar (o quadradinho com a seta) e escolha \"Adicionar à Tela de Início\".",
@@ -851,7 +855,7 @@ html.kb .tabbar { display: none; }
       reminder: "Rappel", inHourCap: "Dans 1 heure", inMinCap: "Dans {n} min", previewTag: " · aperçu", nowLower: "maintenant", atCap: "À {t}", snooze10: "Reporter 10 min",
       stopDictation: "Arrêter la dictée", listening: "Je t'écoute... touche pour terminer", noDictate: "Ce navigateur ne permet pas de dicter.", noMic: "Tu n'as pas autorisé le micro.", transcribing: "Transcription...",
       pushClosed: "Rappels avec l'appli fermée", pushNotReady: "Ils ne sont pas encore prêts sur le serveur.", pushNoBrowser: "Ce navigateur ne permet pas les notifications. Essaie Chrome ou Safari à jour.",
-      pushOn: "✅ Rappels activés", pushOnText: "Ils arrivent même quand l'appli est fermée. En touchant un rappel, des boutons s'ouvrent pour reporter ou marquer comme fait.",
+      pushOn: "✅ Rappels activés", pushOnText: "Ils arrivent même quand l'appli est fermée. Ses boutons répondent sans ouvrir l'appli ; en touchant le rappel, Pendi s'ouvre.",
       sending: "Envoi...", checkNotifs: "C'est fait, regarde tes notifications.", sendTest: "Envoyer un rappel test", activating: "Activation...",
       noPermission: "Tu n'as pas donné l'autorisation. Tu peux l'activer dans Réglages du téléphone > Notifications.", allowNotifs: "Autoriser les rappels", steps3: "Active les rappels en 3 étapes",
       step1: "Ajoute-la à ton écran d'accueil", step1Text: "Dans Safari, touche Partager (le carré avec la flèche) et choisis « Sur l'écran d'accueil ».",
@@ -1024,6 +1028,54 @@ html.kb .tabbar { display: none; }
       obNameTitle: "Comment veux-tu que je t'appelle ?", obNameText: "C'est facultatif. Si tu le laisses vide, je te parle de façon neutre.", next: "Suivant", skip: "Passer" },
   };
   for (const k of Object.keys(P3)) Object.assign(I18N[k], P3[k]);
+  // Phase 5 texts: reminders that never close a task, the closing question, check-in, "¿Cómo te fue?" and a new plan.
+  const P5 = {
+    es: { snoozeDots: "Posponer…", snoozeTitle: "¿Cuándo te aviso otra vez?", in10: "En 10 min", in30: "En 30 min", in60: "En 1 hora", in120: "En 2 horas", tomorrowAt: "Mañana a las {t}",
+      goNow: "Voy ahora", goMsg: "👍 Vamos. En 10 min te pregunto si ya está.", startBtn: "▶ Empezar", startedMsg: "▶ {t}: en curso. Te pregunto al terminar.",
+      notNowBtn: "Ahora no", newTimeTitle: "¿A qué hora lo haces?", otherTime: "Otra hora", setTime: "Poner esa hora", movedTo: "↪️ {t}: {w}",
+      skipToday: "Saltar hoy", skippedMsg: "{t}: saltada hoy",
+      askInstant: "¿Ya hiciste “{t}”?", askTimed: "¿Ya terminaste “{t}”?", yesDefault: "Ya está", finished: "✔ Ya terminé", half: "A medias", more: "Sigo en eso · +15",
+      notYet: "Todavía no", answerLater: "Responder luego", notDone: "No se hizo", askAgainMsg: "Te pregunto otra vez en 30 min.", moreMsg: "+15 min para {t}", halfMsg: "{t}: a medias",
+      howTitle: "¿Cómo te fue?", how_good: "😊 Bien", how_meh: "😐 Regular", how_bad: "😣 Mal", how_solved: "✅ Resolví", how_pending: "⏳ Queda pendiente", how_noanswer: "📵 No contestó", skipHow: "Saltar", howSaved: "Guardado ✓",
+      replanTitle: "¿Mañana, el fin de semana, o la soltamos?", replanTomorrow: "Mañana", replanWeekend: "El fin de semana", replanDrop: "La soltamos", replanned: "Nuevo plan: {t} · {w}", dropped: "Soltamos «{t}». Sin culpa.",
+      runningTag: "▶ En curso · {a} de {b} min", toConfirm: "Por confirmar", unconfirmed: "Sin confirmar", notDoneTag: "No se hizo", skippedTag: "Saltada", halfTag: "A medias",
+      critOn: "🔔 Insistir hasta que confirme", critOff: "🔕 Dejar de insistir", critOnMsg: "🔔 Te insistiré con {t} hasta que me confirmes",
+      confirmTitle: "Por confirmar", confirmEmpty: "Nada por confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver la tarea", weekClosed: "cerradas en los últimos 7 días", weekGood: "😊 Salieron bien: {g}" },
+    en: { snoozeDots: "Snooze…", snoozeTitle: "When should I remind you again?", in10: "In 10 min", in30: "In 30 min", in60: "In 1 hour", in120: "In 2 hours", tomorrowAt: "Tomorrow at {t}",
+      goNow: "On my way", goMsg: "👍 Go for it. I'll ask you in 10 min if it's done.", startBtn: "▶ Start", startedMsg: "▶ {t}: in progress. I'll ask when the time is up.",
+      notNowBtn: "Not now", newTimeTitle: "What time will you do it?", otherTime: "Another time", setTime: "Set that time", movedTo: "↪️ {t}: {w}",
+      skipToday: "Skip today", skippedMsg: "{t}: skipped today",
+      askInstant: "Did you do “{t}”?", askTimed: "Have you finished “{t}”?", yesDefault: "Done it", finished: "✔ I'm done", half: "Halfway", more: "Still on it · +15",
+      notYet: "Not yet", answerLater: "Answer later", notDone: "It didn't happen", askAgainMsg: "I'll ask you again in 30 min.", moreMsg: "+15 min for {t}", halfMsg: "{t}: halfway",
+      howTitle: "How did it go?", how_good: "😊 Good", how_meh: "😐 So-so", how_bad: "😣 Bad", how_solved: "✅ Sorted it", how_pending: "⏳ Still pending", how_noanswer: "📵 No answer", skipHow: "Skip", howSaved: "Saved ✓",
+      replanTitle: "Tomorrow, the weekend, or shall we let it go?", replanTomorrow: "Tomorrow", replanWeekend: "The weekend", replanDrop: "Let it go", replanned: "New plan: {t} · {w}", dropped: "Let go of “{t}”. No guilt.",
+      runningTag: "▶ In progress · {a} of {b} min", toConfirm: "To confirm", unconfirmed: "Not confirmed", notDoneTag: "Didn't happen", skippedTag: "Skipped", halfTag: "Halfway",
+      critOn: "🔔 Keep asking until I confirm", critOff: "🔕 Stop insisting", critOnMsg: "🔔 I'll keep asking about {t} until you confirm",
+      confirmTitle: "To confirm", confirmEmpty: "Nothing to confirm 🎉", reopen: "↩ Reopen", seeTask: "See the task", weekClosed: "closed in the last 7 days", weekGood: "😊 Went well: {g}" },
+    pt: { snoozeDots: "Adiar…", snoozeTitle: "Quando te aviso de novo?", in10: "Em 10 min", in30: "Em 30 min", in60: "Em 1 hora", in120: "Em 2 horas", tomorrowAt: "Amanhã às {t}",
+      goNow: "Vou agora", goMsg: "👍 Bora. Em 10 min te pergunto se já foi.", startBtn: "▶ Começar", startedMsg: "▶ {t}: em andamento. Te pergunto quando acabar o tempo.",
+      notNowBtn: "Agora não", newTimeTitle: "Que horas você faz?", otherTime: "Outro horário", setTime: "Usar esse horário", movedTo: "↪️ {t}: {w}",
+      skipToday: "Pular hoje", skippedMsg: "{t}: pulada hoje",
+      askInstant: "Você já fez “{t}”?", askTimed: "Você já terminou “{t}”?", yesDefault: "Já fiz", finished: "✔ Terminei", half: "Pela metade", more: "Ainda fazendo · +15",
+      notYet: "Ainda não", answerLater: "Responder depois", notDone: "Não rolou", askAgainMsg: "Te pergunto de novo em 30 min.", moreMsg: "+15 min para {t}", halfMsg: "{t}: pela metade",
+      howTitle: "Como foi?", how_good: "😊 Bem", how_meh: "😐 Mais ou menos", how_bad: "😣 Mal", how_solved: "✅ Resolvi", how_pending: "⏳ Ficou pendente", how_noanswer: "📵 Não atendeu", skipHow: "Pular", howSaved: "Salvo ✓",
+      replanTitle: "Amanhã, no fim de semana, ou deixamos pra lá?", replanTomorrow: "Amanhã", replanWeekend: "No fim de semana", replanDrop: "Deixar pra lá", replanned: "Novo plano: {t} · {w}", dropped: "Deixamos “{t}” pra lá. Sem culpa.",
+      runningTag: "▶ Em andamento · {a} de {b} min", toConfirm: "Para confirmar", unconfirmed: "Sem confirmar", notDoneTag: "Não rolou", skippedTag: "Pulada", halfTag: "Pela metade",
+      critOn: "🔔 Insistir até eu confirmar", critOff: "🔕 Parar de insistir", critOnMsg: "🔔 Vou insistir com {t} até você confirmar",
+      confirmTitle: "Para confirmar", confirmEmpty: "Nada para confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver a tarefa", weekClosed: "fechadas nos últimos 7 dias", weekGood: "😊 Deram certo: {g}" },
+    fr: { snoozeDots: "Reporter…", snoozeTitle: "Quand est-ce que je te le rappelle ?", in10: "Dans 10 min", in30: "Dans 30 min", in60: "Dans 1 heure", in120: "Dans 2 heures", tomorrowAt: "Demain à {t}",
+      goNow: "J'y vais", goMsg: "👍 Vas-y. Dans 10 min je te demande si c'est fait.", startBtn: "▶ Commencer", startedMsg: "▶ {t} : en cours. Je te demande à la fin.",
+      notNowBtn: "Pas maintenant", newTimeTitle: "À quelle heure tu le fais ?", otherTime: "Une autre heure", setTime: "Mettre cette heure", movedTo: "↪️ {t} : {w}",
+      skipToday: "Sauter aujourd'hui", skippedMsg: "{t} : sautée aujourd'hui",
+      askInstant: "Tu as fait “{t}” ?", askTimed: "Tu as fini “{t}” ?", yesDefault: "C'est fait", finished: "✔ J'ai fini", half: "À moitié", more: "J'y suis encore · +15",
+      notYet: "Pas encore", answerLater: "Répondre plus tard", notDone: "Pas fait", askAgainMsg: "Je te redemande dans 30 min.", moreMsg: "+15 min pour {t}", halfMsg: "{t} : à moitié",
+      howTitle: "Comment ça s'est passé ?", how_good: "😊 Bien", how_meh: "😐 Bof", how_bad: "😣 Mal", how_solved: "✅ Réglé", how_pending: "⏳ Reste à faire", how_noanswer: "📵 Pas de réponse", skipHow: "Passer", howSaved: "Enregistré ✓",
+      replanTitle: "Demain, ce week-end, ou on laisse tomber ?", replanTomorrow: "Demain", replanWeekend: "Ce week-end", replanDrop: "On laisse tomber", replanned: "Nouveau plan : {t} · {w}", dropped: "On laisse tomber « {t} ». Sans culpabilité.",
+      runningTag: "▶ En cours · {a} sur {b} min", toConfirm: "À confirmer", unconfirmed: "Non confirmée", notDoneTag: "Pas faite", skippedTag: "Sautée", halfTag: "À moitié",
+      critOn: "🔔 Insister jusqu'à ce que je confirme", critOff: "🔕 Arrêter d'insister", critOnMsg: "🔔 J'insisterai pour {t} jusqu'à ta confirmation",
+      confirmTitle: "À confirmer", confirmEmpty: "Rien à confirmer 🎉", reopen: "↩ Rouvrir", seeTask: "Voir la tâche", weekClosed: "clôturées ces 7 derniers jours", weekGood: "😊 Bien passées : {g}" },
+  };
+  for (const k of Object.keys(P5)) Object.assign(I18N[k], P5[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1134,7 +1186,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.9.2";
+  const VERSION = "0.10.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1242,7 +1294,7 @@ html.kb .tabbar { display: none; }
     for (const s of state.series) for (let i = 0; i < 60; i++) {
       const d = addDays(today, i), k = ymd(d), id = s.id + "_" + k;
       if (!occurs(s, d) || state.tasks.some((t) => t.id === id)) continue;
-      put({ id, kind: "task", series: s.id, title: s.title, emoji: s.emoji, cat: s.cat, date: k, time: s.time || "", anytime: !!s.anytime, dur: s.dur || 30, tip: s.tip || "", star: !!s.star, cheer: s.cheer || "", done: false, created: Date.now() }, true);
+      put({ id, kind: "task", series: s.id, title: s.title, emoji: s.emoji, cat: s.cat, date: k, time: s.time || "", anytime: !!s.anytime, dur: s.dur || 30, tip: s.tip || "", star: !!s.star, cheer: s.cheer || "", q: s.q || "", yes: s.yes || "", type: s.type || "", critical: !!s.critical, done: false, created: Date.now() }, true);
       added = true;
     }
     return added;
@@ -1406,31 +1458,42 @@ html.kb .tabbar { display: none; }
   }
   // "Sin cerrar de ayer": yesterday's open tasks above today's list, until they are moved, done or dismissed.
   function openCard() {
-    const left = state.tasks.filter((t) => t.date === ymd(addDays(new Date(), -1)) && !t.done && !t.openSeen && !t.example);
+    const left = state.tasks.filter((t) => t.date === ymd(addDays(new Date(), -1)) && !F.closed(t) && !t.openSeen && !t.example);
     if (!left.length) return null;
     const moveAll = () => {
       const prev = left.map(clone), tomorrow = ymd(addDays(new Date(), 1));
-      left.forEach((t) => put({ ...t, date: tomorrow, done: false, snooze: null }, true)); render();
+      left.forEach((t) => put({ ...F.fresh(t), date: tomorrow }, true)); render();
       notice(tr("movedN", { n: left.length }), () => { prev.forEach((x) => put(x, true)); render(); });
     };
     return el("div", { class: "card", style: "margin-bottom:12px" },
       el("h3", {}, tr("openCardTitle")),
       el("div", { class: "muted" }, tr(left.length === 1 ? "openCardOne" : "openCardMany", { n: left.length })),
       left.map((t) => el("div", { class: "row" },
-        el("button", { class: "link", style: "flex:1;text-align:left;padding:6px 0", onclick: () => openSheet(t) }, `${icon(t)} ${t.title} · ${timeOf(t)}`),
+        el("button", { class: "link", style: "flex:1;text-align:left;padding:6px 0", onclick: () => openQuick(t) }, `${icon(t)} ${t.title} · ${timeOf(t)}`, stateTag(t)),
         el("button", { class: "chev", "aria-label": tr("openCardDismiss"), title: tr("openCardDismiss"), onclick: () => change(t, { openSeen: true }, tr("openCardDismissed", { t: t.title })) }, "✕"))),
       el("button", { class: "btn small primary", onclick: moveAll }, tr("openCardMoveAll")));
   }
+  // Where the task is in its closing cycle, as a small tag: en curso, por confirmar, sin confirmar, no se hizo...
+  function stateText(t) {
+    const ph = F.phase(t, Date.now());
+    if (ph === "running") return tr("runningTag", { a: Math.max(1, Math.round((Date.now() - Date.parse(t.startedAt)) / 60000)), b: (Number(t.dur) || 30) + 15 * (Number(t.ext) || 0) });
+    if (ph === "asking") return tr("toConfirm");
+    if (ph === "unconfirmed") return tr("unconfirmed");
+    const how = t.close && t.close.how;
+    const outcome = t.close && t.close.outcome ? " · " + tr("how_" + t.close.outcome) : "";
+    return how === "notdone" ? tr("notDoneTag") : how === "skip" ? tr("skippedTag") : how === "half" ? tr("halfTag") + outcome : outcome ? outcome.slice(3) : "";
+  }
+  const stateTag = (t) => { const x = stateText(t); return x ? el("span", { class: "prog state" }, " · " + x) : null; };
   const nowMark = () => el("div", { class: "nowline" }, el("span", {}, tr("now") + " · " + clock(hm(new Date()))));
   function taskRow(t) {
     const s = at(t.date, t.time), e = new Date(s.getTime() + (t.dur || 30) * 60000), now = Date.now();
     const live = !t.anytime && s.getTime() <= now && now < e.getTime();
     const steps = t.steps && t.steps.length ? " · " + tr("stepsProg", { d: t.steps.filter((x) => x.done).length, n: t.steps.length }) : "";
-    const row = el("button", { class: "item" + (t.done ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : "") + (t.star ? " star" : ""), style: `--c: var(--c-${cat(t.cat)})`,
+    const row = el("button", { class: "item" + (F.closed(t) ? " done" : "") + (t.example ? " example" : "") + (live ? " now" : "") + (t.star ? " star" : ""), style: `--c: var(--c-${cat(t.cat)})`,
         onclick: () => { if (!row.dragged) openSheet(t); } },
       el("span", { class: "t" }, t.anytime ? tr("anyTimeShort") : clock(t.time), t.anytime ? null : el("small", {}, clock(hm(e)))), el("span", { class: "bar" }),
       el("span", {}, el("div", { class: "ti", "data-example": t.example ? tr("exampleTag") : null }, `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`,
-          t.series ? el("span", { class: "prog", title: tr("repeats") }, " 🔁") : null, steps ? el("span", { class: "prog" }, steps) : null),
+          t.series ? el("span", { class: "prog", title: tr("repeats") }, " 🔁") : null, steps ? el("span", { class: "prog" }, steps) : null, t.example ? null : stateTag(t)),
         t.tip ? el("div", { class: "tip" }, t.tip) : null));
     return row;
   }
@@ -1453,11 +1516,11 @@ html.kb .tabbar { display: none; }
     });
     const n = Math.max(1, lanes.length);
     let from = isToday ? Math.max(a0, Math.ceil(nowM / 15) * 15) : a0;
-    for (const [s, e] of [...blocks.filter((b) => !b.t.done).map((b) => [b.s, b.e]), [a1, a1]]) {
+    for (const [s, e] of [...blocks.filter((b) => !F.closed(b.t)).map((b) => [b.s, b.e]), [a1, a1]]) {
       if (s - from >= 30) box.append(el("button", { class: "tl-free", style: `top:${y(from) + 8}px;height:${y(s) - y(from) - 16}px`, onclick: ((f) => () => openAdd({ date: k, time: hhmm(f) }))(from) }, freeLabel(s - from)));
       from = Math.max(from, e);
     }
-    for (const b of blocks) box.append(el("button", { class: "tl-b" + (b.t.done ? " done" : "") + (b.t.star ? " star" : "") + (b.e - b.s < 45 ? " short" : ""), onclick: () => openSheet(b.t),
+    for (const b of blocks) box.append(el("button", { class: "tl-b" + (F.closed(b.t) ? " done" : "") + (b.t.star ? " star" : "") + (b.e - b.s < 45 ? " short" : ""), onclick: () => openSheet(b.t),
         style: `--c: var(--c-${cat(b.t.cat)});top:${y(b.s) + 1}px;height:${y(b.e) - y(b.s) - 2}px;left:calc(64px + (100% - 70px) * ${b.c / n});width:calc((100% - 70px) / ${n} - 4px)` },
       el("b", {}, `${b.t.star ? "⭐ " : ""}${icon(b.t)} ${b.t.title}`), el("span", {}, `${clock(b.t.time)} – ${clock(hhmm((b.s + (b.t.dur || 30)) % 1440))}` + (b.t.steps && b.t.steps.length ? " · " + tr("stepsProg", { d: b.t.steps.filter((x) => x.done).length, n: b.t.steps.length }) : ""))));
     if (isToday && nowM >= a0 && nowM <= a1) box.append(el("div", { class: "tl-now", style: `top:${y(nowM)}px` }));
@@ -1481,8 +1544,8 @@ html.kb .tabbar { display: none; }
     const end = () => {
       if (id === null) return;
       id = null; wrap.classList.remove("dragging");
-      if (on && dx > 90) { ls.set("swiped", true); change(t, { done: !t.done, snooze: null }, t.done ? tr("markedPending") : tr("doneMsg", { t: t.title })); return; }
-      if (on && dx < -90) { ls.set("swiped", true); change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title })); return; }
+      if (on && dx > 90) { ls.set("swiped", true); answer(t, F.closed(t) ? "reopen" : "yes"); return; }
+      if (on && dx < -90) { ls.set("swiped", true); change(t, { ...F.fresh(t), date: ymd(addDays(fromYmd(t.date), 1)) }, tr("movedTomorrow", { t: t.title })); return; }
       row.style.transform = ""; wrap.classList.remove("go-done", "go-later");
       setTimeout(() => { row.dragged = false; }, 50);
     };
@@ -1576,18 +1639,23 @@ html.kb .tabbar { display: none; }
       s ? el("div", { class: "muted" }, "🔁 " + repeatText(s)) : null,
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
       el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("notifyYou", { x: remindText() })),
+      real && stateText(t) ? el("div", { class: "tipbox" }, stateText(t)) : null,
       real && hasSteps ? stepsBox(t) : real && !t.done ? split : null,
       el("details", { class: "more" }, el("summary", {}, "⋯ " + tr("moreOptions")), el("div", { class: "actions" },
         real ? el("button", { onclick: then(() => openEdit(t)) }, "✏️ " + tr("edit")) : null,
         real && t.anytime && !t.done ? el("button", { onclick: then(() => placeAnytime(t)) }, tr("findSlot")) : null,
-        real ? el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
+        real ? el("button", { onclick: then(() => change(t, { ...F.fresh(t), date: ymd(addDays(fromYmd(t.date), 1)) }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
         real ? el("button", { onclick: then(() => change(t, { star: !t.star }, t.star ? null : tr("starOn", { t: t.title }))) }, tr(t.star ? "unstar" : "star")) : null,
+        real && !t.anytime ? el("button", { onclick: then(() => change(t, { critical: !t.critical }, t.critical ? null : tr("critOnMsg", { t: t.title }))) }, tr(t.critical ? "critOff" : "critOn")) : null,
+        real && !F.closed(t) ? el("button", { onclick: then(() => answer(t, "skip")) }, tr("skipToday")) : null,
         t.anytime ? null : el("button", { onclick: () => { closeSheet(); toast(t, 30, true); } }, tr("previewAlert")),
         t.anytime ? null : el("a", { href: gcalLink(t), target: "_blank", rel: "noopener" }, tr("addGcal")),
         real ? el("button", { class: "danger", onclick: then(() => del(t)) }, tr(s ? "delOne" : "del")) : null,
         real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null)),
       // Completing is its own big, explicit button; closing is the ✕.
-      real ? el("button", { class: "btn primary huge", onclick: () => { const cur = state.tasks.find((x) => x.id === t.id) || t; closeSheet(); change(cur, { done: !cur.done, snooze: null }, cur.done ? tr("markedPending") : tr("doneMsg", { t: cur.title })); } }, tr(t.done ? "markUndoneMain" : "markDoneMain")) : null,
+      // A timed task can be started from here too; the check-in comes when its time is up.
+      real && canStart(t) ? el("button", { class: "btn", onclick: then(() => answer(t, "start")) }, tr("startBtn")) : null,
+      real ? el("button", { class: "btn primary huge", onclick: () => { const cur = state.tasks.find((x) => x.id === t.id) || t; closeSheet(); answer(cur, F.closed(cur) ? "reopen" : "yes"); } }, tr(t.done ? "markUndoneMain" : F.closed(t) ? "reopen" : "markDoneMain")) : null,
       real ? el("div", { class: "row" }, el("button", { class: "btn", style: "flex:1", onclick: () => openEdit(t) }, "✏️ " + tr("edit"))) : null));
   }
   // Every field of a task can be changed; in a series, "apply to all" also updates the pattern and the coming days.
@@ -1620,7 +1688,7 @@ html.kb .tabbar { display: none; }
           put({ ...s, ...patch }, true);
           prevT.forEach((x) => put({ ...x, ...patch, ...(x.id === t.id ? { date: day.value || t.date } : {}) }, true));
           render(); notice(tr("edited"), () => { put(prevS, true); prevT.forEach((x) => put(x, true)); render(); });
-        } else change(t, { ...patch, date: day.value || t.date, snooze: null }, tr("edited"));
+        } else change(t, { ...((day.value || t.date) !== t.date || patch.time !== t.time ? F.fresh(t) : {}), ...patch, date: day.value || t.date, snooze: null }, tr("edited"));
         state.anchor = fromYmd(day.value || t.date); render();
       } },
       el("div", { class: "grabber" }), el("h2", {}, tr("editTask")),
@@ -1680,7 +1748,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   function saveSteps(c, steps) {
     const allNow = steps.length > 0 && steps.every((x) => x.done), allBefore = (c.steps || []).length > 0 && c.steps.every((x) => x.done);
     put({ ...c, steps });
-    if (allNow && !allBefore && !c.done) notice(tr("allStepsDone", { t: c.title }), () => { closeSheet(); markDone(c.id); }, tr("markDoneMain"));
+    if (allNow && !allBefore && !c.done) notice(tr("allStepsDone", { t: c.title }), () => { closeSheet(); answer(c, "yes"); }, tr("markDoneMain"));
   }
   // Search across every task and birthday.
   function openSearch() {
@@ -1709,53 +1777,193 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   }
   // From the evening notification: what is left of today, to finish or move.
   function openEvening() {
-    const today = ymd(new Date()), tomorrow = ymd(addDays(new Date(), 1)), left = state.tasks.filter((t) => t.date === today && !t.done);
+    const today = ymd(new Date()), tomorrow = ymd(addDays(new Date(), 1)), left = state.tasks.filter((t) => t.date === today && !F.closed(t));
     if (!left.length) { notice("🎉 " + tr("dayComplete")); return; }
+    // "Sin confirmar" shows up here once; after that it expires quietly (not in tomorrow's "Sin cerrar" card).
+    left.filter((t) => !t.openSeen && F.phase(t, Date.now()) === "unconfirmed").forEach((t) => put({ ...t, openSeen: true }, true));
     const moveAll = () => {
       const prev = left.map(clone);
-      left.forEach((t) => put({ ...t, date: tomorrow, done: false, snooze: null }, true)); render(); closeSheet();
+      left.forEach((t) => put({ ...F.fresh(t), date: tomorrow }, true)); render(); closeSheet();
       notice(tr("movedN", { n: left.length }), () => { prev.forEach((x) => put(x, true)); render(); });
     };
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("eveningTitle") }, el("div", { class: "grabber" }),
       el("h2", {}, "🌙 " + tr("eveningTitle")), el("div", { class: "muted" }, tr(left.length === 1 ? "leftOne" : "leftMany", { n: left.length })),
-      el("div", { class: "actions" }, left.map((t) => el("button", { onclick: () => { closeSheet(); openQuick(t); } }, `${icon(t)} ${t.title} · ${timeOf(t)}`))),
+      el("div", { class: "actions" }, left.map((t) => el("button", { onclick: () => { closeSheet(); openQuick(t); } }, `${icon(t)} ${t.title} · ${timeOf(t)}`, stateTag(t)))),
       el("button", { class: "btn primary", onclick: moveAll }, tr("moveAllTomorrow")),
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // The week in review: done per day, the best day, and what comes next.
   function openWeek() {
     const now = new Date(), today = ymd(now), limit = ymd(addDays(now, 7));
-    const stats = [...Array(7)].map((_, i) => { const d = addDays(now, i - 6), ts = state.tasks.filter((t) => t.date === ymd(d)); return { d, n: ts.length, done: ts.filter((t) => t.done).length }; });
+    const stats = [...Array(7)].map((_, i) => { const d = addDays(now, i - 6), ts = state.tasks.filter((t) => t.date === ymd(d)); return { d, n: ts.length, done: ts.filter(F.closed).length, ok: ts.filter((t) => t.done).length, good: ts.filter((t) => t.close && F.good(t.close.outcome)).length }; });
+    const good = stats.reduce((a, x) => a + x.good, 0);
     const total = stats.reduce((a, x) => a + x.n, 0), done = stats.reduce((a, x) => a + x.done, 0), max = Math.max(1, ...stats.map((x) => x.n));
-    const best = stats.slice().sort((a, b) => b.done - a.done)[0];
-    const next = state.tasks.filter((t) => t.date > today && t.date <= limit && !t.done).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const best = stats.slice().sort((a, b) => b.ok - a.ok)[0];
+    const next = state.tasks.filter((t) => t.date > today && t.date <= limit && !F.closed(t)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("weekTitle") }, el("div", { class: "grabber" }),
       el("h2", {}, "📊 " + tr("weekTitle")),
-      el("div", { class: "weekstat" }, el("b", {}, `${done}/${total}`), el("span", { class: "muted" }, tr("weekDone"))),
+      el("div", { class: "weekstat" }, el("b", {}, `${done}/${total}`), el("span", { class: "muted" }, tr("weekClosed"))),
+      good ? el("div", { class: "muted" }, tr("weekGood", { g: good })) : null,
       el("div", { class: "bars" }, stats.map((x) => el("div", {}, el("div", { class: "v", style: `height:${4 + Math.round((x.n / max) * 70)}px` }, el("i", { style: `height:${x.n ? Math.round((x.done / x.n) * 100) : 0}%` })), el("span", {}, fmt(x.d, { weekday: "short" }))))),
-      best && best.done ? el("div", { class: "tipbox" }, tr("bestDay", { d: dayName(best.d), n: best.done })) : null,
+      best && best.ok ? el("div", { class: "tipbox" }, tr("bestDay", { d: dayName(best.d), n: best.ok })) : null,
       el("b", {}, tr("nextWeekN", { n: next.length })),
       next.length ? el("div", { class: "actions" }, next.slice(0, 8).map((t) => el("button", { onclick: () => { closeSheet(); state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, `${icon(t)} ${t.title} · ${niceDate(t.date)}`))) : null,
       el("button", { class: "btn primary", onclick: () => { closeSheet(); showTab("chat"); sendChat(tr("qPlanWeek")); } }, tr("planWeek")),
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
-  // Opened by tapping a notification: the task in big, with one-tap answers.
+  // Opened by tapping a notification: the task in big, with the answers that fit where it is.
+  // At its time it only informs (Voy ahora / Posponer, or ▶ Empezar / Ahora no / Saltar hoy): nothing here marks it done.
+  // Once Pendi asks (or while it runs), the closing question opens instead.
   function openQuick(t) {
     if (!t) return;
+    t = state.tasks.find((x) => x.id === t.id) || t;
+    const ph = F.phase(t, Date.now());
+    if (ph === "asking" || ph === "unconfirmed" || ph === "running") return openCheck(t);
+    if (ph === "closed") return openSheet(t);
     const left = Math.round((at(t.date, t.time) - Date.now()) / 60000);
     const when = t.anytime ? niceDate(t.date) : left > 0 ? (left >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: left })) : left > -(t.dur || 30) ? tr("isNow") : tr("wasAt", { t: clock(t.time) });
-    const then = (fn) => () => { fn(); closeSheet(); };
+    const then = (fn) => () => { closeSheet(); fn(); };
+    const timed = F.timed(t) && !t.anytime;
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
       el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${timeOf(t)} · ${when}`))),
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
-      el("div", { class: "qa" },
-        t.done ? null : el("button", { class: "big", onclick: then(() => markDone(t.id)) }, tr("done")),
-        [10, 30, 60].map((m) => el("button", { onclick: then(() => { snooze(t.id, m); notice(tr("againIn", { x: m === 60 ? tr("oneHour") : tr("nMin", { n: m }) })); }) }, m === 60 ? tr("plusHour") : tr("plusMin", { n: m })))),
+      timed
+        ? el("div", { class: "qa" },
+          el("button", { class: "big", onclick: then(() => answer(t, "start")) }, tr("startBtn")),
+          el("button", { onclick: then(() => openNotNow(t)) }, tr("notNowBtn")),
+          el("button", { onclick: then(() => answer(t, "skip")) }, tr("skipToday")))
+        : el("div", { class: "qa" },
+          t.anytime ? null : el("button", { class: "big", onclick: then(() => answer(t, "go")) }, tr("goNow")),
+          snoozeChoices(t)),
       el("div", { class: "actions" },
-        el("button", { onclick: then(() => change(t, { date: ymd(addDays(fromYmd(t.date), 1)), done: false, snooze: null }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")),
         el("button", { onclick: () => { state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, tr("seeInAgenda"))),
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+  }
+  // Posponer: 10 min, 30 min, 1 hour, or tomorrow at the morning summary's time.
+  function snoozeChoices(t) {
+    const morning = (state.settings.brief || {}).m || "08:00";
+    const later = (m) => () => { closeSheet(); snooze(t.id, m); notice(tr("againIn", { x: m === 60 ? tr("oneHour") : tr("nMin", { n: m }) })); };
+    return [el("button", { onclick: later(10) }, tr("in10")), el("button", { onclick: later(30) }, tr("in30")), el("button", { onclick: later(60) }, tr("in60")),
+      el("button", { onclick: () => { closeSheet(); const w = ymd(addDays(new Date(), 1)); change(t, { ...F.fresh(t), date: w, time: morning, anytime: false }, tr("movedTo", { t: t.title, w: tr("tomorrowAt", { t: clock(morning) }) })); } }, tr("tomorrowAt", { t: clock(morning) }))];
+  }
+  // From "Posponer" on a notification (Android shows only 2 buttons): the choice, inside the installed app.
+  function openSnooze(t) {
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("snoozeTitle"), style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, tr("snoozeTitle")), el("div", { class: "when" }, t.title))),
+      el("div", { class: "qa two" }, snoozeChoices(t))));
+  }
+  // "Ahora no" on a timed task: a new, concrete time (today or tomorrow), or skip it today.
+  function openNotNow(t) {
+    const now = new Date(), base = now.getHours() * 60 + now.getMinutes();
+    const set = (date, time) => { closeSheet(); change(t, { ...F.fresh(t), date, time, anytime: false }, tr("movedTo", { t: t.title, w: (date === ymd(now) ? "" : niceDate(date) + " · ") + clock(time) })); };
+    const opts = [30, 60, 120].map((m) => Math.ceil((base + m) / 5) * 5).filter((m) => m < 24 * 60);
+    const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" }); time.value = hhmm(opts[0] || base);
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("newTimeTitle"), style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, tr("newTimeTitle")), el("div", { class: "when" }, t.title))),
+      el("div", { class: "qa two" },
+        opts.map((m, i) => el("button", { onclick: () => set(ymd(now), hhmm(m)) }, tr(["in30", "in60", "in120"][i]) + " · " + clock(hhmm(m)))),
+        el("button", { onclick: () => set(ymd(addDays(now, 1)), t.time || "09:00") }, tr("tomorrowAt", { t: clock(t.time || "09:00") }))),
+      el("label", { class: "row muted" }, tr("otherTime"), time, el("button", { class: "btn small", onclick: () => time.value && set(time.value > hm(now) ? ymd(now) : ymd(addDays(now, 1)), time.value) }, tr("setTime"))),
+      el("div", { class: "actions" }, el("button", { onclick: () => { closeSheet(); answer(t, "skip"); } }, tr("skipToday")))));
+  }
+  // The closing question ("¿Ya te tomaste la pastilla?" / "¿Ya terminaste…?"). Only a yes closes it as done.
+  function openCheck(t) {
+    t = state.tasks.find((x) => x.id === t.id) || t;
+    const timed = F.timed(t), ph = F.phase(t, Date.now()), go = (a) => () => { closeSheet(); answer(t, a); };
+    const q = timed ? tr("askTimed", { t: t.title }) : t.q || tr("askInstant", { t: t.title });
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": q, style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, q), el("div", { class: "when" }, `${timeOf(t)} · ${stateText(t) || t.title}`))),
+      el("div", { class: "qa" },
+        el("button", { class: "big", onclick: go(timed ? "finished" : "yes") }, timed ? tr("finished") : "✔ " + (t.yes || tr("yesDefault"))),
+        timed ? el("button", { onclick: go("half") }, tr("half")) : null,
+        timed && (Number(t.ext) || 0) < F.MAX_EXT && ph !== "unconfirmed" ? el("button", { onclick: go("more") }, tr("more")) : null,
+        !timed && ph !== "unconfirmed" ? el("button", { onclick: go("notyet") }, tr("notYet")) : null,
+        el("button", { onclick: go("notdone") }, tr("notDone"))),
+      el("div", { class: "actions" },
+        timed && ph !== "unconfirmed" ? el("button", { onclick: go("later") }, tr("answerLater")) : null,
+        el("button", { onclick: () => { closeSheet(); state.anchor = fromYmd(t.date); showTab("cal"); render(); openSheet(t); } }, tr("seeTask")))));
+  }
+  // "¿Cómo te fue?": 3 answers that fit the task, skippable. Saved in the task for the Sunday summary.
+  function openHow(t) {
+    const pick = (k) => () => { closeSheet(); answer(t, "outcome:" + k, true); notice(tr("howSaved")); };
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("howTitle"), style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, tr("howTitle")), el("div", { class: "when" }, t.title))),
+      el("div", { class: "qa" }, F.outcomes(t).map((k) => el("button", { onclick: pick(k) }, tr("how_" + k)))),
+      el("button", { class: "btn", onclick: closeSheet }, tr("skipHow"))));
+  }
+  // "No se hizo" is a valid close; right away, a concrete new plan (a new task), or let it go.
+  function openReplan(t) {
+    const now = new Date(), sat = addDays(now, ((6 - now.getDay() + 7) % 7) || 7);
+    const plan = (d) => () => {
+      closeSheet();
+      const row = { ...F.fresh(t), id: uid("t"), series: null, date: ymd(d), history: [], created: Date.now() };
+      put(row); notice(tr("replanned", { t: t.title, w: niceDate(row.date) + (row.anytime ? "" : " · " + clock(row.time)) }), () => remove(row));
+    };
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("replanTitle"), style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, tr("replanTitle")), el("div", { class: "when" }, t.title))),
+      el("div", { class: "qa" },
+        el("button", { onclick: plan(addDays(now, 1)) }, tr("replanTomorrow")),
+        el("button", { onclick: plan(sat) }, tr("replanWeekend")),
+        el("button", { onclick: () => { closeSheet(); notice(tr("dropped", { t: t.title })); } }, tr("replanDrop")))));
+  }
+  // From the grouped notification ("Tienes 3 cosas por confirmar"): today's and yesterday's open questions.
+  function openConfirm() {
+    const from = ymd(addDays(new Date(), -1)), now = Date.now();
+    const list = state.tasks.filter((t) => t.date >= from && t.date <= ymd(new Date()) && ["asking", "unconfirmed"].includes(F.phase(t, now)) && !t.openSeen);
+    if (!list.length) { notice(tr("confirmEmpty")); return; }
+    if (list.length === 1) return openCheck(list[0]);
+    showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("confirmTitle") }, el("div", { class: "grabber" }),
+      el("h2", {}, tr("confirmTitle")),
+      el("div", { class: "actions" }, list.map((t) => el("button", { onclick: () => { closeSheet(); openCheck(t); } }, `${icon(t)} ${t.title} · ${timeOf(t)}`, stateTag(t)))),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+  }
+  // A timed task of today (or one with no reminder yet) can be started while it is not running or closed.
+  const canStart = (t) => !t.example && !t.anytime && F.timed(t) && t.date === ymd(new Date()) && ["upcoming", "due"].includes(F.phase(t, Date.now()));
+  // Every answer goes through here (in the app or from a notification that could not reach the server).
+  // A yes closes it with the real time it took; "¿Cómo te fue?" follows for timed tasks and calls; "No se hizo" asks for a new plan.
+  function answer(t, a, quiet) {
+    const cur = state.tasks.find((x) => x.id === t.id) || t, prev = clone(cur);
+    const next = F.apply(cur, a, Date.now());
+    if (!next) return;
+    const k = String(a).split(":")[0], yes = (k === "yes" || k === "finished" || k === "done" || k === "half") && !F.closed(cur);
+    if (yes && F.asksHow(next)) next.howAsked = true;
+    put(next);
+    if (next.done && !cur.done) celebrate(next);
+    if (quiet) return next;
+    const msg = { go: tr("goMsg"), start: tr("startedMsg", { t: next.title }), notyet: tr("askAgainMsg"), later: tr("askAgainMsg"), more: tr("moreMsg", { t: next.title }),
+      skip: tr("skippedMsg", { t: next.title }), half: tr("halfMsg", { t: next.title }), reopen: tr("markedPending"), yes: tr("doneMsg", { t: next.title }) }[k === "finished" || k === "done" ? "yes" : k];
+    if (msg && k !== "notdone") notice(msg, () => put(prev));
+    if (yes && next.howAsked) openHow(next);
+    if (k === "notdone" && !F.closed(cur)) openReplan(next);
+    return next;
+  }
+  // A task answered from a notification while the app was closed: "¿Cómo te fue?" once, the next time Pendi opens.
+  function nextHow() {
+    if (!$("sheet").hidden) return;
+    const since = Date.now() - 12 * 3600000;
+    const t = state.tasks.find((x) => x.close && x.done && !x.close.outcome && !x.howAsked && F.asksHow(x) && Date.parse(x.close.at) > since);
+    if (t) { put({ ...t, howAsked: true }); openHow(t); }
+  }
+  // The task as the server has it after a notification's button changed it.
+  function fromServer(row) {
+    if (!row || !row.id) return;
+    const i = state.tasks.findIndex((x) => x.id === row.id);
+    if (i >= 0) state.tasks[i] = row; else state.tasks.push(row);
+    if (outbox.up[row.id]) { delete outbox.up[row.id]; ls.set("outbox", outbox); }
+    saveLocal(); render();
+    if (!document.hidden) nextHow();
+  }
+  // Back to the app: the server may have answers given from notifications meanwhile.
+  async function refreshTasks() {
+    if (!state.status.db || pending() || !$("sheet").hidden) return;
+    try {
+      const { items } = await call("/api/items");
+      if (pending() || !$("sheet").hidden) return;
+      const ts = items.filter((r) => r.kind === "task");
+      if (ts.length) { state.tasks = ts; saveLocal(); render(); }
+    } catch {}
+    nextHow();
   }
   // Quick add from the + button: say or type it; if there is no time, the AI picks a good one.
   // opts: date, time, text (prefilled) and image (a shared picture to read right away).
@@ -1854,8 +2062,8 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   // o: anytime (no time), rep (repeat), image (a photo to read), dry (only return [{row, rep}], nothing is saved).
   async function quickAdd(what, date, time, o = {}) {
     let tareas = [];
-    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","repetir":null}]}
-"original" son las palabras exactas de la persona (o de la imagen) para esa tarea, copiadas sin traducir. "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
+    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra","repetir":null}]}
+"original" son las palabras exactas de la persona (o de la imagen) para esa tarea, copiadas sin traducir. "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. ${closeFields()} "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
     try {
       const res = o.image ? await ai.see(`Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. Los títulos van en el idioma de la imagen o de la nota de la persona, sin traducir.
 ${nowLine()}
@@ -1878,7 +2086,7 @@ ${shape}`);
       const has = /^\d{1,2}:\d{2}$/.test(t.hora || ""), anytime = !!o.anytime || (!has && !time);
       const title = o.image ? ownTitle(t.titulo, t.original, "") : titles[tareas.indexOf(t)];
       const row = { id: uid("t"), kind: "task", title: (title || what || tr("task")).slice(0, 120), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha || "") ? t.fecha : date,
-        time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), done: false, created: Date.now() };
+        time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), ...closeFrom(t), done: false, created: Date.now() };
       // A repeat only when the person asked for one (the AI sometimes makes "take the pill" daily on its own).
       const asked = /\b(cada|tod[oa]s? l[oa]s|diari|semanal|mensual|every|daily|weekly|monthly|weekdays|chaque|tous les|toutes les|quotidien|hebdo|mensuel|todo dia|todos os|toda semana|di[aá]rio)/i.test(what);
       const rep = o.rep || (asked || o.image ? repFromAi(t.repetir) : null);
@@ -1938,6 +2146,9 @@ ${shape}`);
     return n ? `La persona se llama ${JSON.stringify(n)}: llámala así de vez en cuando, con naturalidad. ${neutral}`
       : `No sabes cómo se llama la persona: no inventes un nombre ni se lo preguntes (si quiere, lo guarda en Ajustes). ${neutral}`;
   }
+  // The closing question asked 10 min after an instant task, in the person's language, and whether it is a call.
+  const closeFields = () => `"pregunta" es la pregunta corta que Pendi hará después para confirmar que se hizo, en ${AI_LANG[lang]}, en segunda persona y sobre esa tarea (ej.: "¿Ya te tomaste la pastilla?"). "si" es la respuesta afirmativa para un botón, de 1 a 3 palabras (ej.: "Ya la tomé"). "tipo" es "llamada" si es llamar o hablar por teléfono con alguien; si no, "otra".`;
+  const closeFrom = (t) => ({ q: String(t.pregunta || "").slice(0, 120), yes: String(t.si || "").replace(/^[✔✓]\s*/, "").slice(0, 28), type: t.tipo === "llamada" ? "call" : "" });
   const keepTitles = `Los títulos ("titulo") van en el mismo idioma y con las mismas palabras que usó la persona (solo puedes acortarlos o poner mayúscula inicial); nunca los traduzcas ni cambies de idioma, aunque el resto vaya en otro idioma.`;
   // A title is the person's own when most of its words come from what they wrote or dictated (same word stem,
   // so "pastillas" matches "pastilla" but "pill" never does). If the AI translated or reworded it into another
@@ -1980,8 +2191,8 @@ Texto de la persona:
 
 Para cada tarea da: título corto, un emoji que la represente, categoría (una de: trabajo, personal, casa, salud, creativo, social, otro), duración estimada en minutos, 3 opciones de hora distintas (mañana, tarde y noche si tiene sentido; formato HH:MM 24h; sin choques), cuál recomiendas y por qué en pocas palabras, y un consejo práctico breve (1-2 frases).
 Ordena las tareas en el orden recomendado.
-Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦"}]}
-"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir.`;
+Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra"}]}
+"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir. ${closeFields()}`;
     try {
       const res = await ai.json(prompt);
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
@@ -1991,7 +2202,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
         title: titles[tareas.indexOf(t)] || tr("task"), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
         dur: Math.max(5, Number(t.duracion) || 30),
         options: (Array.isArray(t.opciones) ? t.opciones : []).map(String).filter((x) => /^\d{1,2}:\d{2}$/.test(x)).map((x) => x.padStart(5, "0")).slice(0, 3),
-        rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), skip: false,
+        rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), ...closeFrom(t), skip: false,
       })).filter((p) => p.options.length);
       state.proposals.forEach((p) => { p.pick = p.options[Math.min(p.rec, p.options.length - 1)]; });
       $("dumpStatus").textContent = res.resumen ? String(res.resumen) : tr("chooseTimes");
@@ -2025,7 +2236,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     const all = state.proposals || [], some = all.some((p) => p.sel);
     const ps = all.filter((p) => (!some || p.sel) && !p.skip && p.pick);
     const rest = some ? all.filter((p) => !p.sel) : [];
-    for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, done: false, created: Date.now() });
+    for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, q: p.q, yes: p.yes, type: p.type, done: false, created: Date.now() });
     state.proposals = rest.length ? rest : null; renderProposals(); if (!rest.length) $("dump").value = "";
     $("dumpStatus").className = "status";
     $("dumpStatus").textContent = ps.length ? tr(ps.length === 1 ? "scheduledOne" : "scheduledMany", { n: ps.length }) : tr("noneChosen");
@@ -2033,14 +2244,15 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
   }
   function renderOverdue() {
     const box = $("overdue"); box.replaceChildren();
-    const late = state.tasks.filter((t) => !t.done && t.date < ymd(new Date()));
+    const yday = ymd(addDays(new Date(), -1)), now = Date.now();
+    const late = state.tasks.filter((t) => !F.closed(t) && t.date < ymd(new Date()) && !t.openSeen && !(t.date < yday && F.phase(t, now) === "unconfirmed"));
     if (!late.length) return;
     box.append(el("h2", {}, tr("missedN", { n: late.length })));
     for (const t of late.slice(0, 6)) box.append(el("div", { class: "card", style: `--c: var(--c-${cat(t.cat)})` },
       el("h3", {}, el("span", { class: "dot" }), `${icon(t)} ${t.title}`), el("div", { class: "muted" }, niceDate(t.date) + " · " + clock(t.time)),
       el("div", { class: "row" },
-        el("button", { class: "btn small", onclick: () => change(t, { date: ymd(addDays(new Date(), 1)) }, tr("movedTomorrow", { t: t.title })) }, tr("moveTomorrow")),
-        el("button", { class: "btn small", onclick: () => change(t, { done: true }, tr("doneMsg", { t: t.title })) }, tr("didIt")))));
+        el("button", { class: "btn small", onclick: () => change(t, { ...F.fresh(t), date: ymd(addDays(new Date(), 1)) }, tr("movedTomorrow", { t: t.title })) }, tr("moveTomorrow")),
+        el("button", { class: "btn small", onclick: () => answer(t, "yes") }, tr("didIt")))));
   }
 
   // ---------- chat ----------
@@ -2060,10 +2272,10 @@ Cumpleaños guardados: ${state.bdays.map((b) => `${b.name} (${b.day}/${b.month})
 
 Si pregunta qué tiene un día (hoy, mañana, el viernes...), enumera en "respuesta" todos los eventos reales de ese día con su hora, uno por línea, y pon ese día en "dia" (YYYY-MM-DD). "acciones" es solo para cambios, nunca para mostrar la agenda.
 Si la persona pide crear, mover o borrar eventos, o guardar un cumpleaños, propón las acciones; ella las confirmará. Nunca inventes ids ni crees eventos que ya existen.
-Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","original":"palabras exactas de la persona para ese evento, sin traducir","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
+Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","original":"palabras exactas de la persona para ese evento, sin traducir","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","pregunta":"¿Ya…?","si":"Ya…","tipo":"otra","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
 En "cumple", "anio" y "gustos" son opcionales. En "crear", "hora" puede ir vacía si no tiene hora fija, y "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (0 domingo a 6 sábado) si se repite.
 Las tareas marcadas con ⭐ son importantes.
-Si no hay acciones, usa "acciones":[].`;
+Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
     const turns = state.chat.filter((m) => !m.temp && !m.actions).slice(-8);
     try {
       const res = await ai.json([{ role: "user", content: rules }, ...turns], false, ctl.signal);
@@ -2099,7 +2311,7 @@ Si no hay acciones, usa "acciones":[].`;
     for (const a of msg.actions) {
       const okDate = /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || ""), okTime = /^\d{1,2}:\d{2}$/.test(a.hora || "");
       if (a.tipo === "cumple") await put({ id: uid("b"), kind: "bday", name: String(a.nombre).slice(0, 60), month: Number(a.mes), day: Number(a.dia), year: Number(a.anio) > 1900 ? Number(a.anio) : null, notes: String(a.gustos || "") });
-      if (a.tipo === "crear" && okDate) await addTask({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: okTime ? a.hora.padStart(5, "0") : "", anytime: !okTime, dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), cheer: String(a.felicitacion || "").slice(0, 140), done: false, created: Date.now() }, repFromAi(a.repetir));
+      if (a.tipo === "crear" && okDate) await addTask({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: okTime ? a.hora.padStart(5, "0") : "", anytime: !okTime, dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), cheer: String(a.felicitacion || "").slice(0, 140), ...closeFrom(a), done: false, created: Date.now() }, repFromAi(a.repetir));
       const t = state.tasks.find((x) => x.id === String(a.id));
       if (a.tipo === "mover" && t) await put({ ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, anytime: okTime ? false : t.anytime, done: false });
       if (a.tipo === "borrar" && t) del(t);
@@ -2284,8 +2496,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       el("div", {}, el("div", { class: "meta" }, el("span", {}, "PENDI" + (test ? tr("previewTag") : "")), el("span", {}, tr("nowLower"))),
         el("b", {}, `${icon(t)} ${label}: ${t.title}`), el("p", {}, tr("atCap", { t: clock(t.time) }) + (t.tip ? " · " + t.tip : ""))),
       el("div", { class: "acts" },
-        act(tr("snooze10"), () => { if (real) snooze(t.id, 10); }),
-        act(tr("doneHeading"), () => { if (real) markDone(t.id); }),
+        act(tr("snoozeDots"), () => { if (real) openSnooze(state.tasks.find((x) => x.id === t.id)); }),
         act(tr("close"), () => {})),
       el("span", { class: "life" }));
     const stack = $("toasts"); stack.prepend(box);
@@ -2295,10 +2506,6 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function snooze(id, mins) {
     const t = state.tasks.find((x) => x.id === id); if (!t) return;
     put({ ...t, snooze: new Date(Date.now() + mins * 60000).toISOString() });
-  }
-  function markDone(id) {
-    const t = state.tasks.find((x) => x.id === id); if (!t || t.done) return;
-    change(t, { done: true, snooze: null }, tr("doneMsg", { t: t.title }));
   }
   // Opening the app from a notification: the in-app banner for that task would only repeat it.
   function silence(id) {
@@ -2319,7 +2526,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (isQuiet()) return;
     const wanted = remindList().sort((a, b) => b - a);
     for (const t of state.tasks) {
-      if (t.done || t.anytime) continue;
+      if (F.closed(t) || t.anytime || t.startedAt) continue;
       if (t.snooze) {
         const s = Date.parse(t.snooze), key = t.id + "@snooze@" + t.snooze;
         if (s <= now && now - s < 30 * 60000 && !fired.has(key)) { fired.add(key); ls.set("fired", [...fired].slice(-300)); toast(t, "snooze", false); }
@@ -2375,15 +2582,24 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (!accion && !tab && !share && !probe) return false;
     history.replaceState(null, "", location.pathname);
     if (probe) { caches.open("pendi-share").then((c) => c.delete("/probe-ok")).catch(() => {}); proved(probe); return ls.get("onboarded", false); }
-    if (id) silence(id);
-    if (accion === "snooze" && id) { snooze(id, 10); notice(tr("againIn", { x: tr("nMin", { n: 10 }) })); }
-    else if (accion === "done" && id) markDone(id);
-    else if (accion === "open" && id) { const t = state.tasks.find((x) => x.id === id); if (t) { state.anchor = fromYmd(t.date); render(); openQuick(t); } }
-    else if (accion === "evening") openEvening();
-    else if (accion === "week") openWeek();
+    runAccion(accion, id);
     if (share) { openShared(q.get("text") || "", q.get("img") === "1"); return true; }
     if (tab) { showTab(tab); return true; }
     return !!accion;
+  }
+  // What a notification asked for: a choice (Posponer, Ahora no), the task's answers (a tap on it), a review,
+  // or an answer whose background send failed (the app applies it).
+  function runAccion(accion, id) {
+    const t = id && state.tasks.find((x) => x.id === id);
+    if (id) silence(id);
+    if (t) { state.anchor = fromYmd(t.date); render(); }
+    if (accion === "snooze" && t) openSnooze(t);
+    else if (accion === "notnow" && t) openNotNow(t);
+    else if ((accion === "open" || accion === "ask") && t) openQuick(t);
+    else if (t && ["go", "start", "yes", "finished", "done", "notyet", "later", "more"].includes(accion)) answer(t, accion);
+    else if (accion === "evening") openEvening();
+    else if (accion === "week") openWeek();
+    else if (accion === "confirm") openConfirm();
   }
   // Shared to Pendi from another app (Android): the text fills the add sheet; a picture is read by the AI.
   async function openShared(text, img) {
@@ -2458,8 +2674,15 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   async function probeCache() {
     try { const c = await caches.open("pendi-share"), r = await c.match("/probe-ok"); if (r) { await c.delete("/probe-ok"); proved(await r.text()); } } catch {}
   }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => { if (e.data && e.data.probe) { caches.open("pendi-share").then((c) => c.delete("/probe-ok")).catch(() => {}); proved(e.data.probe); } });
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) probeCache(); });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => {
+    const d = e.data || {};
+    if (d.probe) { caches.open("pendi-share").then((c) => c.delete("/probe-ok")).catch(() => {}); proved(d.probe); }
+    // A notification's button answered in the background: show the change now.
+    if (d.task) fromServer(d.task);
+    // A tap on a notification while this window is open: go there without reloading.
+    if (d.open) { const q = new URL(d.open, location.href).searchParams; closeSheet(); if (q.get("accion")) runAccion(q.get("accion"), q.get("id")); else if (q.get("tab")) showTab(q.get("tab")); }
+  });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { probeCache(); refreshTasks(); } });
   // This phone's subscription, asking for permission when `ask`. Throws { probe: "install" | "denied" | "browser" | "server" }.
   async function pushSub(ask) {
     if (isIOS && !standalone) throw { probe: "install" };
@@ -2759,7 +2982,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (bdayNudges() && !fromUrl) showTab("chat");
     scrollToNow(); checkReminders();
     await probeCache();
+    if ("serviceWorker" in navigator) navigator.serviceWorker.ready.then((r) => r.active && r.active.postMessage({ hello: true, standalone })).catch(() => {});
     if (!ls.get("onboarded", false) && !fromUrl) onboarding();
+    else if (!fromUrl) nextHow();
   }
 
   // ---------- wiring ----------
