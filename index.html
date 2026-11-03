@@ -1031,7 +1031,7 @@ html.kb .tabbar { display: none; }
   // Phase 5 texts: reminders that never close a task, the closing question, check-in, "¿Cómo te fue?" and a new plan.
   const P5 = {
     es: { snoozeDots: "Posponer…", snoozeTitle: "¿Cuándo te aviso otra vez?", in10: "En 10 min", in30: "En 30 min", in60: "En 1 hora", in120: "En 2 horas", tomorrowAt: "Mañana a las {t}",
-      goNow: "Voy ahora", goMsg: "👍 Vamos. En 10 min te pregunto si ya está.", startBtn: "▶ Empezar", startedMsg: "▶ {t}: en curso. Te pregunto al terminar.",
+      goNow: "Voy ahora", goMsg: "👍 Vamos. En 10 min te pregunto si ya está.", startBtn: "▶ Empezar", startEarly: "▶ Empezar temprano", startedMsg: "▶ {t}: en curso. Te pregunto al terminar.",
       notNowBtn: "Ahora no", newTimeTitle: "¿A qué hora lo haces?", otherTime: "Otra hora", setTime: "Poner esa hora", movedTo: "↪️ {t}: {w}",
       skipToday: "Saltar hoy", skippedMsg: "{t}: saltada hoy",
       askInstant: "¿Ya hiciste “{t}”?", askTimed: "¿Ya terminaste “{t}”?", yesDefault: "Ya está", finished: "✔ Ya terminé", half: "A medias", more: "Sigo en eso · +15",
@@ -1042,7 +1042,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Insistir hasta que confirme", critOff: "🔕 Dejar de insistir", critOnMsg: "🔔 Te insistiré con {t} hasta que me confirmes",
       confirmTitle: "Por confirmar", confirmEmpty: "Nada por confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver la tarea", weekClosed: "cerradas en los últimos 7 días", weekGood: "😊 Salieron bien: {g}" },
     en: { snoozeDots: "Snooze…", snoozeTitle: "When should I remind you again?", in10: "In 10 min", in30: "In 30 min", in60: "In 1 hour", in120: "In 2 hours", tomorrowAt: "Tomorrow at {t}",
-      goNow: "On my way", goMsg: "👍 Go for it. I'll ask you in 10 min if it's done.", startBtn: "▶ Start", startedMsg: "▶ {t}: in progress. I'll ask when the time is up.",
+      goNow: "On my way", goMsg: "👍 Go for it. I'll ask you in 10 min if it's done.", startBtn: "▶ Start", startEarly: "▶ Start early", startedMsg: "▶ {t}: in progress. I'll ask when the time is up.",
       notNowBtn: "Not now", newTimeTitle: "What time will you do it?", otherTime: "Another time", setTime: "Set that time", movedTo: "↪️ {t}: {w}",
       skipToday: "Skip today", skippedMsg: "{t}: skipped today",
       askInstant: "Did you do “{t}”?", askTimed: "Have you finished “{t}”?", yesDefault: "Done it", finished: "✔ I'm done", half: "Halfway", more: "Still on it · +15",
@@ -1053,7 +1053,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Keep asking until I confirm", critOff: "🔕 Stop insisting", critOnMsg: "🔔 I'll keep asking about {t} until you confirm",
       confirmTitle: "To confirm", confirmEmpty: "Nothing to confirm 🎉", reopen: "↩ Reopen", seeTask: "See the task", weekClosed: "closed in the last 7 days", weekGood: "😊 Went well: {g}" },
     pt: { snoozeDots: "Adiar…", snoozeTitle: "Quando te aviso de novo?", in10: "Em 10 min", in30: "Em 30 min", in60: "Em 1 hora", in120: "Em 2 horas", tomorrowAt: "Amanhã às {t}",
-      goNow: "Vou agora", goMsg: "👍 Bora. Em 10 min te pergunto se já foi.", startBtn: "▶ Começar", startedMsg: "▶ {t}: em andamento. Te pergunto quando acabar o tempo.",
+      goNow: "Vou agora", goMsg: "👍 Bora. Em 10 min te pergunto se já foi.", startBtn: "▶ Começar", startEarly: "▶ Começar mais cedo", startedMsg: "▶ {t}: em andamento. Te pergunto quando acabar o tempo.",
       notNowBtn: "Agora não", newTimeTitle: "Que horas você faz?", otherTime: "Outro horário", setTime: "Usar esse horário", movedTo: "↪️ {t}: {w}",
       skipToday: "Pular hoje", skippedMsg: "{t}: pulada hoje",
       askInstant: "Você já fez “{t}”?", askTimed: "Você já terminou “{t}”?", yesDefault: "Já fiz", finished: "✔ Terminei", half: "Pela metade", more: "Ainda fazendo · +15",
@@ -1064,7 +1064,7 @@ html.kb .tabbar { display: none; }
       critOn: "🔔 Insistir até eu confirmar", critOff: "🔕 Parar de insistir", critOnMsg: "🔔 Vou insistir com {t} até você confirmar",
       confirmTitle: "Para confirmar", confirmEmpty: "Nada para confirmar 🎉", reopen: "↩ Reabrir", seeTask: "Ver a tarefa", weekClosed: "fechadas nos últimos 7 dias", weekGood: "😊 Deram certo: {g}" },
     fr: { snoozeDots: "Reporter…", snoozeTitle: "Quand est-ce que je te le rappelle ?", in10: "Dans 10 min", in30: "Dans 30 min", in60: "Dans 1 heure", in120: "Dans 2 heures", tomorrowAt: "Demain à {t}",
-      goNow: "J'y vais", goMsg: "👍 Vas-y. Dans 10 min je te demande si c'est fait.", startBtn: "▶ Commencer", startedMsg: "▶ {t} : en cours. Je te demande à la fin.",
+      goNow: "J'y vais", goMsg: "👍 Vas-y. Dans 10 min je te demande si c'est fait.", startBtn: "▶ Commencer", startEarly: "▶ Commencer en avance", startedMsg: "▶ {t} : en cours. Je te demande à la fin.",
       notNowBtn: "Pas maintenant", newTimeTitle: "À quelle heure tu le fais ?", otherTime: "Une autre heure", setTime: "Mettre cette heure", movedTo: "↪️ {t} : {w}",
       skipToday: "Sauter aujourd'hui", skippedMsg: "{t} : sautée aujourd'hui",
       askInstant: "Tu as fait “{t}” ?", askTimed: "Tu as fini “{t}” ?", yesDefault: "C'est fait", finished: "✔ J'ai fini", half: "À moitié", more: "J'y suis encore · +15",
@@ -1186,7 +1186,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.10.0";
+  const VERSION = "0.10.1";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1654,7 +1654,7 @@ html.kb .tabbar { display: none; }
         real && s ? el("button", { class: "danger", onclick: then(() => delSeries(t)) }, tr("delSeries")) : null)),
       // Completing is its own big, explicit button; closing is the ✕.
       // A timed task can be started from here too; the check-in comes when its time is up.
-      real && canStart(t) ? el("button", { class: "btn", onclick: then(() => answer(t, "start")) }, tr("startBtn")) : null,
+      real && canStart(t) ? el("button", { class: "btn", onclick: then(() => answer(t, "start")) }, startLabel(t)) : null,
       real ? el("button", { class: "btn primary huge", onclick: () => { const cur = state.tasks.find((x) => x.id === t.id) || t; closeSheet(); answer(cur, F.closed(cur) ? "reopen" : "yes"); } }, tr(t.done ? "markUndoneMain" : F.closed(t) ? "reopen" : "markDoneMain")) : null,
       real ? el("div", { class: "row" }, el("button", { class: "btn", style: "flex:1", onclick: () => openEdit(t) }, "✏️ " + tr("edit"))) : null));
   }
@@ -1830,7 +1830,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       timed
         ? el("div", { class: "qa" },
-          el("button", { class: "big", onclick: then(() => answer(t, "start")) }, tr("startBtn")),
+          el("button", { class: "big", onclick: then(() => answer(t, "start")) }, startLabel(t)),
           el("button", { onclick: then(() => openNotNow(t)) }, tr("notNowBtn")),
           el("button", { onclick: then(() => answer(t, "skip")) }, tr("skipToday")))
         : el("div", { class: "qa" },
@@ -1919,6 +1919,9 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
   }
   // A timed task of today (or one with no reminder yet) can be started while it is not running or closed.
+  // Before its time it says "Empezar temprano" (it starts now and the check-in comes when its duration is up from now);
+  // at or after its time, "Empezar".
+  const startLabel = (t) => tr(Date.now() < at(t.date, t.time).getTime() ? "startEarly" : "startBtn");
   const canStart = (t) => !t.example && !t.anytime && F.timed(t) && t.date === ymd(new Date()) && ["upcoming", "due"].includes(F.phase(t, Date.now()));
   // Every answer goes through here (in the app or from a notification that could not reach the server).
   // A yes closes it with the real time it took; "¿Cómo te fue?" follows for timed tasks and calls; "No se hizo" asks for a new plan.

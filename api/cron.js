@@ -60,7 +60,8 @@ async function remind(sb, owner, items) {
   // Posponer and Ahora no open a small choice inside the installed app; the others work in the background.
   const btn = (k, title) => ({ action: k, title: title || tr("a_" + k) });
   const sign = (id) => ({ act: { o: owner, s: actSig(owner, id) } });
-  const remindBtns = (t) => (F.timed(t) ? [btn("start"), btn("notnow")] : [btn("snooze"), btn("go")]);
+  // Before the task's time, "▶ Empezar temprano": it starts now and the check-in comes when its duration is up from now.
+  const remindBtns = (t) => (F.timed(t) ? [btn("start", now < Date.parse(t.start) ? tr("a_startEarly") : null), btn("notnow")] : [btn("snooze"), btn("go")]);
   const askBtns = (t) => (F.timed(t) ? [btn("finished"), ...((Number(t.ext) || 0) < F.MAX_EXT ? [btn("more")] : [])] : [btn("yes", t.yes), btn("notyet")]);
   const question = (t) => (F.timed(t) ? tr("askTimed", { x: t.title }) : t.q || tr("askInstant", { x: t.title }));
   const asks = []; // closing questions due now: grouped if there are several

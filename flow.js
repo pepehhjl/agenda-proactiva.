@@ -46,8 +46,10 @@
     if (closed(t)) return "closed";
     if (t.anytime || !t.start) return "open";
     const p = plan(t);
-    if (t.startedAt && timed(t) && now < p.runEnd) return "running";
-    if (now < p.remind) return "upcoming";
+    const started = !!(t.startedAt && timed(t));
+    if (started && now < p.runEnd) return "running";
+    // Started early ("Empezar temprano") and already over before its scheduled time: its check-in is due, not "upcoming".
+    if (now < p.remind && !started) return "upcoming";
     if (timed(t) ? !t.startedAt && now < p.ask : now < p.ask) return "due";
     return now < p.until ? "asking" : "unconfirmed";
   }
