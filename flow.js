@@ -25,12 +25,37 @@
   const asksHow = (t) => timed(t) || t.type === "call";
   const good = (k) => k === "good" || k === "solved";
 
+  // Notification level (Ajustes > Avisos, and optionally per task). Summaries, birthdays and the test push are outside it.
+  // - low  ("Solo lo esencial"): one reminder 5 min before; no closing question by push (closed inside the app).
+  // - mid  (default): one reminder 10 min before + one closing question, no repeat on silence.
+  // - high ("Que no se me pase nada"): 60/30/10 before, one at its time, the question and one repeat on silence (0.10.0).
+  // "Insistir hasta que confirme" (t.critical) works above the level: it always asks and keeps asking.
+  const LEVELS = ["low", "mid", "high"];
+  const LEADS = { low: [5], mid: [10], high: [60, 30, 10] };
+  // Accounts from before the levels: the level comes from the warnings they had (all three by default → high;
+  // only the 10-min one → mid; none → low). New accounts are saved as mid when they first open the app.
+  function fromRemind(r) {
+    if (!Array.isArray(r)) return "high";
+    if (!r.length) return "low";
+    return r.some((x) => Number(x) > 10) ? "high" : "mid";
+  }
+  const levelOf = (s) => (s && LEVELS.includes(s.level) ? s.level : fromRemind(s && s.remind));
+  const levelFor = (t, s) => (t && LEVELS.includes(t.level) ? t.level : levelOf(s));
+  // Which pushes a task gets at a level: leads (minutes before), at (the one at its exact time), ask (closing question),
+  // again (a repeat when there is no answer).
+  function pushes(t, lv) {
+    const c = !!(t && t.critical);
+    return { leads: LEADS[lv] || LEADS.mid, at: lv === "high", ask: lv !== "low" || c, again: lv === "high" || c };
+  }
+
   // The reminder's time: the task's time, or the later postponed one.
   function anchor(t) { const s = ms(t.start), z = ms(t.snooze); return z > s ? z : s; }
   // When each notification is due (ask: the question or check-in, ask2: the one repeat) and when silence
   // turns into "Sin confirmar" (until). runEnd: when a started task is expected to finish.
-  function plan(t) {
-    const a = anchor(t), again = ms(t.again), ext = Number(t.ext) || 0;
+  // lv: the task's level; below "high" a timed check-in with no answer is not repeated (only when the person asked
+  // for it with "Responder luego" or "Sigo en eso").
+  function plan(t, lv) {
+    const a = anchor(t), again = ms(t.again), ext = Number(t.ext) || 0, rep = !lv || pushes(t, lv).again;
     if (!timed(t)) {
       const ask = a + ASK_AFTER * MIN, ask2 = again > ask ? again : NaN;
       return { remind: a, ask, ask2, until: (ask2 || ask) + SILENT * MIN, runEnd: NaN };
@@ -38,14 +63,14 @@
     const base = ms(t.startedAt) || a, end = base + (Number(t.dur) || 30) * MIN, runEnd = end + ext * EXTRA * MIN;
     // After "Sigo en eso", the next question comes when the extra time is over (the first check-in is already used).
     const ask = ext ? NaN : end;
-    const ask2 = ext ? Math.max(runEnd, again || 0) : again > end ? again : end + AGAIN * MIN;
-    return { remind: a, ask, ask2, until: ask2 + SILENT * MIN, runEnd };
+    const ask2 = ext ? Math.max(runEnd, again || 0) : again > end ? again : rep ? end + AGAIN * MIN : NaN;
+    return { remind: a, ask, ask2, until: (ask2 || ask) + SILENT * MIN, runEnd };
   }
   // closed | open (no time) | upcoming | running | due (reminded, not asked yet) | asking | unconfirmed
-  function phase(t, now) {
+  function phase(t, now, lv) {
     if (closed(t)) return "closed";
     if (t.anytime || !t.start) return "open";
-    const p = plan(t);
+    const p = plan(t, lv);
     const started = !!(t.startedAt && timed(t));
     if (started && now < p.runEnd) return "running";
     // Started early ("Empezar temprano") and already over before its scheduled time: its check-in is due, not "upcoming".
@@ -80,5 +105,5 @@
   }
   // A new time or day starts the cycle again.
   const fresh = (t) => ({ ...t, done: false, close: null, snooze: null, startedAt: null, again: null, ext: 0, openSeen: false });
-  g.PendiFlow = { MIN, TIMED, ASK_AFTER, AGAIN, EXTRA, MAX_EXT, SILENT, WINDOW, timed, closed, outcomes, asksHow, good, anchor, plan, phase, apply, fresh };
+  g.PendiFlow = { LEVELS, LEADS, fromRemind, levelOf, levelFor, pushes, MIN, TIMED, ASK_AFTER, AGAIN, EXTRA, MAX_EXT, SILENT, WINDOW, timed, closed, outcomes, asksHow, good, anchor, plan, phase, apply, fresh };
 })(typeof self !== "undefined" ? self : globalThis);
