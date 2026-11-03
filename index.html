@@ -374,7 +374,7 @@ h1 { font-size: 46px; }
 #sheet:not([hidden]) ~ .snacks { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
 .snacks { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; width: min(420px, calc(100vw - 24px)); z-index: 62; pointer-events: none; }
 .snack { pointer-events: auto; position: relative; overflow: hidden; display: flex; align-items: center; gap: 12px; padding: 12px 12px 14px 16px; border-radius: 18px; background: var(--cell); color: var(--ink); box-shadow: var(--shadow); touch-action: none; transition: transform .2s, opacity .2s; }
-.snack b { flex: 1; font-size: 15px; line-height: 1.3; }
+.snack b { flex: 1; font-size: 15px; line-height: 1.3; white-space: pre-line; }
 .snack .undo { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 8px 16px; font-weight: 800; font-size: 14px; cursor: pointer; flex: none; }
 .snack .life { position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: var(--accent); transform-origin: left; animation: life var(--life, 6s) linear forwards; }
 .snack.hold .life { animation-play-state: paused; }
@@ -954,6 +954,39 @@ html.kb .tabbar { display: none; }
     restoreConfirm: "J'ajoute les {n} tâches et anniversaires de cette copie ? Ce que tu as déjà reste.", restored: "C'est fait : {n} éléments restaurés", restoreBad: "Ce fichier n'est pas une copie de Pendi",
     offlineNote: "Pas d'internet : je garde tout et je l'envoie au retour", backOnline: "Connexion revenue : tout est à jour",
   });
+  // Phase 2 texts: what was understood when adding, and the test reminder that proves notifications reach this phone.
+  // Menu paths stay in English on purpose (phones are often set to English).
+  const P2 = {
+    es: { noTimeLower: "sin hora", planHint: "Esto entendí. Toca una para quitarla.", confirmN: "✔ Agregar {n}", confirm1: "✔ Agregar", readingShare: "Leyendo lo que compartiste...",
+      probeSending: "Te estoy mandando un aviso de prueba...", probeWait: "Te mandé un aviso de prueba. Cuando llegue, tócalo.", probeWaitSub: "Así sé que los avisos llegan de verdad a este teléfono.",
+      probeOk: "✅ ¡Llegó! Tus avisos funcionan en este teléfono.", probeMiss: "¿No llegó? Revisa esto:", probeDenied: "Los avisos de Pendi están bloqueados. Actívalos así:",
+      probeAndroid1: "Quita el ahorro de batería para Pendi:", probeAndroid2: "Activa «Permitir notificaciones»:", probeAndroidNote: "Si Pendi no sale en la lista, busca Chrome y haz lo mismo.",
+      probeIos: "Activa «Allow Notifications» en:", probeOther: "Revisa que este navegador tenga permiso para mostrar notificaciones.",
+      probeInstall: "En iPhone los avisos solo funcionan con Pendi en la pantalla de inicio: toca Compartir ⬆️ > Agregar a pantalla de inicio y ábrela desde su ícono.",
+      probeResend: "Reenviar aviso ({n})", probeLater: "Lo reviso luego", pushUnconfirmed: "⚠️ Avisos sin confirmar", pushUnconfirmedText: "El aviso de prueba nunca se tocó en este teléfono. Manda uno y tócalo cuando llegue." },
+    en: { noTimeLower: "no time", planHint: "Here's what I understood. Tap one to leave it out.", confirmN: "✔ Add {n}", confirm1: "✔ Add", readingShare: "Reading what you shared...",
+      probeSending: "Sending you a test reminder...", probeWait: "I sent you a test reminder. When it arrives, tap it.", probeWaitSub: "That way I know reminders really reach this phone.",
+      probeOk: "✅ It arrived! Your reminders work on this phone.", probeMiss: "Didn't arrive? Check this:", probeDenied: "Pendi's notifications are blocked. Turn them on like this:",
+      probeAndroid1: "Turn off battery saving for Pendi:", probeAndroid2: "Turn on \"Allow notifications\":", probeAndroidNote: "If Pendi isn't in the list, find Chrome and do the same.",
+      probeIos: "Turn on \"Allow Notifications\" in:", probeOther: "Check that this browser is allowed to show notifications.",
+      probeInstall: "On iPhone, reminders only work with Pendi on the home screen: tap Share ⬆️ > Add to Home Screen and open it from its icon.",
+      probeResend: "Send again ({n})", probeLater: "I'll check later", pushUnconfirmed: "⚠️ Reminders not confirmed", pushUnconfirmedText: "The test reminder was never tapped on this phone. Send one and tap it when it arrives." },
+    pt: { noTimeLower: "sem hora", planHint: "Foi isto que entendi. Toque em uma para tirá-la.", confirmN: "✔ Adicionar {n}", confirm1: "✔ Adicionar", readingShare: "Lendo o que você compartilhou...",
+      probeSending: "Estou te mandando um aviso de teste...", probeWait: "Te mandei um aviso de teste. Quando chegar, toque nele.", probeWaitSub: "Assim eu sei que os avisos chegam de verdade neste celular.",
+      probeOk: "✅ Chegou! Seus avisos funcionam neste celular.", probeMiss: "Não chegou? Confira isto:", probeDenied: "Os avisos do Pendi estão bloqueados. Ative assim:",
+      probeAndroid1: "Tire a economia de bateria do Pendi:", probeAndroid2: "Ative «Permitir notificações»:", probeAndroidNote: "Se o Pendi não aparecer na lista, procure o Chrome e faça o mesmo.",
+      probeIos: "Ative «Allow Notifications» em:", probeOther: "Confira se este navegador tem permissão para mostrar notificações.",
+      probeInstall: "No iPhone, os avisos só funcionam com o Pendi na tela de início: toque em Compartilhar ⬆️ > Adicionar à Tela de Início e abra pelo ícone.",
+      probeResend: "Reenviar aviso ({n})", probeLater: "Vejo depois", pushUnconfirmed: "⚠️ Avisos sem confirmar", pushUnconfirmedText: "O aviso de teste nunca foi tocado neste celular. Mande um e toque nele quando chegar." },
+    fr: { noTimeLower: "sans heure", planHint: "Voilà ce que j'ai compris. Touche une tâche pour l'enlever.", confirmN: "✔ Ajouter {n}", confirm1: "✔ Ajouter", readingShare: "Je lis ce que tu as partagé...",
+      probeSending: "Je t'envoie un rappel de test...", probeWait: "Je t'ai envoyé un rappel de test. Quand il arrive, touche-le.", probeWaitSub: "Comme ça je sais que les rappels arrivent vraiment sur ce téléphone.",
+      probeOk: "✅ Il est arrivé ! Tes rappels marchent sur ce téléphone.", probeMiss: "Pas arrivé ? Vérifie ceci :", probeDenied: "Les notifications de Pendi sont bloquées. Active-les ainsi :",
+      probeAndroid1: "Enlève l'économie de batterie pour Pendi :", probeAndroid2: "Active « Autoriser les notifications » :", probeAndroidNote: "Si Pendi n'est pas dans la liste, cherche Chrome et fais pareil.",
+      probeIos: "Active « Allow Notifications » dans :", probeOther: "Vérifie que ce navigateur a le droit d'afficher des notifications.",
+      probeInstall: "Sur iPhone, les rappels ne marchent qu'avec Pendi sur l'écran d'accueil : touche Partager ⬆️ > Sur l'écran d'accueil et ouvre-la depuis son icône.",
+      probeResend: "Renvoyer ({n})", probeLater: "Je vérifierai plus tard", pushUnconfirmed: "⚠️ Rappels non confirmés", pushUnconfirmedText: "Le rappel de test n'a jamais été touché sur ce téléphone. Envoie-en un et touche-le quand il arrive." },
+  };
+  for (const k of Object.keys(P2)) Object.assign(I18N[k], P2[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1064,7 +1097,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.8.1";
+  const VERSION = "0.9.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1676,11 +1709,35 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     const repValue = () => (rep.value === "none" ? null : { freq: rep.value, days: rep.value === "weekly" ? picked : [] });
     const st = el("div", { class: "status", role: "status" });
     const go = el("button", { class: "btn primary" }, tr("add"));
+    // The confirmation reads back what was understood, one line per task: "✔ Dentista · mañana 10:00".
     const finish = (added) => {
       if (!added || !added.length) { st.className = "status err"; st.textContent = tr("nothingFound"); return; }
       closeSheet(); state.anchor = fromYmd(added[0].date); render();
-      notice(added.length === 1 ? `${icon(added[0])} ${added[0].title}: ${niceDate(added[0].date)}, ${added[0].anytime ? tr("anyTimeShort").toLowerCase() : clock(added[0].time)}` : tr("addedN", { n: added.length }),
-        () => { added.forEach((t) => (t.series ? delSeries(t) : remove(t, true))); render(); });
+      notice(added.map(readBack).join("\n"), () => { added.forEach((t) => (t.series ? delSeries(t) : remove(t, true))); render(); });
+    };
+    // Something shared from another app is read right away and shown as a proposal to confirm with one tap.
+    let plan = null, planFor = "";
+    const planBox = el("div", { style: "display:grid;gap:8px", hidden: true });
+    const dropPlan = () => { if (plan) { plan = null; paintPlan(); } };
+    // While a proposal is shown, the day, time, repeat and photo controls step aside: the proposal already has them.
+    function paintPlan() {
+      planBox.hidden = !plan;
+      form.querySelectorAll("[data-plan-hide]").forEach((n) => (n.hidden = !!plan));
+      if (!plan) { planBox.replaceChildren(); go.textContent = tr("add"); go.disabled = false; return; }
+      const n = plan.filter((p) => p.on).length;
+      planBox.replaceChildren(el("div", { class: "muted" }, tr("planHint")),
+        ...plan.map((p) => el("button", { type: "button", class: "chip", "aria-pressed": String(p.on), style: "justify-content:flex-start;text-align:left;white-space:normal;min-height:44px",
+          onclick: () => { p.on = !p.on; paintPlan(); } }, readBack(p.row))));
+      go.textContent = n > 1 ? tr("confirmN", { n }) : tr("confirm1");
+      go.disabled = !n;
+    }
+    const propose = async (image) => {
+      go.disabled = true; st.className = "status"; st.textContent = tr(image ? "readingPhoto" : "readingShare");
+      try {
+        const rows = await quickAdd(text.value.trim(), day.value, time.value, { image: image ? await shrink(image) : null, dry: true });
+        if (!rows.length) { st.className = "status err"; st.textContent = tr("nothingFound"); go.disabled = false; return; }
+        plan = rows.map((x) => ({ ...x, on: true })); planFor = text.value.trim(); st.textContent = ""; paintPlan();
+      } catch (err) { st.className = "status err"; st.textContent = errText(err); go.disabled = false; }
     };
     const fromPhoto = async (file) => {
       go.disabled = true; st.className = "status"; st.textContent = tr("readingPhoto");
@@ -1691,6 +1748,13 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     const photo = el("input", { type: "file", accept: "image/*", hidden: true, onchange: () => photo.files[0] && fromPhoto(photo.files[0]) });
     const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("add"), onsubmit: async (e) => {
         e.preventDefault();
+        // Adding while the mic is still listening finishes the recording first and uses what was said.
+        if (dictating) { const d = dictating; dictating = null; await d.stop(); }
+        if (plan && text.value.trim() === planFor) {
+          go.disabled = true; const added = [];
+          for (const p of plan.filter((x) => x.on)) added.push(await addTask(p.row, p.rep));
+          return finish(added);
+        }
         const what = text.value.trim(); if (!what) { text.focus(); return; }
         const anytime = anyChip.getAttribute("aria-pressed") === "true";
         go.disabled = true; st.className = "status"; st.textContent = tr(time.value || anytime ? "adding" : "findingTime");
@@ -1699,17 +1763,26 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
         if (added) finish(added);
       } },
       el("div", { class: "grabber" }), el("h2", {}, tr("add")),
-      el("div", { class: "row", style: "flex-wrap:nowrap" }, mic, text),
-      seg,
-      el("label", { class: "row muted" }, tr("hourLbl"), time, anyChip),
-      el("div", { class: "muted", style: "margin-top:-8px" }, tr("suggestHint")),
-      el("label", { class: "row muted" }, tr("repeat"), rep), days,
-      el("div", { class: "row" }, el("button", { type: "button", class: "btn small", onclick: () => photo.click() }, tr("fromPhoto")), el("span", { class: "muted" }, tr("photoHint"))), photo,
+      el("div", { class: "row", style: "flex-wrap:nowrap" }, mic, text), planBox,
+      el("div", { "data-plan-hide": true, style: "display:contents" }, seg,
+        el("label", { class: "row muted" }, tr("hourLbl"), time, anyChip),
+        el("div", { class: "muted", style: "margin-top:-8px" }, tr("suggestHint")),
+        el("label", { class: "row muted" }, tr("repeat"), rep), days,
+        el("div", { class: "row" }, el("button", { type: "button", class: "btn small", onclick: () => photo.click() }, tr("fromPhoto")), el("span", { class: "muted" }, tr("photoHint"))), photo),
       st, el("div", { class: "row" }, go, el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
     showSheet(form); daySeg(seg, day);
-    if (opts.image) fromPhoto(opts.image); else text.focus();
+    // Changing the text, day or time after a proposal means the proposal no longer fits: start over.
+    text.addEventListener("input", dropPlan); day.addEventListener("change", dropPlan); time.addEventListener("change", dropPlan);
+    if (opts.propose && (opts.image || text.value.trim())) propose(opts.image);
+    else if (opts.image) fromPhoto(opts.image); else text.focus();
   }
-  // o: anytime (no time), rep (repeat), image (a photo to read).
+  // "✔ Dentista · mañana 10:00" (or "· sin hora"): what was understood for one task, in a few words.
+  function readBack(t) {
+    const d = fromYmd(t.date), today = new Date(), k = Math.round((d - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 864e5);
+    const day = k === 0 ? tr("todayLower") : k === 1 ? tr("tomorrow").toLowerCase() : fmt(d, { weekday: "long", day: "numeric", month: k > 6 || k < 0 ? "short" : undefined });
+    return `✔ ${t.title} · ${day} ${t.anytime || !t.time ? "· " + tr("noTimeLower") : clock(t.time)}`;
+  }
+  // o: anytime (no time), rep (repeat), image (a photo to read), dry (only return [{row, rep}], nothing is saved).
   async function quickAdd(what, date, time, o = {}) {
     let tareas = [];
     const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","repetir":null}]}
@@ -1725,7 +1798,8 @@ ${o.anytime ? "No pongas hora: deja \"hora\" vacía.\n" : time ? "" : "Si no dic
 ${agendaText(date, 2)}
 Texto: """${what.slice(0, 1000)}"""
 ${shape}`);
-      tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
+      // Some models answer with the bare list instead of {"tareas": [...]}; both are fine.
+      tareas = Array.isArray(res) ? res : Array.isArray(res && res.tareas) ? res.tareas : [];
     } catch (e) { if (o.image) throw e; }
     if (o.image && !tareas.length) return [];
     // Without the AI (no internet, for example) it is saved as written, without a time unless one was chosen.
@@ -1738,7 +1812,8 @@ ${shape}`);
         time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), done: false, created: Date.now() };
       // A repeat only when the person asked for one (the AI sometimes makes "take the pill" daily on its own).
       const asked = /\b(cada|tod[oa]s? l[oa]s|diari|semanal|mensual|every|daily|weekly|monthly|weekdays|chaque|tous les|toutes les|quotidien|hebdo|mensuel|todo dia|todos os|toda semana|di[aá]rio)/i.test(what);
-      out.push(await addTask(row, o.rep || (asked || o.image ? repFromAi(t.repetir) : null)));
+      const rep = o.rep || (asked || o.image ? repFromAi(t.repetir) : null);
+      out.push(o.dry ? { row, rep } : await addTask(row, rep));
     }
     return out;
   }
@@ -2220,9 +2295,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // Taps on a notification open the app with ?accion=snooze|done&id=... or ?tab=chat.
   function handleUrl() {
     const q = new URLSearchParams(location.search);
-    const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab"), share = q.get("share");
-    if (!accion && !tab && !share) return false;
+    const accion = q.get("accion"), id = q.get("id"), tab = q.get("tab"), share = q.get("share"), probe = q.get("probe");
+    if (!accion && !tab && !share && !probe) return false;
     history.replaceState(null, "", location.pathname);
+    if (probe) { caches.open("pendi-share").then((c) => c.delete("/probe-ok")).catch(() => {}); proved(probe); return ls.get("onboarded", false); }
     if (id) silence(id);
     if (accion === "snooze" && id) { snooze(id, 10); notice(tr("againIn", { x: tr("nMin", { n: 10 }) })); }
     else if (accion === "done" && id) markDone(id);
@@ -2239,7 +2315,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (img && "caches" in window) {
       try { const c = await caches.open("pendi-share"), r = await c.match("/shared-image"); if (r) { image = await r.blob(); await c.delete("/shared-image"); } } catch {}
     }
-    showTab("cal"); openAdd({ text: text.slice(0, 500), image });
+    showTab("cal"); openAdd({ text: text.slice(0, 500), image, propose: true });
   }
 
   // ---------- push notifications ----------
@@ -2247,8 +2323,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   function b64ToBytes(s) { s = s.replace(/[^A-Za-z0-9_-]/g, ""); const p = "=".repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(r, (c) => c.charCodeAt(0)); }
   // Guided steps: install on the home screen, open from the icon, allow notifications.
+  let pushRun = 0;
   async function renderPush() {
-    const box = $("pushBox"); box.replaceChildren();
+    const box = $("pushBox"), run = ++pushRun; box.replaceChildren();
     const st = state.status;
     if (!st.push || !st.db) { box.append(el("b", {}, tr("pushClosed")), el("div", { class: "muted" }, tr("pushNotReady"))); return; }
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -2256,18 +2333,25 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     }
     const reg = "serviceWorker" in navigator && !(isIOS && !standalone) ? await navigator.serviceWorker.ready : null;
     const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
+    if (run !== pushRun) return; // a newer paint is on its way
     const status = el("div", { class: "status" });
+    // Until a test reminder is tapped on this phone, Ajustes says so, and the test button waits for that tap.
+    const unproven = (proof() || {}).ok === false;
+    const probeBox = el("div", { style: "display:grid;gap:10px" });
+    const runProbe = () => probeFlow(probeBox, { ask: true, onDone: () => { notice(tr("probeOk")); renderPush(); } });
     if (sub && Notification.permission === "granted") {
-      box.append(el("b", {}, tr("pushOn")), el("div", { class: "muted" }, tr("pushOnText")),
-        el("button", { class: "btn small", style: "justify-self:start", onclick: async () => { status.textContent = tr("sending"); try { await call("/api/subscribe", { sub: sub.toJSON(), test: true, lang }); status.textContent = tr("checkNotifs"); } catch (e) { status.textContent = errText(e); } } }, tr("sendTest")), status);
+      box.append(el("b", {}, tr(unproven ? "pushUnconfirmed" : "pushOn")), el("div", { class: "muted" }, tr(unproven ? "pushUnconfirmedText" : "pushOnText")),
+        el("button", { class: "btn small", style: "justify-self:start", onclick: unproven ? runProbe : async () => { status.textContent = tr("sending"); try { await call("/api/subscribe", { sub: sub.toJSON(), test: true, lang }); status.textContent = tr("checkNotifs"); } catch (e) { status.textContent = errText(e); } } }, tr("sendTest")), status, probeBox);
       return;
     }
+    if (unproven) box.append(el("b", {}, tr("pushUnconfirmed")), el("div", { class: "muted" }, tr("pushUnconfirmedText")));
     const needInstall = isIOS && !standalone;
     const step = (state, title, text, extra) => el("div", { class: "step " + state }, el("span", { class: "n" }, state === "ok" ? "✓" : ""), el("div", {}, el("b", {}, title), text ? el("p", {}, text) : null, extra || null));
     const allow = el("button", { class: "btn primary small", style: "margin-top:8px", onclick: async () => {
       status.textContent = tr("activating");
       try {
         if ((await Notification.requestPermission()) !== "granted") { status.textContent = tr("noPermission"); return; }
+        if (unproven) { status.textContent = ""; box.append(probeBox); return runProbe(); }
         const s = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(st.vapidPublicKey) });
         await call("/api/subscribe", { sub: s.toJSON(), test: true, lang });
         renderPush();
@@ -2280,6 +2364,68 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
         step(needInstall ? "" : "ok", tr("step2"), needInstall ? tr("step2Text") : null),
         step(needInstall ? "" : "now", tr("step3"), denied ? tr("step3Denied") : needInstall ? null : tr("step3Text"), needInstall || denied ? null : allow)),
       status);
+  }
+
+  // ---------- proof that reminders reach this phone ----------
+  // pushProof (this device only): null = never checked, {ok:false} = the test reminder was never tapped, {ok:true} = it was.
+  const proof = () => ls.get("pushProof", null);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  let probeLive = null; // the flow waiting for a tap: { ids, ok }
+  // A tap on the test reminder (seen through the service worker's message, the ?probe= address or its cache).
+  function proved(id) {
+    if (!id || !ls.get("probeIds", []).includes(id)) return false;
+    ls.set("pushProof", { ok: true, at: Date.now() }); ls.set("onboarded", true);
+    if (probeLive) { const p = probeLive; probeLive = null; p.ok(); } else { notice(tr("probeOk")); renderPush(); }
+    return true;
+  }
+  async function probeCache() {
+    try { const c = await caches.open("pendi-share"), r = await c.match("/probe-ok"); if (r) { await c.delete("/probe-ok"); proved(await r.text()); } } catch {}
+  }
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => { if (e.data && e.data.probe) { caches.open("pendi-share").then((c) => c.delete("/probe-ok")).catch(() => {}); proved(e.data.probe); } });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) probeCache(); });
+  // This phone's subscription, asking for permission when `ask`. Throws { probe: "install" | "denied" | "browser" | "server" }.
+  async function pushSub(ask) {
+    if (isIOS && !standalone) throw { probe: "install" };
+    if (!state.status.push || !state.status.db) throw { probe: "server" };
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) throw { probe: "browser" };
+    if (Notification.permission !== "granted" && (!ask || (await Notification.requestPermission()) !== "granted")) throw { probe: "denied" };
+    const reg = await navigator.serviceWorker.ready;
+    return (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(state.status.vapidPublicKey) }));
+  }
+  // Sends a real test reminder to this phone and waits for it to be tapped. After 30 s without a tap: a short rescue
+  // guide for this kind of phone and "Reenviar" (2 times at most). later: shows "Lo reviso luego" with that action.
+  function probeFlow(box, { ask, onDone, later }) {
+    let resends = 2, timer = null;
+    const laterBtn = later ? el("button", { class: "link", onclick: () => { stop(); later(); } }, tr("probeLater")) : null;
+    const stop = () => { clearTimeout(timer); probeLive = null; };
+    const path = (x) => el("div", { style: "font-weight:800;font-family:ui-monospace,monospace;font-size:14px;overflow-wrap:anywhere" }, x);
+    const guide = () => isIOS ? [el("div", {}, tr("probeIos")), path("Settings > Notifications > Pendi")]
+      : isAndroid ? [el("div", {}, tr("probeAndroid1")), path("Settings > Apps > Pendi > Battery > Unrestricted"),
+          el("div", {}, tr("probeAndroid2")), path("Settings > Apps > Pendi > Notifications"), el("div", { class: "muted" }, tr("probeAndroidNote"))]
+      : [el("div", {}, tr("probeOther"))];
+    const show = (...kids) => box.replaceChildren(el("div", { style: "display:grid;gap:10px;text-align:left;justify-items:start" }, ...kids.filter(Boolean)));
+    const rescue = (title) => show(el("b", {}, title), ...guide(),
+      resends > 0 ? el("button", { class: "btn primary small", onclick: () => { resends--; send(); } }, tr("probeResend", { n: resends })) : null, laterBtn);
+    async function send() {
+      stop(); show(el("div", { class: "muted" }, tr("probeSending")));
+      let sub;
+      try { sub = await pushSub(ask); }
+      catch (e) {
+        const k = e && e.probe;
+        if (k === "install") return show(el("div", {}, tr("probeInstall")), laterBtn);
+        if (k === "server") return show(el("div", {}, tr("pushNotReady")), laterBtn);
+        if (k === "denied") return rescue(tr("probeDenied"));
+        return show(el("div", {}, k === "browser" ? tr("pushNoBrowser") : errText(e)), laterBtn);
+      }
+      const id = uid("p");
+      ls.set("probeIds", [...ls.get("probeIds", []), id].slice(-10));
+      try { await call("/api/subscribe", { sub: sub.toJSON(), probe: id, lang }); }
+      catch (e) { return rescue(errText(e)); }
+      probeLive = { ok: () => { clearTimeout(timer); show(el("b", {}, tr("probeOk"))); onDone && onDone(); } };
+      show(el("b", {}, "📲 " + tr("probeWait")), el("div", { class: "muted" }, tr("probeWaitSub")), laterBtn);
+      timer = setTimeout(() => { if (probeLive) rescue(tr("probeMiss")); }, 30000);
+    }
+    send();
   }
 
   // ---------- invites ----------
@@ -2388,7 +2534,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function onboarding() {
     const box = $("onboard"); let i = 0;
     const finish = (tab) => { ls.set("onboarded", true); box.hidden = true; box.replaceChildren(); if (tab) showTab(tab); };
-    const pager = () => el("div", { class: "pager" }, [0, 1, 2].map((j) => el("i", { class: j === i ? "on" : "" })));
+    const pager = () => el("div", { class: "pager" }, [0, 1, 2].map((j) => el("i", { class: j === Math.min(i, 2) ? "on" : "" })));
     const slides = [
       () => [el("div", { class: "big" }, "👋"), el("h2", {}, tr("ob1Title")),
         el("p", {}, tr("ob1Text")),
@@ -2398,9 +2544,17 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
         el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 2; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
       () => [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")),
         el("p", {}, tr("ob3Text", { x: remindText() })),
-        el("button", { class: "btn primary", onclick: () => finish("settings") }, tr("enableNotifs")),
-        el("button", { class: "link", onclick: () => finish() }, tr("notNow"))],
+        el("button", { class: "btn primary", onclick: () => { i = 3; paint(); } }, tr("enableNotifs")),
+        el("button", { class: "link", onclick: later }, tr("probeLater"))],
+      // The welcome ends when a real test reminder is tapped on this phone. It can be skipped, and then Ajustes keeps
+      // saying the reminders are not confirmed.
+      () => {
+        const area = el("div", { style: "display:grid;gap:12px;width:100%" });
+        probeFlow(area, { ask: true, later, onDone: () => area.append(el("button", { class: "btn primary", style: "justify-self:center", onclick: () => finish() }, tr("start"))) });
+        return [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")), area];
+      },
     ];
+    function later() { ls.set("pushProof", { ok: false, at: Date.now() }); finish(); renderPush(); }
     const paint = () => box.replaceChildren(el("div", { class: "slide" }, ...slides[i](), pager()));
     box.hidden = false; paint();
   }
@@ -2518,6 +2672,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const fromUrl = handleUrl();
     if (bdayNudges() && !fromUrl) showTab("chat");
     scrollToNow(); checkReminders();
+    await probeCache();
     if (!ls.get("onboarded", false) && !fromUrl) onboarding();
   }
 
