@@ -4,7 +4,8 @@
 // instant tasks get the question 10 min later, timed ones a check-in when their time is up, each repeated once
 // at most; several questions at once go out as one grouped notification;
 // birthday notices 2 days before and on the day, at 9:00 in the user's time zone, and the morning, evening and
-// Sunday summaries at the times chosen in Ajustes > Resúmenes.
+// Sunday summaries at the times chosen in Ajustes > Resúmenes (or, with sleep hours in Ajustes > Tu rutina, 15 min after
+// waking up and 45 min before bed). In the 40 min before bed (the calm shoulder) no new non-critical push goes out.
 import { authed, deny, supa, pushReady, sendToAll, actSig } from "./_lib.js";
 import { texts } from "./_i18n.js";
 import "../flow.js";
@@ -74,6 +75,8 @@ async function remind(sb, owner, items) {
   const todayK = dayKey(0);
   const tasks = items.filter((r) => r.kind === "task").map((r) => r.data);
   const today = tasks.filter((t) => t.date === todayK), open = today.filter((t) => !F.closed(t));
+  // Calm shoulder (Tu rutina): the 40 minutes before going to bed.
+  const calm = F.inCalm(settings, todayK, hmNow);
 
   const due = []; // {keys, payload}
   for (const r of items) {
@@ -110,9 +113,12 @@ async function remind(sb, owner, items) {
     if (r.kind === "task" && !F.closed(t) && !t.startedAt && t.start && !t.anytime) {
       const mins = (Date.parse(t.start) - now) / 60000;
       if (mins <= 0 || mins > 60) continue;
-      const lv = lvOf(t), hit = F.pushes(t, lv).leads.filter((th) => mins <= th);
+      const lv = lvOf(t), leads = F.pushes(t, lv).leads, hit = leads.filter((th) => mins <= th);
       if (!hit.length) continue;
       const smallest = hit[hit.length - 1];
+      // In the calm shoulder the early warnings (60 and 30 min before) wait; only the task's last reminder goes out,
+      // and "Insistir hasta que confirme" is not held back.
+      if (calm && !t.critical && smallest !== leads[leads.length - 1]) continue;
       // Say the real time left (a task created 3 minutes ahead says "En 3 minutos", not "En 10").
       const left = Math.max(1, Math.round(mins));
       const label = left >= 55 ? tr("inHour") : tr("inMin", { n: left });
@@ -126,7 +132,7 @@ async function remind(sb, owner, items) {
     }
     if (r.kind === "bday" && t.month && t.day) {
       const lp = localParts(new Date(now), tz);
-      if (lp.h < 9) continue;
+      if (lp.h < 9 || calm) continue;
       const today = Date.UTC(lp.y, lp.m - 1, lp.d);
       let next = Date.UTC(lp.y, t.month - 1, t.day);
       if (next < today) next = Date.UTC(lp.y + 1, t.month - 1, t.day);
@@ -158,7 +164,8 @@ async function remind(sb, owner, items) {
   }
 
   // Summaries, once a day each, within two hours of the chosen time (so quiet hours only delay them).
-  const b = settings.brief || {};
+  // With sleep hours, the morning one comes 15 min after waking up and the evening one 45 min before bed.
+  const b = { ...(settings.brief || {}), ...(F.briefTimes(settings, todayK) || {}) };
   const within = (t) => hmNow >= t && hmNow < addMin(t, 120);
   const brief = (key, payload) => due.push({ check: key, keys: [key], payload: { tag: "brief", ...payload } });
   if (b.mOn !== false && within(b.m || "08:00")) {
