@@ -1097,7 +1097,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.9.0";
+  const VERSION = "0.9.1";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -2336,7 +2336,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (run !== pushRun) return; // a newer paint is on its way
     const status = el("div", { class: "status" });
     // Until a test reminder is tapped on this phone, Ajustes says so, and the test button waits for that tap.
-    const unproven = (proof() || {}).ok === false;
+    // Also for someone who finished the welcome before 0.9.0 (or skipped the test): never proven is not proven.
+    const unproven = ls.get("onboarded", false) && (proof() || {}).ok !== true;
     const probeBox = el("div", { style: "display:grid;gap:10px" });
     const runProbe = () => probeFlow(probeBox, { ask: true, onDone: () => { notice(tr("probeOk")); renderPush(); } });
     if (sub && Notification.permission === "granted") {
