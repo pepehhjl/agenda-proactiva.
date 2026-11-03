@@ -103,7 +103,62 @@
     }
     return t;
   }
+  // ---- The person's routine (Ajustes > Tu rutina, from Pendi's interview) ----
+  // SLEEP is a hard rule: Pendi never proposes a time inside it, warns once if the person picks one, and sends no new
+  // non-critical push in the 40 min before bedtime (the calm shoulder). WORK is a soft rule: Pendi proposes only light
+  // tasks (5 min or less) there and asks once if the person picks it for a longer one; it never blocks.
+  // Times are "HH:MM" in the person's own clock; days are "YYYY-MM-DD".
+  const CALM = 40; // minutes before bedtime with no new non-critical push
+  const LIGHT = 5; // a light task lasts 5 minutes or less
+  const LUNCH = 60; // the lunch break inside work hours
+  const toM = (s) => { const m = /^(\d{1,2}):(\d{2})$/.exec(s || ""); return m ? +m[1] * 60 + +m[2] : NaN; };
+  const dowOf = (k) => new Date(k + "T12:00:00Z").getUTCDay();
+  const dayAdd = (k, n) => new Date(Date.parse(k + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+  const okPair = (x) => x && !isNaN(toM(x.up)) && !isNaN(toM(x.bed)) && x.up !== x.bed;
+  const sleepOf = (s) => { const r = s && s.routine && s.routine.sleep; return okPair(r) ? r : null; };
+  const workOf = (s) => { const w = s && s.routine && s.routine.work; return w && w.kind !== "none" && !isNaN(toM(w.from)) && !isNaN(toM(w.to)) && w.from !== w.to ? w : null; };
+  const light = (t) => (Number(t && t.dur) || 30) <= LIGHT;
+  // The night that starts on day k: Friday and Saturday nights use the weekend hours, if the person gave them.
+  const nightOf = (r, k) => { const d = dowOf(k); return (d === 5 || d === 6) && okPair(r.we) ? r.we : r; };
+  // Sleep spans in minutes from day k's midnight: the night before (ends this morning) and tonight's.
+  // A bedtime earlier than the wake-up time (01:00 → 09:00) falls after midnight.
+  function sleepSpans(r, k) {
+    return [-1, 0].map((off) => {
+      const n = nightOf(r, dayAdd(k, off)), b = toM(n.bed), u = toM(n.up), base = off * 1440;
+      return b > u ? [base + b, base + 1440 + u] : [base + 1440 + b, base + 1440 + u];
+    });
+  }
+  const hit = (spans, m, len) => spans.some(([a, b]) => (len > 0 ? m < b && m + len > a : m >= a && m < b));
+  // Does a time (and, with len, the whole task) fall inside the sleep window?
+  function inSleep(s, k, hm, len) { const r = sleepOf(s), m = toM(hm); return !!r && !isNaN(m) && hit(sleepSpans(r, k), m, len || 0); }
+  // The calm shoulder: the 40 minutes before going to bed.
+  function inCalm(s, k, hm) { const r = sleepOf(s), m = toM(hm); return !!r && !isNaN(m) && hit(sleepSpans(r, k).map(([a]) => [a - CALM, a]), m, 0); }
+  // Work hours on a work day (minus lunch); a shift may end after midnight.
+  function inWork(s, k, hm, len) {
+    const w = workOf(s), m = toM(hm); if (!w || isNaN(m)) return false;
+    const days = Array.isArray(w.days) ? w.days : [1, 2, 3, 4, 5], spans = [];
+    for (const off of [-1, 0]) {
+      if (!days.includes(dowOf(dayAdd(k, off)))) continue;
+      const f = toM(w.from), t = toM(w.to), base = off * 1440, a = base + f, b = base + (f < t ? t : t + 1440), l = toM(w.lunch);
+      let L = isNaN(l) ? NaN : base + l; if (L < a) L += 1440;
+      if (L >= a && L < b) spans.push([a, L], [L + LUNCH, b]); else spans.push([a, b]);
+    }
+    return hit(spans.filter(([a, b]) => b > a), m, len || 0);
+  }
+  // Wake-up time on day k, and tonight's bedtime (it may be after midnight).
+  const wakeOf = (s, k) => { const r = sleepOf(s); return r ? nightOf(r, dayAdd(k, -1)).up : null; };
+  const bedOf = (s, k) => { const r = sleepOf(s); return r ? nightOf(r, k).bed : null; };
+  // Summaries anchored to sleep: the morning one 15 min after waking up, the evening one 45 min before bed (the start
+  // of the calm time). An evening time that would fall after midnight goes at 23:45. Without sleep hours: null.
+  function briefTimes(s, k) {
+    const r = sleepOf(s); if (!r) return null;
+    const hh = (x) => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0");
+    const n = nightOf(r, k), b = toM(n.bed), late = b <= toM(n.up);
+    let e = b - 45; if (late || e < 0) e = late && e >= 0 ? 23 * 60 + 45 : (e + 1440) % 1440;
+    return { m: hh(Math.min(23 * 60 + 59, toM(wakeOf(s, k)) + 15)), e: hh(e) };
+  }
+
   // A new time or day starts the cycle again.
   const fresh = (t) => ({ ...t, done: false, close: null, snooze: null, startedAt: null, again: null, ext: 0, openSeen: false });
-  g.PendiFlow = { LEVELS, LEADS, fromRemind, levelOf, levelFor, pushes, MIN, TIMED, ASK_AFTER, AGAIN, EXTRA, MAX_EXT, SILENT, WINDOW, timed, closed, outcomes, asksHow, good, anchor, plan, phase, apply, fresh };
+  g.PendiFlow = { CALM, LIGHT, toM, dayAdd, sleepOf, workOf, light, inSleep, inCalm, inWork, wakeOf, bedOf, briefTimes, LEVELS, LEADS, fromRemind, levelOf, levelFor, pushes, MIN, TIMED, ASK_AFTER, AGAIN, EXTRA, MAX_EXT, SILENT, WINDOW, timed, closed, outcomes, asksHow, good, anchor, plan, phase, apply, fresh };
 })(typeof self !== "undefined" ? self : globalThis);

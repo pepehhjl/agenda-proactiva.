@@ -284,6 +284,16 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .onboard .big { font-size: 64px; line-height: 1; }
 .onboard h2 { margin: 0; font-family: var(--display); font-size: 30px; letter-spacing: -0.02em; }
 .onboard p { margin: 0; color: var(--muted); font-size: 17px; }
+.onboard.iv { place-items: start center; overflow-y: auto; }
+.onboard.iv .slide { margin: auto 0; padding: 28px 0; }
+.onboard .slide .group { width: 100%; text-align: left; }
+.onboard .slide .chips { justify-content: center; } .onboard .slide .group .chips { justify-content: flex-start; }
+.onboard .slide .reward { color: var(--ink); font-size: 18px; line-height: 1.45; }
+.onboard .ivx { position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--fill); color: var(--ink); font-size: 17px; font-weight: 700; cursor: pointer; }
+.ivprog { width: 100%; display: grid; gap: 6px; justify-items: center; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.ivprog .bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
+.ivprog .bar i { height: 6px; border-radius: 999px; background: var(--fill); }
+.ivprog .bar i.on { background: var(--accent); }
 .pager { display: flex; gap: 6px; } .pager i { width: 7px; height: 7px; border-radius: 50%; background: var(--fill); } .pager i.on { background: var(--accent); }
 
 /* Pendi: ink outlines and offset "sticker" shadows by day; Penumbra cards (yellow top edge) by night. */
@@ -523,12 +533,21 @@ html.kb .tabbar { display: none; }
       <div class="pane" data-pane="settings" hidden>
         <h2 data-i18n="tabSettings"></h2>
         <div id="setupAlert"></div>
-        <h3 class="sub" data-i18n="youH"></h3>
-        <div class="group">
+        <h3 class="sub" data-i18n="routine"></h3>
+        <div class="group" id="routineGroup">
           <label style="display:grid;gap:8px"><span data-i18n="yourName"></span>
-            <input class="field" id="myName" autocomplete="given-name" maxlength="40" style="background:var(--fill)" data-i18n-ph="yourNamePh"></label>
+            <input class="field" id="myName" autocomplete="nickname" maxlength="40" style="background:var(--fill)" data-i18n-ph="yourNamePh"></label>
+          <div id="formBox" style="display:grid;gap:8px"></div>
+          <div id="workBox" style="display:grid;gap:10px"></div>
+          <div id="sleepBox" style="display:grid;gap:10px"></div>
+          <div id="forgetBox" style="display:grid;gap:8px"></div>
+          <label class="toggle"><span data-i18n="bestAt"></span>
+            <select id="energy"><option value="mañana" data-i18n="morning"></option><option value="tarde" data-i18n="afternoon"></option><option value="noche" data-i18n="night"></option></select>
+          </label>
+          <button class="link" id="rtRedo" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
         </div>
         <p class="foot" data-i18n="nameFoot"></p>
+        <p class="foot" data-i18n="rtFoot"></p>
         <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
@@ -543,18 +562,13 @@ html.kb .tabbar { display: none; }
           <button class="link" id="testToast" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
         </div>
         <p class="foot" data-i18n="quietFoot"></p>
-        <h3 class="sub" data-i18n="routine"></h3>
-        <div class="group">
-          <label class="toggle"><span data-i18n="bestAt"></span>
-            <select id="energy"><option value="mañana" data-i18n="morning"></option><option value="tarde" data-i18n="afternoon"></option><option value="noche" data-i18n="night"></option></select>
-          </label>
-        </div>
         <h3 class="sub" data-i18n="summaries"></h3>
         <div class="group">
           <label class="toggle"><span data-i18n="morningBrief"></span> <input type="checkbox" id="briefMOn"></label>
           <div class="toggle" id="briefMRow"><span><span data-i18n="atTime"></span> <input type="time" id="briefM" value="08:00"></span></div>
           <label class="toggle"><span data-i18n="eveningBrief"></span> <input type="checkbox" id="briefEOn"></label>
           <div class="toggle" id="briefERow"><span><span data-i18n="atTime"></span> <input type="time" id="briefE" value="21:00"></span></div>
+          <div class="muted" id="briefAnch" hidden></div>
           <label class="toggle"><span data-i18n="weeklyBrief"></span> <input type="checkbox" id="briefWOn"></label>
           <button class="link" id="seeWeek" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
         </div>
@@ -643,7 +657,7 @@ html.kb .tabbar { display: none; }
       addBday: "Agregar cumpleaños", bdIntro: "Te aviso 2 días antes y el mismo día, con ideas de regalo. También puedes decírmelo en el chat.", name: "Nombre",
       likesPh: "Gustos (opcional): café, anime, fútbol...", save: "Guardar", cancel: "Cancelar", bdayDate: "Fecha de cumpleaños", chooseBdayDate: "Elige la fecha del cumpleaños",
       setNotices: "Avisos", remindBefore: "Avisarme antes", quiet: "Horas de silencio", from: "De", to: "a", sound: "Sonido dentro de la app", previewNotice: "Ver cómo se ve un aviso",
-      quietFoot: "Durante las horas de silencio no te llega ningún aviso.", routine: "Mi rutina", bestAt: "Rindo mejor en la", morning: "mañana", afternoon: "tarde", night: "noche",
+      quietFoot: "Durante las horas de silencio no te llega ningún aviso.", routine: "Tu rutina", bestAt: "Rindo mejor en la", morning: "mañana", afternoon: "tarde", night: "noche",
       appearance: "Apariencia", theme: "Tema", system: "Como mi teléfono", light: "Claro", dark: "Oscuro", language: "Idioma",
       format: "Formato", clock: "Reloj", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Fechas", dmy: "27/10/2026 (día/mes)", mdy: "10/27/2026 (mes/día)",
       account: "Cuenta", logout: "Cerrar sesión en este dispositivo", version: "Versión", adminSuffix: " · administrador", adminOn: "Modo administrador activado", adminOff: "Modo administrador desactivado",
@@ -705,7 +719,7 @@ html.kb .tabbar { display: none; }
       addBday: "Add birthday", bdIntro: "I'll remind you 2 days before and on the day, with gift ideas. You can also tell me in the chat.", name: "Name",
       likesPh: "Likes (optional): coffee, anime, soccer...", save: "Save", cancel: "Cancel", bdayDate: "Birthday date", chooseBdayDate: "Choose the birthday date",
       setNotices: "Reminders", remindBefore: "Remind me before", quiet: "Quiet hours", from: "From", to: "to", sound: "Sound inside the app", previewNotice: "See what a reminder looks like",
-      quietFoot: "During quiet hours you won't get any reminders.", routine: "My routine", bestAt: "I work best in the", morning: "morning", afternoon: "afternoon", night: "evening",
+      quietFoot: "During quiet hours you won't get any reminders.", routine: "Your routine", bestAt: "I work best in the", morning: "morning", afternoon: "afternoon", night: "evening",
       appearance: "Appearance", theme: "Theme", system: "Same as my phone", light: "Light", dark: "Dark", language: "Language",
       format: "Format", clock: "Clock", clock12: "12-hour (3:52 PM)", clock24: "24-hour (15:52)", dates: "Dates", dmy: "27/10/2026 (day/month)", mdy: "10/27/2026 (month/day)",
       account: "Account", logout: "Sign out on this device", version: "Version", adminSuffix: " · admin", adminOn: "Admin mode on", adminOff: "Admin mode off",
@@ -767,7 +781,7 @@ html.kb .tabbar { display: none; }
       addBday: "Adicionar aniversário", bdIntro: "Eu aviso 2 dias antes e no próprio dia, com ideias de presente. Você também pode me contar no chat.", name: "Nome",
       likesPh: "Gostos (opcional): café, anime, futebol...", save: "Salvar", cancel: "Cancelar", bdayDate: "Data do aniversário", chooseBdayDate: "Escolha a data do aniversário",
       setNotices: "Avisos", remindBefore: "Me avisar antes", quiet: "Horário de silêncio", from: "Das", to: "às", sound: "Som dentro do app", previewNotice: "Ver como fica um aviso",
-      quietFoot: "Durante o horário de silêncio você não recebe nenhum aviso.", routine: "Minha rotina", bestAt: "Rendo melhor de", morning: "manhã", afternoon: "tarde", night: "noite",
+      quietFoot: "Durante o horário de silêncio você não recebe nenhum aviso.", routine: "Sua rotina", bestAt: "Rendo melhor de", morning: "manhã", afternoon: "tarde", night: "noite",
       appearance: "Aparência", theme: "Tema", system: "Igual ao meu celular", light: "Claro", dark: "Escuro", language: "Idioma",
       format: "Formato", clock: "Relógio", clock12: "12 horas (3:52 PM)", clock24: "24 horas (15:52)", dates: "Datas", dmy: "27/10/2026 (dia/mês)", mdy: "10/27/2026 (mês/dia)",
       account: "Conta", logout: "Sair neste dispositivo", version: "Versão", adminSuffix: " · administrador", adminOn: "Modo administrador ativado", adminOff: "Modo administrador desativado",
@@ -829,7 +843,7 @@ html.kb .tabbar { display: none; }
       addBday: "Ajouter un anniversaire", bdIntro: "Je te préviens 2 jours avant et le jour même, avec des idées de cadeau. Tu peux aussi me le dire dans le chat.", name: "Nom",
       likesPh: "Goûts (facultatif) : café, anime, foot...", save: "Enregistrer", cancel: "Annuler", bdayDate: "Date d'anniversaire", chooseBdayDate: "Choisis la date d'anniversaire",
       setNotices: "Rappels", remindBefore: "Me prévenir avant", quiet: "Heures calmes", from: "De", to: "à", sound: "Son dans l'appli", previewNotice: "Voir à quoi ressemble un rappel",
-      quietFoot: "Pendant les heures calmes, tu ne reçois aucun rappel.", routine: "Ma routine", bestAt: "Je suis plus efficace le", morning: "matin", afternoon: "après-midi", night: "soir",
+      quietFoot: "Pendant les heures calmes, tu ne reçois aucun rappel.", routine: "Ta routine", bestAt: "Je suis plus efficace le", morning: "matin", afternoon: "après-midi", night: "soir",
       appearance: "Apparence", theme: "Thème", system: "Comme mon téléphone", light: "Clair", dark: "Sombre", language: "Langue",
       format: "Format", clock: "Horloge", clock12: "12 heures (3:52 PM)", clock24: "24 heures (15:52)", dates: "Dates", dmy: "27/10/2026 (jour/mois)", mdy: "10/27/2026 (mois/jour)",
       account: "Compte", logout: "Se déconnecter sur cet appareil", version: "Version", adminSuffix: " · administrateur", adminOn: "Mode administrateur activé", adminOff: "Mode administrateur désactivé",
@@ -1024,19 +1038,19 @@ html.kb .tabbar { display: none; }
   const P3 = {
     es: { markDoneMain: "✔ Marcar como hecha", markUndoneMain: "↩ Marcar como no hecha", seeSteps: "Ver pasos", stepsProg: "{d}/{n} pasos", addStep: "Añadir", addStepPh: "Añadir un paso", delStep: "Borrar este paso",
       regenSteps: "🔄 Pedir otros pasos", stepsRegen: "🧩 Pasos nuevos", allStepsDone: "🧩 ¡Todos los pasos listos! ¿Marco «{t}» como hecha?",
-      youH: "Tú", yourName: "Tu nombre", yourNamePh: "Cómo quieres que te llame", nameFoot: "Pendi te llama así al hablarte. Si lo dejas vacío, te habla de forma neutra.", nameSaved: "Guardado",
+      youH: "Tú", yourName: "Cómo te llama Pendi", yourNamePh: "Cómo quieres que te llame", nameFoot: "Pendi te llama así al hablarte. Si lo dejas vacío, te habla de forma neutra.", nameSaved: "Guardado",
       obNameTitle: "¿Cómo quieres que te llame?", obNameText: "Es opcional. Si lo dejas vacío, te hablo de forma neutra.", next: "Seguir", skip: "Saltar" },
     en: { markDoneMain: "✔ Mark as done", markUndoneMain: "↩ Mark as not done", seeSteps: "See steps", stepsProg: "{d}/{n} steps", addStep: "Add", addStepPh: "Add a step", delStep: "Delete this step",
       regenSteps: "🔄 Get new steps", stepsRegen: "🧩 New steps", allStepsDone: "🧩 All steps done! Mark “{t}” as done?",
-      youH: "You", yourName: "Your name", yourNamePh: "What should I call you?", nameFoot: "Pendi uses it when talking to you. Leave it empty and it talks to you neutrally.", nameSaved: "Saved",
+      youH: "You", yourName: "What Pendi calls you", yourNamePh: "What should I call you?", nameFoot: "Pendi uses it when talking to you. Leave it empty and it talks to you neutrally.", nameSaved: "Saved",
       obNameTitle: "What should I call you?", obNameText: "It's optional. If you leave it empty, I'll talk to you neutrally.", next: "Next", skip: "Skip" },
     pt: { markDoneMain: "✔ Marcar como feita", markUndoneMain: "↩ Marcar como não feita", seeSteps: "Ver passos", stepsProg: "{d}/{n} passos", addStep: "Adicionar", addStepPh: "Adicionar um passo", delStep: "Apagar este passo",
       regenSteps: "🔄 Pedir outros passos", stepsRegen: "🧩 Passos novos", allStepsDone: "🧩 Todos os passos prontos! Marco “{t}” como feita?",
-      youH: "Você", yourName: "Seu nome", yourNamePh: "Como você quer que eu te chame", nameFoot: "A Pendi usa esse nome ao falar com você. Se ficar vazio, ela fala de forma neutra.", nameSaved: "Salvo",
+      youH: "Você", yourName: "Como a Pendi te chama", yourNamePh: "Como você quer que eu te chame", nameFoot: "A Pendi usa esse nome ao falar com você. Se ficar vazio, ela fala de forma neutra.", nameSaved: "Salvo",
       obNameTitle: "Como você quer que eu te chame?", obNameText: "É opcional. Se deixar vazio, eu falo de forma neutra.", next: "Seguir", skip: "Pular" },
     fr: { markDoneMain: "✔ Marquer comme faite", markUndoneMain: "↩ Marquer comme non faite", seeSteps: "Voir les étapes", stepsProg: "{d}/{n} étapes", addStep: "Ajouter", addStepPh: "Ajouter une étape", delStep: "Supprimer cette étape",
       regenSteps: "🔄 Proposer d'autres étapes", stepsRegen: "🧩 Nouvelles étapes", allStepsDone: "🧩 Toutes les étapes sont faites ! Je marque « {t} » comme faite ?",
-      youH: "Toi", yourName: "Ton prénom", yourNamePh: "Comment veux-tu que je t'appelle", nameFoot: "Pendi l'utilise pour te parler. Si tu le laisses vide, elle te parle de façon neutre.", nameSaved: "Enregistré",
+      youH: "Toi", yourName: "Comment Pendi t'appelle", yourNamePh: "Comment veux-tu que je t'appelle", nameFoot: "Pendi l'utilise pour te parler. Si tu le laisses vide, elle te parle de façon neutre.", nameSaved: "Enregistré",
       obNameTitle: "Comment veux-tu que je t'appelle ?", obNameText: "C'est facultatif. Si tu le laisses vide, je te parle de façon neutre.", next: "Suivant", skip: "Passer" },
   };
   for (const k of Object.keys(P3)) Object.assign(I18N[k], P3[k]);
@@ -1140,6 +1154,73 @@ html.kb .tabbar { display: none; }
     fr: { barRun: "⏱ EN COURS", barLeft: "encore {x}", barOver: "terminée il y a {x}", barNext: "PROCHAINE", barIn: "dans {x}", barTomorrow: "demain {t}", barNone: "Aucune tâche à venir" },
   };
   for (const k of Object.keys(P7)) Object.assign(I18N[k], P7[k]);
+  // Pendi's interview ("Tu rutina"): nickname and how Pendi talks to the person, work, sleep and what they forget.
+  const P8 = {
+    es: { ivTitle: "Ahora, conozcámonos", ivPromise: "Cinco preguntas cortitas para conocerte. Puedes saltar las que quieras.", ivStart: "Empezar", ivLater: "Ahora no", ivStep: "Pregunta {i} de {n}",
+      q1Title: "¿Cómo quieres que te llame?", q1Ph: "Tu apodo", q1Form: "¿Cómo te hablo? Toca la que suene a ti.",
+      fm_tu: "{a}¿qué tienes para hoy?", fm_usted: "{a}¿qué tiene para hoy?", fm_vos: "{a}¿qué tenés para hoy?",
+      q2Title: "¿Cuál es tu horario de trabajo?", q2In: "Entrada", q2Out: "Salida", q2Lunch: "🍽 Hora de almuerzo", q2LunchAt: "Almuerzo",
+      q2bTitle: "¿Trabajas siempre en el mismo horario?", wk_fixed: "Fijo", wk_shifts: "Turnos que cambian", wk_none: "Sin horario fijo", q2bDays: "Días que trabajas", q2bFoot: "Los demás quedan como días libres.", q2bNone: "Entonces no aparto horas de trabajo.",
+      q3Title: "Tus horas de sueño", q3Up: "¿A qué hora te levantas?", q3Bed: "¿A qué hora te acuestas?", q3We: "El fin de semana es distinto", q3WeH: "Viernes y sábado por la noche",
+      q4Title: "¿Qué es lo que más se te olvida?", q4Foot: "Elige las que quieras.", fg_meds: "💊 Medicamentos", fg_appts: "📅 Citas", fg_pay: "💳 Pagos", fg_bdays: "🎂 Cumpleaños", fg_work: "💼 Trabajo",
+      rwTitle: "¡Listo!", rwLead: "Listo, {a}: ", rwLead0: "Listo: ", rwSleep: "no te agendo nada mientras duermes (de {b} a {u})", rwSleepWe: "no te agendo nada mientras duermes (de {b} a {u}; el fin de semana, de {b2} a {u2})",
+      rwWork: "en tu horario de trabajo solo te propongo cosas cortas", rwBrief: "tus resúmenes llegan al despertar y antes de dormir", rwAnd: "y ", rwSep: "; ",
+      rwNone: "Listo, {a}. Cuando quieras, me cuentas tu rutina en Ajustes → Tu rutina.", rwNone0: "Listo. Cuando quieras, me cuentas tu rutina en Ajustes → Tu rutina.", rwGo: "Crear mi primer recordatorio", rwOk: "Entendido",
+      rtCardTitle: "Cuéntame tu rutina en 1 minuto", rtCardText: "Así no te agendo nada mientras duermes y te propongo mejores horas.", rtCardGo: "Empezar",
+      formL: "Cómo te habla", workH: "Trabajo", sleepH: "Sueño", stUp: "Me levanto", stBed: "Me acuesto", forgetL: "Lo que más se te olvida", rtRedo: "Repetir la entrevista", rtClear: "Quitar",
+      rtFoot: "Pendi usa tu rutina para proponerte horas y elegir el tono. Nunca te pide datos personales." },
+    en: { ivTitle: "Now, let's get to know each other", ivPromise: "Five quick questions to get to know you. Skip any you like.", ivStart: "Start", ivLater: "Not now", ivStep: "Question {i} of {n}",
+      q1Title: "What should I call you?", q1Ph: "Your nickname", q1Form: "",
+      q2Title: "What are your work hours?", q2In: "Start", q2Out: "End", q2Lunch: "🍽 Lunch break", q2LunchAt: "Lunch",
+      q2bTitle: "Do you always work the same hours?", wk_fixed: "Fixed", wk_shifts: "Changing shifts", wk_none: "No fixed hours", q2bDays: "Days you work", q2bFoot: "The rest are your days off.", q2bNone: "Then I won't set work hours aside.",
+      q3Title: "Your sleep", q3Up: "What time do you get up?", q3Bed: "What time do you go to bed?", q3We: "Weekends are different", q3WeH: "Friday and Saturday nights",
+      q4Title: "What do you forget the most?", q4Foot: "Pick as many as you like.", fg_meds: "💊 Medication", fg_appts: "📅 Appointments", fg_pay: "💳 Payments", fg_bdays: "🎂 Birthdays", fg_work: "💼 Work",
+      rwTitle: "All set!", rwLead: "All set, {a}: ", rwLead0: "All set: ", rwSleep: "I won't schedule anything while you sleep ({b} to {u})", rwSleepWe: "I won't schedule anything while you sleep ({b} to {u}; on weekends, {b2} to {u2})",
+      rwWork: "during your work hours I'll only suggest short things", rwBrief: "your summaries arrive when you wake up and before bed", rwAnd: "and ", rwSep: "; ",
+      rwNone: "All set, {a}. Whenever you like, tell me your routine in Settings → Your routine.", rwNone0: "All set. Whenever you like, tell me your routine in Settings → Your routine.", rwGo: "Create my first reminder", rwOk: "Got it",
+      rtCardTitle: "Tell me your routine in 1 minute", rtCardText: "That way I won't schedule anything while you sleep, and I'll suggest better times.", rtCardGo: "Start",
+      formL: "How Pendi talks to you", workH: "Work", sleepH: "Sleep", stUp: "I get up", stBed: "I go to bed", forgetL: "What I forget the most", rtRedo: "Do the interview again", rtClear: "Remove",
+      rtFoot: "Pendi uses your routine to suggest times and pick its tone. It never asks for personal data." },
+    pt: { ivTitle: "Agora, vamos nos conhecer", ivPromise: "Cinco perguntas rapidinhas para te conhecer. Pule as que quiser.", ivStart: "Começar", ivLater: "Agora não", ivStep: "Pergunta {i} de {n}",
+      q1Title: "Como você quer que eu te chame?", q1Ph: "Seu apelido", q1Form: "Como eu falo com você? Toque na que soa como você.",
+      fm_voce: "{a}o que você tem para hoje?", fm_tu: "{a}o que tens para hoje?",
+      q2Title: "Qual é o seu horário de trabalho?", q2In: "Entrada", q2Out: "Saída", q2Lunch: "🍽 Horário de almoço", q2LunchAt: "Almoço",
+      q2bTitle: "Você trabalha sempre no mesmo horário?", wk_fixed: "Fixo", wk_shifts: "Turnos que mudam", wk_none: "Sem horário fixo", q2bDays: "Dias em que trabalha", q2bFoot: "Os outros ficam como dias de folga.", q2bNone: "Então não reservo horas de trabalho.",
+      q3Title: "Seu sono", q3Up: "A que horas você se levanta?", q3Bed: "A que horas você vai dormir?", q3We: "No fim de semana é diferente", q3WeH: "Noites de sexta e sábado",
+      q4Title: "O que você mais esquece?", q4Foot: "Escolha quantas quiser.", fg_meds: "💊 Remédios", fg_appts: "📅 Consultas", fg_pay: "💳 Pagamentos", fg_bdays: "🎂 Aniversários", fg_work: "💼 Trabalho",
+      rwTitle: "Pronto!", rwLead: "Pronto, {a}: ", rwLead0: "Pronto: ", rwSleep: "não marco nada enquanto você dorme (das {b} às {u})", rwSleepWe: "não marco nada enquanto você dorme (das {b} às {u}; no fim de semana, das {b2} às {u2})",
+      rwWork: "no seu horário de trabalho só te proponho coisas curtas", rwBrief: "seus resumos chegam quando você acorda e antes de dormir", rwAnd: "e ", rwSep: "; ",
+      rwNone: "Pronto, {a}. Quando quiser, me conte sua rotina em Ajustes → Sua rotina.", rwNone0: "Pronto. Quando quiser, me conte sua rotina em Ajustes → Sua rotina.", rwGo: "Criar meu primeiro lembrete", rwOk: "Entendi",
+      rtCardTitle: "Me conte sua rotina em 1 minuto", rtCardText: "Assim não marco nada enquanto você dorme e te proponho horários melhores.", rtCardGo: "Começar",
+      formL: "Como a Pendi fala com você", workH: "Trabalho", sleepH: "Sono", stUp: "Acordo", stBed: "Vou dormir", forgetL: "O que mais esqueço", rtRedo: "Refazer a entrevista", rtClear: "Tirar",
+      rtFoot: "A Pendi usa sua rotina para propor horários e escolher o tom. Ela nunca pede dados pessoais." },
+    fr: { ivTitle: "Maintenant, faisons connaissance", ivPromise: "Cinq petites questions pour te connaître. Tu peux passer celles que tu veux.", ivStart: "Commencer", ivLater: "Pas maintenant", ivStep: "Question {i} sur {n}",
+      q1Title: "Comment veux-tu que je t'appelle ?", q1Ph: "Ton surnom", q1Form: "Comment je te parle ? Touche celle qui te ressemble.",
+      fm_tu: "{a}qu'est-ce que tu as aujourd'hui ?", fm_vous: "{a}qu'est-ce que vous avez aujourd'hui ?",
+      q2Title: "Quels sont tes horaires de travail ?", q2In: "Début", q2Out: "Fin", q2Lunch: "🍽 Pause déjeuner", q2LunchAt: "Déjeuner",
+      q2bTitle: "Tu travailles toujours aux mêmes horaires ?", wk_fixed: "Fixes", wk_shifts: "Horaires qui changent", wk_none: "Pas d'horaires fixes", q2bDays: "Jours où tu travailles", q2bFoot: "Les autres restent des jours de repos.", q2bNone: "Alors je ne réserve pas d'heures de travail.",
+      q3Title: "Ton sommeil", q3Up: "À quelle heure tu te lèves ?", q3Bed: "À quelle heure tu te couches ?", q3We: "Le week-end, c'est différent", q3WeH: "Vendredi et samedi soir",
+      q4Title: "Qu'est-ce que tu oublies le plus ?", q4Foot: "Choisis-en autant que tu veux.", fg_meds: "💊 Médicaments", fg_appts: "📅 Rendez-vous", fg_pay: "💳 Paiements", fg_bdays: "🎂 Anniversaires", fg_work: "💼 Travail",
+      rwTitle: "C'est prêt !", rwLead: "C'est prêt, {a} : ", rwLead0: "C'est prêt : ", rwSleep: "je ne te programme rien pendant que tu dors (de {b} à {u})", rwSleepWe: "je ne te programme rien pendant que tu dors (de {b} à {u} ; le week-end, de {b2} à {u2})",
+      rwWork: "pendant tes heures de travail, je ne te propose que des choses courtes", rwBrief: "tes résumés arrivent à ton réveil et avant de dormir", rwAnd: "et ", rwSep: " ; ",
+      rwNone: "C'est prêt, {a}. Quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.", rwNone0: "C'est prêt. Quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.", rwGo: "Créer mon premier rappel", rwOk: "Compris",
+      rtCardTitle: "Raconte-moi ta routine en 1 minute", rtCardText: "Comme ça, je ne te programme rien pendant que tu dors et je te propose de meilleures heures.", rtCardGo: "Commencer",
+      formL: "Comment Pendi te parle", workH: "Travail", sleepH: "Sommeil", stUp: "Je me lève", stBed: "Je me couche", forgetL: "Ce que j'oublie le plus", rtRedo: "Refaire l'entretien", rtClear: "Retirer",
+      rtFoot: "Pendi utilise ta routine pour te proposer des heures et choisir son ton. Elle ne te demande jamais de données personnelles." },
+  };
+  for (const k of Object.keys(P8)) Object.assign(I18N[k], P8[k]);
+  // The routine's rules: sleep (hard) and work (soft), asked once in the flow where the person picks a time.
+  const P9 = {
+    es: { slTitle: "Esa hora cae en tu horario de sueño", slMove: "Mover al despertar · {t}", slKeep: "Dejar así", wkAsk: "Cae en tu horario de trabajo, ¿la dejo ahí?", wkKeep: "Sí, déjala ahí", wkOther: "Buscar otra hora",
+      briefAnch: "Con tu rutina llegan al despertar ({m}) y antes de dormir ({e})." },
+    en: { slTitle: "That time falls in your sleep hours", slMove: "Move to when I wake up · {t}", slKeep: "Leave it", wkAsk: "It falls in your work hours. Leave it there?", wkKeep: "Yes, leave it", wkOther: "Find another time",
+      briefAnch: "With your routine they arrive when you wake up ({m}) and before bed ({e})." },
+    pt: { slTitle: "Esse horário cai no seu horário de sono", slMove: "Mover para quando eu acordar · {t}", slKeep: "Deixar assim", wkAsk: "Cai no seu horário de trabalho. Deixo aí?", wkKeep: "Sim, deixe aí", wkOther: "Buscar outro horário",
+      briefAnch: "Com sua rotina, chegam quando você acorda ({m}) e antes de dormir ({e})." },
+    fr: { slTitle: "Cette heure tombe pendant ton sommeil", slMove: "Déplacer à mon réveil · {t}", slKeep: "Laisser comme ça", wkAsk: "Ça tombe pendant ton travail. Je la laisse là ?", wkKeep: "Oui, laisse-la là", wkOther: "Chercher une autre heure",
+      briefAnch: "Avec ta routine, ils arrivent à ton réveil ({m}) et avant de dormir ({e})." },
+  };
+  for (const k of Object.keys(P9)) Object.assign(I18N[k], P9[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1250,7 +1331,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.12.0";
+  const VERSION = "0.13.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1402,13 +1483,58 @@ html.kb .tabbar { display: none; }
     gone.forEach((x) => remove(x, true)); render();
     notice(tr("deletedSeries"), () => { put(prevS, true); prevT.forEach((x) => put(x, true)); render(); });
   }
-  // A free slot of the task's length that day, from 8:00 to 22:00 (and from now on, if it is today).
+  // A free slot of the task's length that day, from 8:00 to 22:00 (and from now on, if it is today). With a routine
+  // (Ajustes > Tu rutina): never inside the sleep window (the day then runs from waking up to bedtime), and outside
+  // work hours unless the task is light (5 min or less).
   function freeSlot(k, len) {
-    const busy = state.tasks.filter((t) => t.date === k && !t.anytime && !t.done).map((t) => [mins(t.time), mins(t.time) + (t.dur || 30)]).sort((a, b) => a[0] - b[0]);
-    const n = new Date();
-    let from = Math.max(8 * 60, k === ymd(n) ? Math.ceil((n.getHours() * 60 + n.getMinutes() + 10) / 15) * 15 : 0);
-    for (const [a, b] of busy) { if (a - from >= len) break; from = Math.max(from, b); }
-    return from + len <= 22 * 60 ? hhmm(from) : null;
+    const busy = state.tasks.filter((t) => t.date === k && !t.anytime && !t.done).map((t) => [mins(t.time), mins(t.time) + (t.dur || 30)]);
+    const n = new Date(), s = state.settings, sl = !!F.sleepOf(s);
+    const lo = sl ? 0 : 8 * 60, hi = sl ? 24 * 60 : 22 * 60;
+    const fits = (m) => !busy.some(([a, b]) => m < b && m + len > a) && !F.inSleep(s, k, hhmm(m), len) && (len <= F.LIGHT || !F.inWork(s, k, hhmm(m), len));
+    for (let m = Math.max(lo, k === ymd(n) ? Math.ceil((n.getHours() * 60 + n.getMinutes() + 10) / 15) * 15 : 0); m + len <= hi; m += 5) if (fits(m)) return hhmm(m);
+    return null;
+  }
+  // A time the AI chose on its own (the person named none): kept if it respects the routine, else the first free slot
+  // that does ("" if there is none: the task stays without a time).
+  const fitAi = (k, time, len) => (!time || (!F.inSleep(state.settings, k, time, len) && (len <= F.LIGHT || !F.inWork(state.settings, k, time, len))) ? time : freeSlot(k, len) || "");
+  // The person said a time in their own words ("a las 5", "at 3pm", "à 14 h", "meio-dia"…): then the AI's time is theirs.
+  const saysTime = (x) => /\d{1,2}\s*(:\d{2}|h\b|hs\b|hrs?\b|am\b|pm\b|a\.?\s?m|p\.?\s?m)|\b(a las|a la|at|à|às|as|vers|por la|de la|la una)\s+\d|mediod[ií]a|medianoche|noon|midnight|midi|minuit|meio-dia|meia-noite/i.test(String(x || ""));
+  // Tasks whose time the person chose (typed, said or picked); the routine's questions are only for these.
+  const saidTime = new Set();
+  // Sleep is a hard rule, work a soft one: when the person picks a time inside them, Pendi asks once, right then.
+  // Sleep: "Esa hora cae en tu horario de sueño" [Mover al despertar] [Dejar así] (not for "Insistir hasta que confirme").
+  // Work, only for tasks that are not light: "Cae en tu horario de trabajo, ¿la dejo ahí?" [Sí] [Buscar otra hora].
+  // The answer is kept on the task (ruleOk) so the same day and time are never asked again.
+  function checkRules(list) {
+    const ids = list.filter(Boolean).map((t) => t.id);
+    const next = () => {
+      while (ids.length) {
+        const id = ids.shift(), t = state.tasks.find((x) => x.id === id), s = state.settings;
+        if (!t || t.anytime || !t.time || t.example || F.closed(t)) continue;
+        const key = t.date + " " + t.time;
+        if (t.ruleOk === key) continue;
+        const sleep = !t.critical && F.inSleep(s, t.date, t.time), work = !sleep && !F.light(t) && F.inWork(s, t.date, t.time, Number(t.dur) || 30);
+        if (!sleep && !work) continue;
+        const keep = () => { closeSheet(); put({ ...state.tasks.find((x) => x.id === t.id), ruleOk: key }); next(); };
+        let move;
+        if (sleep) {
+          // After bedtime (tonight) it goes to tomorrow's wake-up; before waking up, to today's.
+          const tomorrow = mins(t.time) >= mins(F.bedOf(s, t.date)) && mins(F.bedOf(s, t.date)) > mins(F.wakeOf(s, t.date)), day = tomorrow ? F.dayAdd(t.date, 1) : t.date, up = F.wakeOf(s, day);
+          move = el("button", { onclick: () => { closeSheet(); change(t, { ...F.fresh(t), date: day, time: up, anytime: false, ruleOk: day + " " + up }, tr("movedTo", { t: t.title, w: (day === t.date ? "" : niceDate(day) + " · ") + clock(up) })); next(); } }, tr("slMove", { t: clock(up) }));
+        } else {
+          move = el("button", { onclick: () => {
+            closeSheet(); const slot = freeSlot(t.date, Number(t.dur) || 30);
+            if (slot) change(t, { ...F.fresh(t), time: slot, ruleOk: t.date + " " + slot }, tr("movedTo", { t: t.title, w: clock(slot) })); else openEdit(t);
+            next();
+          } }, tr("wkOther"));
+        }
+        showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr(sleep ? "slTitle" : "wkAsk"), style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
+          el("div", { class: "qhead" }, el("div", { class: "em" }, sleep ? "🌙" : "💼"), el("div", {}, el("h2", {}, tr(sleep ? "slTitle" : "wkAsk")), el("div", { class: "when" }, `${icon(t)} ${t.title} · ${clock(t.time)}`))),
+          el("div", { class: "qa two" }, move, el("button", { onclick: keep }, tr(sleep ? "slKeep" : "wkKeep")))));
+        return;
+      }
+    };
+    next();
   }
   function placeAnytime(t) {
     const slot = freeSlot(t.date, t.dur || 30);
@@ -1485,6 +1611,8 @@ html.kb .tabbar { display: none; }
     const box = $("dayList"); box.replaceChildren();
     const open = k === today ? openCard() : null;
     if (open) box.append(open);
+    const rcard = k === today ? routineCard() : null;
+    if (rcard) box.append(rcard);
     box.append(statusBar());
     const bds = bdaysOn(d);
     const items = list.filter((t) => t.date === k).sort((a, b) => a.time.localeCompare(b.time));
@@ -1800,6 +1928,7 @@ html.kb .tabbar { display: none; }
           render(); notice(tr("edited"), () => { put(prevS, true); prevT.forEach((x) => put(x, true)); render(); });
         } else change(t, { ...((day.value || t.date) !== t.date || patch.time !== t.time ? F.fresh(t) : {}), ...patch, date: day.value || t.date, snooze: null }, tr("edited"));
         state.anchor = fromYmd(day.value || t.date); render();
+        checkRules([state.tasks.find((x) => x.id === t.id)]);
       } },
       el("div", { class: "grabber" }), el("h2", {}, tr("editTask")),
       el("div", { class: "row", style: "flex-wrap:nowrap" }, emo, title, mic),
@@ -1952,7 +2081,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   }
   // Posponer: 10 min, 30 min, 1 hour, or tomorrow at the morning summary's time.
   function snoozeChoices(t) {
-    const morning = (state.settings.brief || {}).m || "08:00";
+    const morning = (F.briefTimes(state.settings, ymd(addDays(new Date(), 1))) || state.settings.brief || {}).m || "08:00";
     const later = (m) => () => { closeSheet(); snooze(t.id, m); notice(tr("againIn", { x: m === 60 ? tr("oneHour") : tr("nMin", { n: m }) })); };
     return [el("button", { onclick: later(10) }, tr("in10")), el("button", { onclick: later(30) }, tr("in30")), el("button", { onclick: later(60) }, tr("in60")),
       el("button", { onclick: () => { closeSheet(); const w = ymd(addDays(new Date(), 1)); change(t, { ...F.fresh(t), date: w, time: morning, anytime: false }, tr("movedTo", { t: t.title, w: tr("tomorrowAt", { t: clock(morning) }) })); } }, tr("tomorrowAt", { t: clock(morning) }))];
@@ -2105,6 +2234,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       if (!added || !added.length) { st.className = "status err"; st.textContent = tr("nothingFound"); return; }
       closeSheet(); state.anchor = fromYmd(added[0].date); render();
       notice(added.map(readBack).join("\n"), () => { added.forEach((t) => (t.series ? delSeries(t) : remove(t, true))); render(); });
+      checkRules(added.filter((t) => saidTime.has(t.id)));
     };
     // Something shared from another app is read right away and shown as a proposal to confirm with one tap.
     let plan = null, planFor = "";
@@ -2143,7 +2273,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
         if (dictating) { const d = dictating; dictating = null; await d.stop(); }
         if (plan && text.value.trim() === planFor) {
           go.disabled = true; const added = [];
-          for (const p of plan.filter((x) => x.on)) added.push(await addTask(p.row, p.rep));
+          for (const p of plan.filter((x) => x.on)) { const a = await addTask(p.row, p.rep); if (saidTime.has(p.row.id)) saidTime.add(a.id); added.push(a); }
           return finish(added);
         }
         const what = text.value.trim(); if (!what) { text.focus(); return; }
@@ -2176,14 +2306,14 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
   // o: anytime (no time), rep (repeat), image (a photo to read), dry (only return [{row, rep}], nothing is saved).
   async function quickAdd(what, date, time, o = {}) {
     let tareas = [];
-    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra","repetir":null}]}
-"original" son las palabras exactas de la persona (o de la imagen) para esa tarea, copiadas sin traducir. "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. ${closeFields()} "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
+    const shape = `Responde solo JSON: {"tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","hora":"16:00","hora_dicha":false,"duracion":45,"consejo":"Lleva tu documento.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra","repetir":null}]}
+"original" son las palabras exactas de la persona (o de la imagen) para esa tarea, copiadas sin traducir. "hora_dicha" es true solo si la persona (o la imagen) dijo esa hora; false si la elegiste tú. "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. ${closeFields()} "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (dias: 0 domingo a 6 sábado, solo para semanal), solo si dice que se repite.`;
     try {
       const res = o.image ? await ai.see(`Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. Los títulos van en el idioma de la imagen o de la nota de la persona, sin traducir.
 ${nowLine()}
 Mira esta imagen: puede ser un flyer, una cita, una invitación o la captura de un mensaje. Saca cada evento o cosa por hacer con su fecha y hora. Si no dice fecha, usa ${date}. Si no dice hora, deja "hora" vacía.${what ? `\nNota de la persona: """${what.slice(0, 500)}"""` : ""}
 ${shape}`, o.image) : await ai.json(`Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: los consejos van en ese idioma. ${keepTitles} ${who()}
-${nowLine()} La persona rinde mejor en la ${energy()}.
+${nowLine()} La persona rinde mejor en la ${energy()}. ${routineLine()}
 Convierte este texto en tareas para el día ${date}${time ? ` a las ${time}` : ""}. Si menciona otro día u hora, usa esos.
 ${o.anytime ? "No pongas hora: deja \"hora\" vacía.\n" : time ? "" : "Si no dice hora, elige la mejor hora libre (no choques con la agenda).\n"}Agenda ocupada:
 ${agendaText(date, 2)}
@@ -2201,10 +2331,17 @@ ${shape}`);
       const title = o.image ? ownTitle(t.titulo, t.original, "") : titles[tareas.indexOf(t)];
       const row = { id: uid("t"), kind: "task", title: (title || what || tr("task")).slice(0, 120), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha || "") ? t.fecha : date,
         time: anytime ? "" : has ? t.hora.padStart(5, "0") : time, anytime, dur: Math.max(5, Number(t.duracion) || 30), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), ...closeFrom(t), done: false, created: Date.now() };
+      // A time the person gave (typed, said, or on the photo) is theirs: Pendi asks about it once (checkRules).
+      // One the AI chose must respect the routine (sleep never; work only for light tasks).
+      const said = !!row.time && (!!time || !!o.image || t.hora_dicha === true || saysTime(what));
+      if (row.time && !said) { row.time = fitAi(row.date, row.time, row.dur); row.anytime = !row.time; }
       // A repeat only when the person asked for one (the AI sometimes makes "take the pill" daily on its own).
       const asked = /\b(cada|tod[oa]s? l[oa]s|diari|semanal|mensual|every|daily|weekly|monthly|weekdays|chaque|tous les|toutes les|quotidien|hebdo|mensuel|todo dia|todos os|toda semana|di[aá]rio)/i.test(what);
       const rep = o.rep || (asked || o.image ? repFromAi(t.repetir) : null);
-      out.push(o.dry ? { row, rep } : await addTask(row, rep));
+      if (said) saidTime.add(row.id);
+      const done = o.dry ? { row, rep } : await addTask(row, rep);
+      if (said && !o.dry) saidTime.add(done.id);
+      out.push(done);
     }
     return out;
   }
@@ -2254,11 +2391,23 @@ ${shape}`);
   }
   // The person's own words stay as they wrote or dictated them: never translated, whatever the app language.
   // What the AI knows about the owner: the saved name, and never a guessed gender.
+  // The interview adds how to talk to the person (tú / usted / vos) and what they forget the most.
+  const FORM_AI = {
+    tu: "Háblale de tú (tuteo; en portugués, \"tu\"; en francés, \"tu\").",
+    usted: "Háblale de usted (en francés, \"vous\"; en portugués, \"você\" con respeto).",
+    vos: "Háblale de vos, con voseo (tenés, querés, podés); en otros idiomas, de forma informal.",
+    voce: "En portugués háblale de \"você\"; en español, de tú; en francés, \"tu\".",
+    vous: "En francés háblale de \"vous\"; en español, de usted; en portugués, \"você\" con respeto.",
+  };
+  const FORGET_AI = { meds: "medicamentos", appts: "citas", pay: "pagos", bdays: "cumpleaños", work: "cosas del trabajo" };
   function who() {
     const n = String(state.settings.name || "").trim().slice(0, 40);
     const neutral = "Nunca supongas el género de la persona (tampoco por su nombre): háblale con formas neutras, sin adjetivos ni participios con género referidos a ella (por ejemplo, en vez de \"¿Estás listo?\" o \"¿Estás lista?\", di \"¿Todo preparado?\").";
-    return n ? `La persona se llama ${JSON.stringify(n)}: llámala así de vez en cuando, con naturalidad. ${neutral}`
-      : `No sabes cómo se llama la persona: no inventes un nombre ni se lo preguntes (si quiere, lo guarda en Ajustes). ${neutral}`;
+    const fg = (rt().forget || []).filter((k) => FORGET_AI[k]);
+    const more = (FORM_AI[state.settings.form] ? " " + FORM_AI[state.settings.form] : "")
+      + (fg.length ? ` Lo que más se le olvida: ${fg.map((k) => FORGET_AI[k]).join(", ")}. Tenlo en cuenta en tus sugerencias y en el tono (por ejemplo, un consejo para no olvidarlo o una pregunta de confirmación), sin sermonear.` : "");
+    return (n ? `La persona quiere que la llames ${JSON.stringify(n)}: llámala así de vez en cuando, con naturalidad. ${neutral}`
+      : `No sabes cómo llamar a la persona: no inventes un nombre ni se lo preguntes (si quiere, lo guarda en Ajustes > Tu rutina). ${neutral}`) + more;
   }
   // The closing question asked 10 min after an instant task, in the person's language, and whether it is a call.
   const closeFields = () => `"pregunta" es la pregunta corta que Pendi hará después para confirmar que se hizo, en ${AI_LANG[lang]}, en segunda persona y sobre esa tarea (ej.: "¿Ya te tomaste la pastilla?"). "si" es la respuesta afirmativa para un botón, de 1 a 3 palabras (ej.: "Ya la tomé"). "tipo" es "llamada" si es llamar o hablar por teléfono con alguien; si no, "otra".`;
@@ -2287,6 +2436,13 @@ ${shape}`);
     if (parts.length === bad.filter(Boolean).length) { let k = 0; bad.forEach((b, i) => { if (b) out[i] = parts[k++].slice(0, 120); }); }
     return out;
   }
+  // The routine for the AI when it proposes times: sleep is never used, work only for light tasks (5 min or less).
+  function routineLine() {
+    const s = state.settings, r = F.sleepOf(s), w = F.workOf(s), out = [];
+    if (r) out.push(`La persona duerme de ${r.bed} a ${r.up}${r.we && r.we.up && r.we.bed && (r.we.up !== r.up || r.we.bed !== r.bed) ? ` (viernes y sábado por la noche, de ${r.we.bed} a ${r.we.up})` : ""}: NUNCA propongas horas en ese tramo.`);
+    if (w) out.push(`Trabaja de ${w.from} a ${w.to}${w.lunch ? ` (almuerzo a las ${w.lunch}, 1 hora libre)` : ""} los días ${(Array.isArray(w.days) ? w.days : [1, 2, 3, 4, 5]).map((d) => ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][d]).join(", ")}: en ese horario propón solo tareas ligeras (5 minutos o menos); las demás, fuera de él.`);
+    return out.length ? out.join(" ") + " Si la persona dice una hora, respeta la que dijo." : "";
+  }
   const nowLine = () => { const n = new Date(); return `Hoy es ${dayName(n)} ${ymd(n)}, son las ${hm(n)}.`; };
 
   async function organize() {
@@ -2295,7 +2451,7 @@ ${shape}`);
     const date = dumpDate.value || ymd(addDays(new Date(), 1));
     $("organize").disabled = true; $("dumpStatus").className = "status"; $("dumpStatus").textContent = tr("thinkingDay");
     const prompt = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]}: el resumen, los porqués y los consejos van en ese idioma. ${keepTitles} ${who()}
-${nowLine()} La persona rinde mejor en la ${energy()}.
+${nowLine()} La persona rinde mejor en la ${energy()}. ${routineLine()}
 Organiza este texto en tareas para el día ${date}. Si el texto menciona otro día para alguna tarea, usa ese día.
 Agenda ya ocupada (no choques con esto):
 ${agendaText(date, 3)}
@@ -2305,8 +2461,8 @@ Texto de la persona:
 
 Para cada tarea da: título corto, un emoji que la represente, categoría (una de: trabajo, personal, casa, salud, creativo, social, otro), duración estimada en minutos, 3 opciones de hora distintas (mañana, tarde y noche si tiene sentido; formato HH:MM 24h; sin choques), cuál recomiendas y por qué en pocas palabras, y un consejo práctico breve (1-2 frases).
 Ordena las tareas en el orden recomendado.
-Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra"}]}
-"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir. ${closeFields()}`;
+Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"hora_dicha":null,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra"}]}
+"felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir. "hora_dicha" es la hora "HH:MM" si la persona dijo una para esa tarea (ponla también en "opciones"); si no, null. ${closeFields()}`;
     try {
       const res = await ai.json(prompt);
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
@@ -2316,9 +2472,16 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
         title: titles[tareas.indexOf(t)] || tr("task"), emoji: emojiOnly(t.emoji), cat: cat(t.categoria), date: /^\d{4}-\d{2}-\d{2}$/.test(t.fecha) ? t.fecha : date,
         dur: Math.max(5, Number(t.duracion) || 30),
         options: (Array.isArray(t.opciones) ? t.opciones : []).map(String).filter((x) => /^\d{1,2}:\d{2}$/.test(x)).map((x) => x.padStart(5, "0")).slice(0, 3),
+        said: /^\d{1,2}:\d{2}$/.test(t.hora_dicha || "") ? String(t.hora_dicha).padStart(5, "0") : "",
         rec: Number(t.recomendada) || 0, why: String(t.porque || ""), tip: String(t.consejo || ""), cheer: String(t.felicitacion || "").slice(0, 140), ...closeFrom(t), skip: false,
       })).filter((p) => p.options.length);
-      state.proposals.forEach((p) => { p.pick = p.options[Math.min(p.rec, p.options.length - 1)]; });
+      // The AI's options respect the routine (the hour the person said stays); if none is left, Pendi's own free slot.
+      state.proposals.forEach((p) => {
+        const rec = p.options[Math.min(p.rec, p.options.length - 1)];
+        const ok = p.options.filter((o) => o === p.said || fitAi(p.date, o, p.dur) === o);
+        if (ok.length !== p.options.length) { const slot = freeSlot(p.date, p.dur); p.options = ok.length ? ok : slot ? [slot] : []; p.rec = Math.max(0, p.options.indexOf(rec)); if (!p.options.includes(rec)) p.why = ""; }
+        p.pick = p.options[Math.min(p.rec, p.options.length - 1)]; p.skip = !p.options.length;
+      });
       $("dumpStatus").textContent = res.resumen ? String(res.resumen) : tr("chooseTimes");
       renderProposals();
     } catch (e) { $("dumpStatus").className = "status err"; $("dumpStatus").textContent = errText(e); }
@@ -2350,11 +2513,13 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     const all = state.proposals || [], some = all.some((p) => p.sel);
     const ps = all.filter((p) => (!some || p.sel) && !p.skip && p.pick);
     const rest = some ? all.filter((p) => !p.sel) : [];
-    for (const p of ps) await put({ id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, q: p.q, yes: p.yes, type: p.type, done: false, created: Date.now() });
+    const mine = [];
+    for (const p of ps) { const row = { id: uid("t"), kind: "task", title: p.title, emoji: p.emoji, cat: p.cat, date: p.date, time: p.pick, dur: p.dur, tip: p.tip, cheer: p.cheer, q: p.q, yes: p.yes, type: p.type, done: false, created: Date.now() }; await put(row); if (p.said && p.pick === p.said) mine.push(row); }
     state.proposals = rest.length ? rest : null; renderProposals(); if (!rest.length) $("dump").value = "";
     $("dumpStatus").className = "status";
     $("dumpStatus").textContent = ps.length ? tr(ps.length === 1 ? "scheduledOne" : "scheduledMany", { n: ps.length }) : tr("noneChosen");
     if (ps[0]) { state.anchor = fromYmd(ps[0].date); if (isPhone()) showTab("cal"); render(); }
+    checkRules(mine);
   }
   function renderOverdue() {
     const box = $("overdue"); box.replaceChildren();
@@ -2377,7 +2542,7 @@ Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"tit
     const ctl = new AbortController(); chatAbort = ctl; chatBusy(true);
     const rules = `Eres Pendi, la asistente de un calendario personal: cercana, con humor ligero y directa, como una amiga que no olvida nada (por ejemplo: "Ojo: el banco no se va a visitar solo. ¿Lo hacemos a las 9?"). Nunca sarcástica ni pesada. Responde en ${AI_LANG[lang]} (la respuesta y los consejos de las acciones), breve y fácil de leer. ${keepTitles} ${who()} Los eventos que ya están en la agenda se nombran con su título tal cual.
 Formato de "respuesta": una frase corta de introducción y luego, si hay varias cosas, una lista con una línea por punto que empiece con "- " y un emoji que tenga que ver (ej: 🏦 banco, 🇪🇸 consulado de España, 📞 llamada, 🎂 cumpleaños, 💪 gimnasio). Pon las horas en **negrita**. Máximo 6 puntos. Nada de párrafos largos.
-${nowLine()} La persona rinde mejor en la ${energy()}.
+${nowLine()} La persona rinde mejor en la ${energy()}. ${routineLine()}
 Agenda de los próximos 7 días (cada evento tiene un id):
 ${agendaText(ymd(new Date()), 7)}
 Pendientes atrasados sin hacer: ${state.tasks.filter((t) => !t.done && t.date < ymd(new Date())).map((t) => `[id ${t.id}] ${t.date} ${t.time} ${t.title}`).join("; ") || "ninguno"}
@@ -2386,8 +2551,8 @@ Cumpleaños guardados: ${state.bdays.map((b) => `${b.name} (${b.day}/${b.month})
 
 Si pregunta qué tiene un día (hoy, mañana, el viernes...), enumera en "respuesta" todos los eventos reales de ese día con su hora, uno por línea, y pon ese día en "dia" (YYYY-MM-DD). "acciones" es solo para cambios, nunca para mostrar la agenda.
 Si la persona pide crear, mover o borrar eventos, o guardar un cumpleaños, propón las acciones; ella las confirmará. Nunca inventes ids ni crees eventos que ya existen.
-Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","original":"palabras exactas de la persona para ese evento, sin traducir","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","pregunta":"¿Ya…?","si":"Ya…","tipo":"otra","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
-En "cumple", "anio" y "gustos" son opcionales. En "crear", "hora" puede ir vacía si no tiene hora fija, y "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (0 domingo a 6 sábado) si se repite.
+Responde solo JSON: {"respuesta":"texto para la persona","dia":null,"acciones":[{"tipo":"crear","titulo":"...","original":"palabras exactas de la persona para ese evento, sin traducir","emoji":"🏦","categoria":"personal","fecha":"YYYY-MM-DD","hora":"HH:MM","hora_dicha":false,"duracion":30,"consejo":"consejo breve","felicitacion":"frase alegre para cuando la termine, sobre esa tarea","pregunta":"¿Ya…?","si":"Ya…","tipo":"otra","repetir":null},{"tipo":"mover","id":"...","fecha":"YYYY-MM-DD","hora":"HH:MM"},{"tipo":"borrar","id":"..."},{"tipo":"cumple","nombre":"Ana","mes":5,"dia":3,"anio":1990,"gustos":"café"}]}
+En "cumple", "anio" y "gustos" son opcionales. En "crear", "hora" puede ir vacía si no tiene hora fija, "hora_dicha" es true solo si la persona dijo esa hora, y "repetir" es null o {"frecuencia":"diaria|entre_semana|semanal|mensual","dias":[1,3,5]} (0 domingo a 6 sábado) si se repite.
 Las tareas marcadas con ⭐ son importantes.
 Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
     const turns = state.chat.filter((m) => !m.temp && !m.actions).slice(-8);
@@ -2406,6 +2571,11 @@ Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
       const said = state.chat.filter((m) => m.role === "user").slice(-3).map((m) => m.content).join("\n"), creates = acts.filter((a) => a.tipo === "crear");
       // A short "yes, do it" keeps the AI's title; a real request in another language wins over a translation.
       for (const a of creates) a.titulo = ownTitle(a.titulo, said, a.original, creates.length === 1 && stems(q).length >= 2 && q.length <= 120 ? q : false);
+      // A time the AI chose respects the routine before it is shown; a time the person said is theirs (asked once when applied).
+      for (const a of creates) {
+        a.mine = a.hora_dicha === true || saysTime(said);
+        if (!a.mine && /^\d{1,2}:\d{2}$/.test(a.hora || "")) a.hora = fitAi(a.fecha, String(a.hora).padStart(5, "0"), Math.max(5, Number(a.duracion) || 30));
+      }
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
       state.chat.splice(state.chat.indexOf(thinking), 1);
@@ -2422,15 +2592,17 @@ Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
     return tr("actDel", { t: t.title });
   }
   async function applyActions(msg) {
+    const mine = [];
     for (const a of msg.actions) {
       const okDate = /^\d{4}-\d{2}-\d{2}$/.test(a.fecha || ""), okTime = /^\d{1,2}:\d{2}$/.test(a.hora || "");
       if (a.tipo === "cumple") await put({ id: uid("b"), kind: "bday", name: String(a.nombre).slice(0, 60), month: Number(a.mes), day: Number(a.dia), year: Number(a.anio) > 1900 ? Number(a.anio) : null, notes: String(a.gustos || "") });
-      if (a.tipo === "crear" && okDate) await addTask({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: okTime ? a.hora.padStart(5, "0") : "", anytime: !okTime, dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), cheer: String(a.felicitacion || "").slice(0, 140), ...closeFrom(a), done: false, created: Date.now() }, repFromAi(a.repetir));
+      if (a.tipo === "crear" && okDate) { const made = await addTask({ id: uid("t"), kind: "task", title: String(a.titulo || tr("task")), emoji: emojiOnly(a.emoji), cat: cat(a.categoria), date: a.fecha, time: okTime ? a.hora.padStart(5, "0") : "", anytime: !okTime, dur: Math.max(5, Number(a.duracion) || 30), tip: String(a.consejo || ""), cheer: String(a.felicitacion || "").slice(0, 140), ...closeFrom(a), done: false, created: Date.now() }, repFromAi(a.repetir)); if (okTime && a.mine) mine.push(made); }
       const t = state.tasks.find((x) => x.id === String(a.id));
-      if (a.tipo === "mover" && t) await put({ ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, anytime: okTime ? false : t.anytime, done: false });
+      if (a.tipo === "mover" && t) { const moved = { ...t, date: okDate ? a.fecha : t.date, time: okTime ? a.hora.padStart(5, "0") : t.time, anytime: okTime ? false : t.anytime, done: false }; await put(moved); mine.push(moved); }
       if (a.tipo === "borrar" && t) del(t);
     }
     msg.applied = true; renderChat();
+    checkRules(mine);
   }
   function renderChat() {
     const log = $("chatlog"); log.replaceChildren();
@@ -2646,8 +2818,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       }
       const m = (at(t.date, t.time).getTime() - now) / 60000;
       if (m <= 0 || m > 60) continue;
-      const due = F.pushes(t, lvOf(t)).leads.filter((th) => m <= th), smallest = due[due.length - 1];
+      const leads = F.pushes(t, lvOf(t)).leads, due = leads.filter((th) => m <= th), smallest = due[due.length - 1];
       if (!due.length) continue;
+      // Calm shoulder (40 min before bed): only the last reminder of a task, unless it insists (same rule as api/cron.js).
+      if (!t.critical && smallest !== leads[leads.length - 1] && F.inCalm(state.settings, ymd(new Date(now)), hm(new Date(now)))) continue;
       const key = t.id + "@" + t.date + t.time + "#";
       if (!fired.has(key + smallest)) { due.forEach((th) => fired.add(key + th)); ls.set("fired", [...fired].slice(-300)); toast(t, Math.max(1, Math.round(m)), false); }
     }
@@ -2898,6 +3072,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // ---------- settings ----------
   function syncSettings() {
     if (document.activeElement !== $("myName")) $("myName").value = state.settings.name || "";
+    paintRoutine();
     $("energy").value = energy();
     $("sound").checked = state.settings.sound !== false;
     $("datefmt").value = state.settings.datefmt || "es";
@@ -2905,9 +3080,11 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("theme").value = state.settings.theme || "system";
     $("lang").value = LANGS[state.settings.lang] ? state.settings.lang : "system";
     applyTheme();
-    const b = state.settings.brief || {};
-    $("briefMOn").checked = b.mOn !== false; $("briefMRow").hidden = b.mOn === false; $("briefM").value = b.m || "08:00";
-    $("briefEOn").checked = b.eOn !== false; $("briefERow").hidden = b.eOn === false; $("briefE").value = b.e || "21:00";
+    const b = state.settings.brief || {}, anch = F.briefTimes(state.settings, ymd(new Date()));
+    // With sleep hours (Tu rutina) the summaries follow them, so their own time pickers step aside.
+    $("briefMOn").checked = b.mOn !== false; $("briefMRow").hidden = b.mOn === false || !!anch; $("briefM").value = b.m || "08:00";
+    $("briefEOn").checked = b.eOn !== false; $("briefERow").hidden = b.eOn === false || !!anch; $("briefE").value = b.e || "21:00";
+    $("briefAnch").hidden = !anch; $("briefAnch").textContent = anch ? tr("briefAnch", { m: clock(anch.m), e: clock(anch.e) }) : "";
     $("briefWOn").checked = b.wOn !== false;
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
@@ -2942,39 +3119,192 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("quietSum").textContent = tr("quietSum", { a: clock($("quietFrom").value), b: clock($("quietTo").value) });
   };
 
+  // ---------- Pendi's interview and "Tu rutina" ----------
+  // settings.name: the nickname Pendi uses. settings.form: how Pendi talks to the person (tú, usted or vos in Spanish;
+  // tu or vous in French; você or tu in Portuguese; English has a single "you", so it is not asked there).
+  // settings.routine: {work: {from, to, lunch, kind: fixed|shifts|none, days}, sleep: {up, bed, we: {up, bed} | null},
+  // forget: [...], done}. Nothing asks for a legal name, health, income or gender.
+  const FORMS = { es: ["tu", "usted", "vos"], pt: ["voce", "tu"], fr: ["tu", "vous"], en: [] };
+  const FORGET = ["meds", "appts", "pay", "bdays", "work"];
+  const WEEK = [1, 2, 3, 4, 5, 6, 0];
+  const rt = () => state.settings.routine || {};
+  const saveRoutine = (patch) => saveSettings({ routine: { ...rt(), ...patch } });
+  const capFirst = (x) => x.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase());
+  const formLine = (f, nick) => capFirst(tr("fm_" + f, { a: nick ? nick + ", " : "" }));
+  // The same nickname said each way; the person taps the one that sounds like them.
+  function formPicker(nick, cur, onPick) {
+    const list = FORMS[lang] || [];
+    if (!list.length) return null;
+    return el("div", { class: "lvcards", role: "radiogroup" }, list.map((f) => el("button", { type: "button", class: "lvcard", role: "radio", "aria-checked": String(cur === f), onclick: () => onPick(f) }, el("b", {}, formLine(f, String(nick || "").trim())))));
+  }
+  const dayChips = (days, onToggle) => el("div", { class: "chips" }, WEEK.map((i) => el("button", { type: "button", class: "chip", "aria-pressed": String(days.includes(i)), onclick: () => onToggle(i) }, fmt(new Date(2024, 0, i === 0 ? 7 : i), { weekday: "short" }))));
+  const forgetChips = (list, onToggle) => el("div", { class: "chips" }, FORGET.map((k) => el("button", { type: "button", class: "chip", "aria-pressed": String(list.includes(k)), onclick: () => onToggle(k) }, tr("fg_" + k))));
+  const timeIn = (v, fn) => { const i = el("input", { type: "time" }); i.value = v || ""; if (fn) i.onchange = () => fn(i.value); return i; };
+  const qrow = (label, input) => el("label", { class: "qrow" }, el("span", {}, label), input);
+  const switchRow = (label, on, fn) => { const c = el("input", { type: "checkbox" }); c.checked = !!on; c.onchange = () => fn(c.checked); return el("label", { class: "toggle" }, el("span", {}, label), c); };
+  // "Listo, Ana: no te agendo nada mientras duermes (de 11:00 PM a 7:00 AM); … y tus resúmenes llegan al despertar y antes de dormir."
+  // Only the rules for what the person answered.
+  function rewardText() {
+    const r = rt(), nick = String(state.settings.name || "").trim(), parts = [];
+    const sl = r.sleep && r.sleep.up && r.sleep.bed && r.sleep.up !== r.sleep.bed ? r.sleep : null;
+    if (sl) parts.push(sl.we && sl.we.up && sl.we.bed ? tr("rwSleepWe", { b: clock(sl.bed), u: clock(sl.up), b2: clock(sl.we.bed), u2: clock(sl.we.up) }) : tr("rwSleep", { b: clock(sl.bed), u: clock(sl.up) }));
+    if (r.work && r.work.from && r.work.to && r.work.kind !== "none") parts.push(tr("rwWork"));
+    if (sl) parts.push(tr("rwBrief"));
+    if (!parts.length) return nick ? tr("rwNone", { a: nick }) : tr("rwNone0");
+    if (parts.length > 1) parts[parts.length - 1] = tr("rwAnd") + parts[parts.length - 1];
+    return (nick ? tr("rwLead", { a: nick }) : tr("rwLead0")) + parts.join(tr("rwSep")) + ".";
+  }
+  // Five short questions, one per screen, every one can be skipped; each answer is saved when the person goes on.
+  // From the welcome (right after the reminders step), from the card on the day screen, or from Ajustes > Tu rutina.
+  function interview({ welcome = false } = {}) {
+    const box = $("onboard"), N = 5; let i = 0;
+    if (welcome) ls.set("onboarded", true);
+    const r0 = rt(), d = { form: state.settings.form || "", work: { days: [1, 2, 3, 4, 5], kind: "fixed", ...(r0.work || {}) }, forget: [...(r0.forget || [])] };
+    let lunchOn = !!d.work.lunch, weOn = !!(r0.sleep && r0.sleep.we);
+    const end = () => { box.hidden = true; box.classList.remove("iv"); box.replaceChildren(); syncSettings(); render(); };
+    const go = (save) => () => { if (save) save(); i++; paint(); };
+    const nav = (save) => el("div", { style: "display:grid;gap:4px;width:100%;justify-items:center" },
+      el("button", { class: "btn primary", style: "width:100%", onclick: go(save) }, tr("next")),
+      el("button", { class: "link", onclick: go() }, tr("skip")));
+    const panel = (...kids) => el("div", { class: "group" }, ...kids);
+    const steps = [
+      () => [el("div", { class: "big" }, "🧭"), el("h2", {}, tr("ivTitle")), el("p", {}, tr("ivPromise")),
+        el("button", { class: "btn primary", onclick: go() }, tr("ivStart")),
+        el("button", { class: "link", onclick: welcome ? () => { end(); openAdd(); } : end }, tr("ivLater"))],
+      // P1: the nickname, and how Pendi talks (tú / usted / vos), chosen by tapping a sentence, not asked apart.
+      () => {
+        const name = el("input", { class: "field", autocomplete: "nickname", maxlength: 40, placeholder: tr("q1Ph"), style: "background:var(--cell);text-align:center;font-size:18px" });
+        name.value = state.settings.name || "";
+        const pick = el("div", { style: "display:grid;gap:8px;width:100%" });
+        const paintForms = () => { const p = formPicker(name.value, d.form, (f) => { d.form = f; paintForms(); }); pick.replaceChildren(...(p ? [el("p", {}, tr("q1Form")), p] : [])); };
+        name.addEventListener("input", paintForms); paintForms();
+        return [el("h2", {}, tr("q1Title")), name, pick, nav(() => {
+          const v = name.value.trim().slice(0, 40), patch = {};
+          if (v !== (state.settings.name || "")) patch.name = v;
+          if (d.form && d.form !== state.settings.form) patch.form = d.form;
+          if (Object.keys(patch).length) saveSettings(patch);
+        })];
+      },
+      // P2: work hours, with an optional lunch time.
+      () => {
+        const from = timeIn(d.work.from), to = timeIn(d.work.to), lunch = timeIn(d.work.lunch || "13:00");
+        const lunchRow = qrow(tr("q2LunchAt"), lunch); lunchRow.hidden = !lunchOn;
+        const chip = el("button", { type: "button", class: "chip", "aria-pressed": String(lunchOn), onclick: () => { lunchOn = !lunchOn; chip.setAttribute("aria-pressed", String(lunchOn)); lunchRow.hidden = !lunchOn; } }, tr("q2Lunch"));
+        return [el("h2", {}, tr("q2Title")), panel(qrow(tr("q2In"), from), qrow(tr("q2Out"), to), el("div", { class: "chips" }, chip), lunchRow), nav(() => {
+          if (!from.value || !to.value || from.value === to.value) return;
+          d.work = { ...d.work, from: from.value, to: to.value, lunch: lunchOn ? lunch.value : "" }; saveRoutine({ work: d.work });
+        })];
+      },
+      // P2b: fixed, changing shifts or no fixed hours (that one turns the work rule off), and the days worked.
+      () => {
+        let kind = d.work.kind || "fixed", days = [...(d.work.days || [])];
+        const kinds = el("div", { class: "chips", style: "justify-content:center" }), daysBox = el("div", { style: "display:grid;gap:8px;width:100%" });
+        const paintP = () => {
+          kinds.replaceChildren(...["fixed", "shifts", "none"].map((k) => el("button", { type: "button", class: "chip", "aria-pressed": String(kind === k), onclick: () => { kind = k; paintP(); } }, tr("wk_" + k))));
+          daysBox.replaceChildren(...(kind === "none" ? [el("p", {}, tr("q2bNone"))]
+            : [el("p", {}, tr("q2bDays")), el("div", { style: "display:flex;justify-content:center" }, dayChips(days, (x) => { days = days.includes(x) ? days.filter((y) => y !== x) : [...days, x]; paintP(); })), el("p", { style: "font-size:14px" }, tr("q2bFoot"))]));
+        };
+        paintP();
+        return [el("h2", {}, tr("q2bTitle")), kinds, daysBox, nav(() => { d.work = { ...d.work, kind, days }; saveRoutine({ work: d.work }); })];
+      },
+      // P3: sleep, with a second pair of hours for the weekend if it is different.
+      () => {
+        const sl = rt().sleep || {}, up = timeIn(sl.up), bed = timeIn(sl.bed), weUp = timeIn((sl.we && sl.we.up) || ""), weBed = timeIn((sl.we && sl.we.bed) || "");
+        const we = el("div", { style: "display:grid;gap:10px", hidden: !weOn }, el("b", {}, tr("q3WeH")), qrow(tr("q3Up"), weUp), qrow(tr("q3Bed"), weBed));
+        return [el("h2", {}, tr("q3Title")), panel(qrow(tr("q3Up"), up), qrow(tr("q3Bed"), bed), switchRow(tr("q3We"), weOn, (on) => { weOn = on; we.hidden = !on; }), we), nav(() => {
+          if (!up.value || !bed.value || up.value === bed.value) return;
+          saveRoutine({ sleep: { up: up.value, bed: bed.value, we: weOn && weUp.value && weBed.value && weUp.value !== weBed.value ? { up: weUp.value, bed: weBed.value } : null } });
+        })];
+      },
+      // P4: what the person forgets the most (for the AI's suggestions and tone; no new reminders from it).
+      () => {
+        const chips = el("div", { style: "display:flex;justify-content:center" });
+        const paintF = () => chips.replaceChildren(forgetChips(d.forget, (k) => { d.forget = d.forget.includes(k) ? d.forget.filter((x) => x !== k) : [...d.forget, k]; paintF(); }));
+        paintF();
+        return [el("h2", {}, tr("q4Title")), el("p", {}, tr("q4Foot")), chips, nav(() => saveRoutine({ forget: d.forget }))];
+      },
+      // The reward: the rules, said back with the person's own data.
+      () => {
+        saveRoutine({ done: true });
+        return [el("div", { class: "big" }, "🎉"), el("h2", {}, tr("rwTitle")), el("p", { class: "reward" }, rewardText()),
+          el("button", { class: "btn primary", onclick: welcome ? () => { end(); openAdd(); } : end }, tr(welcome ? "rwGo" : "rwOk"))];
+      },
+    ];
+    const progress = () => el("div", { class: "ivprog", "aria-label": tr("ivStep", { i: Math.min(i, N), n: N }) },
+      el("div", { class: "bar" }, [...Array(N)].map((_, j) => el("i", { class: j < i ? "on" : "" }))),
+      i >= 1 && i <= N ? el("span", {}, tr("ivStep", { i, n: N })) : null);
+    const paint = () => {
+      box.replaceChildren(el("div", { class: "slide" }, progress(), ...steps[i]()),
+        ...(welcome ? [] : [el("button", { type: "button", class: "ivx", "aria-label": tr("close"), onclick: end }, "✕")]));
+      box.scrollTop = 0;
+    };
+    box.classList.add("iv"); box.hidden = false; paint();
+  }
+  // Accounts from before the interview: a soft card on today's screen, on one day only, that opens it.
+  function routineCard() {
+    const s = state.settings, today = ymd(new Date());
+    if (s.routine || !ls.get("onboarded", false) || (s.rtCard && s.rtCard !== today) || !$("onboard").hidden) return null;
+    if (!s.rtCard) saveSettings({ rtCard: today });
+    return el("div", { class: "card", style: "margin-bottom:12px;display:grid;gap:8px" },
+      el("div", { class: "row", style: "flex-wrap:nowrap;align-items:flex-start" }, el("h3", { style: "flex:1;margin:0" }, "🧭 " + tr("rtCardTitle")),
+        el("button", { class: "chev", "aria-label": tr("ivLater"), title: tr("ivLater"), onclick: () => { saveSettings({ rtCard: "off" }); renderCal(); } }, "✕")),
+      el("div", { class: "muted" }, tr("rtCardText")),
+      el("button", { class: "btn small primary", style: "justify-self:start", onclick: () => interview() }, tr("rtCardGo")));
+  }
+  // Ajustes > Tu rutina: everything from the interview, editable. Repainted from the saved settings, except while
+  // the person is typing a time there.
+  function paintRoutine(force) {
+    const a = document.activeElement;
+    if (!force && a && a.tagName === "INPUT" && a.type === "time" && $("routineGroup").contains(a)) return;
+    const r = rt(), w = { days: [1, 2, 3, 4, 5], kind: "fixed", ...(r.work || {}) }, sl = r.sleep || {};
+    const f = formPicker(state.settings.name, state.settings.form, (x) => { saveSettings({ form: x }); paintRoutine(true); });
+    $("formBox").hidden = !f; $("formBox").replaceChildren(...(f ? [el("span", {}, tr("formL")), f] : []));
+    const saveW = (patch) => { saveRoutine({ work: { ...w, ...patch } }); paintRoutine(true); };
+    $("workBox").replaceChildren(el("b", {}, tr("workH")),
+      el("div", { class: "chips" }, ["fixed", "shifts", "none"].map((k) => el("button", { type: "button", class: "chip", "aria-pressed": String(w.kind === k), onclick: () => saveW({ kind: k }) }, tr("wk_" + k)))),
+      ...(w.kind === "none" ? [el("span", { class: "muted" }, tr("q2bNone"))] : [
+        qrow(tr("q2In"), timeIn(w.from, (v) => saveW({ from: v }))), qrow(tr("q2Out"), timeIn(w.to, (v) => saveW({ to: v }))),
+        switchRow(tr("q2Lunch"), !!w.lunch, (on) => saveW({ lunch: on ? "13:00" : "" })),
+        w.lunch ? qrow(tr("q2LunchAt"), timeIn(w.lunch, (v) => saveW({ lunch: v }))) : null,
+        el("span", { class: "muted" }, tr("q2bDays")), dayChips(w.days, (x) => saveW({ days: w.days.includes(x) ? w.days.filter((y) => y !== x) : [...w.days, x] })),
+        w.from || w.to ? el("button", { type: "button", class: "link", style: "justify-self:start;padding-left:0", onclick: () => saveW({ from: "", to: "", lunch: "" }) }, tr("rtClear")) : null]));
+    const saveS = (patch) => { saveRoutine({ sleep: { ...sl, ...patch } }); paintRoutine(true); };
+    const we = sl.we || null;
+    $("sleepBox").replaceChildren(el("b", {}, tr("sleepH")),
+      qrow(tr("stUp"), timeIn(sl.up, (v) => saveS({ up: v }))), qrow(tr("stBed"), timeIn(sl.bed, (v) => saveS({ bed: v }))),
+      switchRow(tr("q3We"), !!we, (on) => saveS({ we: on ? { up: sl.up || "", bed: sl.bed || "" } : null })),
+      ...(we ? [el("span", { class: "muted" }, tr("q3WeH")), qrow(tr("stUp"), timeIn(we.up, (v) => saveS({ we: { ...we, up: v } }))), qrow(tr("stBed"), timeIn(we.bed, (v) => saveS({ we: { ...we, bed: v } })))] : []),
+      sl.up || sl.bed ? el("button", { type: "button", class: "link", style: "justify-self:start;padding-left:0", onclick: () => { saveRoutine({ sleep: null }); paintRoutine(true); } }, tr("rtClear")) : null);
+    const fg = r.forget || [];
+    $("forgetBox").replaceChildren(el("b", {}, tr("forgetL")), forgetChips(fg, (k) => { saveRoutine({ forget: fg.includes(k) ? fg.filter((x) => x !== k) : [...fg, k] }); paintRoutine(true); }));
+    $("rtRedo").textContent = tr(r.done ? "rtRedo" : "rtCardTitle");
+  }
+
   // ---------- first-time welcome ----------
+  // The welcome ends with Pendi's interview, right after the reminders step (tested or left for later).
   function onboarding() {
     const box = $("onboard"); let i = 0;
-    const finish = (tab) => { ls.set("onboarded", true); box.hidden = true; box.replaceChildren(); if (tab) showTab(tab); };
-    const pager = () => el("div", { class: "pager" }, [0, 1, 2, 3].map((j) => el("i", { class: j === Math.min(i, 3) ? "on" : "" })));
+    const pager = () => el("div", { class: "pager" }, [0, 1, 2].map((j) => el("i", { class: j === Math.min(i, 2) ? "on" : "" })));
     const slides = [
       () => [el("div", { class: "big" }, "👋"), el("h2", {}, tr("ob1Title")),
         el("p", {}, tr("ob1Text")),
         el("button", { class: "btn primary", onclick: () => { i = 1; paint(); } }, tr("start"))],
-      // Optional: the name Pendi uses; empty means neutral.
-      () => {
-        const name = el("input", { class: "field", autocomplete: "given-name", maxlength: 40, placeholder: tr("yourNamePh"), value: state.settings.name || "", style: "background:var(--cell);text-align:center;font-size:18px" });
-        return [el("div", { class: "big" }, "🙂"), el("h2", {}, tr("obNameTitle")), el("p", {}, tr("obNameText")),
-          el("form", { style: "display:grid;gap:12px;width:100%", onsubmit: (e) => { e.preventDefault(); const v = name.value.trim().slice(0, 40); if (v !== (state.settings.name || "")) saveSettings({ name: v }); syncSettings(); i = 2; paint(); } },
-            name, el("button", { class: "btn primary" }, tr("next"))),
-          el("button", { class: "link", onclick: () => { i = 2; paint(); } }, tr("skip"))];
-      },
       () => [el("div", { class: "big" }, "⚡"), el("h2", {}, tr("ob2Title")),
         el("p", {}, tr("ob2Text")),
-        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 3; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
+        el("div", { class: "chips", style: "justify-content:center" }, ["mañana", "tarde", "noche"].map((e) => el("button", { class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); syncSettings(); i = 2; paint(); } }, tr(e === "mañana" ? "morningE" : e === "tarde" ? "afternoonE" : "nightE"))))],
       () => [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")),
         el("p", {}, tr("ob3Text", { x: remindText() })),
-        el("button", { class: "btn primary", onclick: () => { i = 4; paint(); } }, tr("enableNotifs")),
+        el("button", { class: "btn primary", onclick: () => { i = 3; paint(); } }, tr("enableNotifs")),
         el("button", { class: "link", onclick: later }, tr("probeLater"))],
-      // The welcome ends when a real test reminder is tapped on this phone. It can be skipped, and then Ajustes keeps
+      // The reminders step ends when a real test reminder is tapped on this phone. It can be skipped, and then Ajustes keeps
       // saying the reminders are not confirmed.
       () => {
         const area = el("div", { style: "display:grid;gap:12px;width:100%" });
-        probeFlow(area, { ask: true, later, onDone: () => area.append(el("button", { class: "btn primary", style: "justify-self:center", onclick: () => finish() }, tr("start"))) });
+        probeFlow(area, { ask: true, later, onDone: () => area.append(el("button", { class: "btn primary", style: "justify-self:center", onclick: () => interview({ welcome: true }) }, tr("start"))) });
         return [el("div", { class: "big" }, "🔔"), el("h2", {}, tr("ob3Title")), area];
       },
     ];
-    function later() { ls.set("pushProof", { ok: false, at: Date.now() }); finish(); renderPush(); }
+    function later() { ls.set("pushProof", { ok: false, at: Date.now() }); renderPush(); interview({ welcome: true }); }
     const paint = () => box.replaceChildren(el("div", { class: "slide" }, ...slides[i](), pager()));
     box.hidden = false; paint();
   }
@@ -3089,12 +3419,15 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     syncSettings();
     render(); renderChat(); renderSetup(); renderPush();
     showTab(isPhone() ? "cal" : "organize");
+    const wasOnboarded = ls.get("onboarded", false);
     const fromUrl = handleUrl();
     if (bdayNudges() && !fromUrl) showTab("chat");
     scrollToNow(); checkReminders();
     await probeCache();
     if ("serviceWorker" in navigator) navigator.serviceWorker.ready.then((r) => r.active && r.active.postMessage({ hello: true, standalone })).catch(() => {});
     if (!ls.get("onboarded", false) && !fromUrl) onboarding();
+    // The test reminder of the welcome was tapped and opened a new window: the welcome goes on with the interview.
+    else if (!wasOnboarded && ls.get("onboarded", false) && !state.settings.routine) interview({ welcome: true });
     else if (!fromUrl) nextHow();
   }
 
@@ -3145,7 +3478,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v);
   };
   $("energy").onchange = () => saveSettings({ energy: $("energy").value });
-  $("myName").onchange = () => { const v = $("myName").value.trim().slice(0, 40); $("myName").value = v; if (v !== (state.settings.name || "")) { saveSettings({ name: v }); notice(tr("nameSaved")); } };
+  $("myName").onchange = () => { const v = $("myName").value.trim().slice(0, 40); $("myName").value = v; if (v !== (state.settings.name || "")) { saveSettings({ name: v }); paintRoutine(true); notice(tr("nameSaved")); } };
+  $("myName").oninput = () => { const f = formPicker($("myName").value, state.settings.form, () => {}); if (f) $("formBox").querySelectorAll(".lvcard b").forEach((b, j) => { b.textContent = f.children[j].textContent; }); };
+  $("rtRedo").onclick = () => interview();
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
   $("logout").onclick = () => { ls.set("pass", ""); pass = ""; location.reload(); };
