@@ -572,7 +572,7 @@ html.kb .tabbar { display: none; }
           <label class="toggle"><span data-i18n="weeklyBrief"></span> <input type="checkbox" id="briefWOn"></label>
           <button class="link" id="seeWeek" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
         </div>
-        <p class="foot" data-i18n="briefFoot"></p>
+        <p class="foot" id="briefFoot"></p>
         <h3 class="sub" data-i18n="appearance"></h3>
         <div class="group">
           <label class="toggle"><span data-i18n="theme"></span>
@@ -605,7 +605,7 @@ html.kb .tabbar { display: none; }
             <input class="field" id="inviteName" autocomplete="off" maxlength="60" style="flex:1" data-i18n-ph="inviteNamePh">
             <button class="btn primary small" id="inviteGo" data-i18n="inviteGo"></button>
           </form>
-          <div id="inviteList" class="group"></div>
+          <div id="inviteList" class="group" hidden></div>
         </div>
         <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
@@ -1221,6 +1221,19 @@ html.kb .tabbar { display: none; }
       briefAnch: "Avec ta routine, ils arrivent à ton réveil ({m}) et avant de dormir ({e})." },
   };
   for (const k of Object.keys(P9)) Object.assign(I18N[k], P9[k]);
+  // 0.13.2: the strip once the time is up, "Quitar" with undo, the Sunday time in the chosen clock, and a task the chat
+  // proposed to move or delete that is no longer there.
+  const P10 = {
+    es: { barEnd: "⌛ TERMINÓ", barOver: "hace {x}", rtWorkGone: "Horario de trabajo quitado", rtSleepGone: "Horario de sueño quitado",
+      briefFoot: "Llegan como aviso. El de la noche te deja pasar lo pendiente a mañana; el del domingo, a las {t}.", goneTask: "una tarea que ya no está" },
+    en: { barEnd: "⌛ TIME'S UP", barOver: "{x} ago", rtWorkGone: "Work hours removed", rtSleepGone: "Sleep hours removed",
+      briefFoot: "They arrive as notifications. The evening one lets you move what's left to tomorrow; Sunday's comes at {t}.", goneTask: "a task that's no longer there" },
+    pt: { barEnd: "⌛ TERMINOU", barOver: "há {x}", rtWorkGone: "Horário de trabalho removido", rtSleepGone: "Horário de sono removido",
+      briefFoot: "Chegam como aviso. O da noite deixa você passar o que falta para amanhã; o de domingo chega às {t}.", goneTask: "uma tarefa que já não existe" },
+    fr: { barEnd: "⌛ TERMINÉE", barOver: "il y a {x}", rtWorkGone: "Horaires de travail retirés", rtSleepGone: "Horaires de sommeil retirés",
+      briefFoot: "Ils arrivent comme des rappels. Celui du soir te laisse passer le reste à demain ; celui du dimanche arrive à {t}.", goneTask: "une tâche qui n'existe plus" },
+  };
+  for (const k of Object.keys(P10)) Object.assign(I18N[k], P10[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1275,8 +1288,9 @@ html.kb .tabbar { display: none; }
   // Short date in the format chosen in Ajustes (día/mes or mes/día).
   const fmtDate = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return (state.settings.datefmt === "en" ? `${m}/${d}` : `${d}/${m}`) + "/" + y; };
   // A "HH:MM" time in the clock chosen in Ajustes: "3:52 PM" (12 h, the default) or "15:52" (24 h).
+  const clockMode = () => state.settings.clock || "12";
   const clock = (s) => {
-    if (!s || state.settings.clock === "24") return s || "";
+    if (!s || clockMode() === "24") return s || "";
     const [h, m] = s.split(":").map(Number);
     return `${h % 12 || 12}:${pad(m)} ${h < 12 ? "AM" : "PM"}`;
   };
@@ -1331,7 +1345,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.13.1";
+  const VERSION = "0.13.2";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1691,7 +1705,8 @@ html.kb .tabbar { display: none; }
     let head = tr("barNone"), rest = [], cls = "none";
     if (x.kind === "run") {
       const left = x.end - now;
-      head = tr("barRun"); cls = left > 0 ? "run" : "run over";
+      // In time: "EN CURSO" counting down; past its time and still open: "TERMINÓ", counting up.
+      head = tr(left > 0 ? "barRun" : "barEnd"); cls = left > 0 ? "run" : "run over";
       rest = [t.title, left > 0 ? tr("barLeft", { x: tick(left) }) : tr("barOver", { x: tick(-left) })];
       if (t.steps && t.steps.length) rest.push(tr("stepsProg", { d: t.steps.filter((s) => s.done).length, n: t.steps.length }));
     } else if (x.kind === "next") {
@@ -1844,7 +1859,7 @@ html.kb .tabbar { display: none; }
 
   // ---------- event sheet ----------
   function gcalLink(t) {
-    const s = at(t.date, t.time), e = new Date(s.getTime() + t.dur * 60000);
+    const s = at(t.date, t.time), e = new Date(s.getTime() + (Number(t.dur) || 30) * 60000);
     const f = (d) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
     return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(t.title) + "&dates=" + f(s) + "/" + f(e) + "&details=" + encodeURIComponent(t.tip ? tr("tipLabel") + t.tip : "");
   }
@@ -1860,7 +1875,7 @@ html.kb .tabbar { display: none; }
     const bg = $("sheet"); bg.replaceChildren(sh); bg.hidden = false;
   }
   function openSheet(t) {
-    const end = new Date(at(t.date, t.time).getTime() + t.dur * 60000);
+    const end = new Date(at(t.date, t.time).getTime() + (Number(t.dur) || 30) * 60000);
     const s = t.series && state.series.find((x) => x.id === t.series);
     const real = !t.example;
     const then = (fn) => () => { closeSheet(); fn(); };
@@ -2385,7 +2400,7 @@ ${shape}`);
     for (let i = 0; i < days; i++) {
       const d = ymd(addDays(start, i));
       const items = state.tasks.filter((t) => t.date === d).sort((a, b) => a.time.localeCompare(b.time));
-      out.push(d + " (" + dayName(addDays(start, i)) + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.anytime ? "sin hora" : t.time} ${t.star ? "⭐ " : ""}${t.title} (${t.dur} min${t.done ? ", hecho" : ""}${t.series ? ", se repite" : ""})`).join("; ") : "libre"));
+      out.push(d + " (" + dayName(addDays(start, i)) + "): " + (items.length ? items.map((t) => `[id ${t.id}] ${t.anytime ? "sin hora" : t.time} ${t.star ? "⭐ " : ""}${t.title} (${t.dur || 30} min${t.done ? ", hecho" : ""}${t.series ? ", se repite" : ""})`).join("; ") : "libre"));
     }
     return out.join("\n");
   }
@@ -2576,6 +2591,7 @@ Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
         a.mine = a.hora_dicha === true || saysTime(said);
         if (!a.mine && /^\d{1,2}:\d{2}$/.test(a.hora || "")) a.hora = fitAi(a.fecha, String(a.hora).padStart(5, "0"), Math.max(5, Number(a.duracion) || 30));
       }
+      for (const a of acts) { const t = (a.tipo === "mover" || a.tipo === "borrar") && state.tasks.find((x) => x.id === String(a.id)); if (t) a.was = t.title; }
       if (acts.length) state.chat.push({ role: "assistant", actions: acts, content: "" });
     } catch (e) {
       state.chat.splice(state.chat.indexOf(thinking), 1);
@@ -2584,8 +2600,10 @@ Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
   }
   let chatAbort = null;
   function chatBusy(on) { const b = $("chatSend"); b.classList.toggle("stop", on); b.textContent = tr(on ? "stop" : "send"); }
+  // A task to move or delete may be gone by the time the card is painted again (deleted here, or by hand later):
+  // the card then uses the title saved when it was proposed, so the chat never breaks.
   function describe(a) {
-    const t = state.tasks.find((x) => x.id === String(a.id));
+    const t = state.tasks.find((x) => x.id === String(a.id)) || { title: a.was || tr("goneTask"), date: a.fecha || ymd(new Date()), time: a.hora || "" };
     if (a.tipo === "crear") return (/^\d{1,2}:\d{2}$/.test(a.hora || "") ? tr("actCreate", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha), h: clock(String(a.hora).padStart(5, "0")) }) : tr("actCreateAny", { e: emojiOnly(a.emoji) || "➕", t: a.titulo, d: niceDate(a.fecha) })) + (repFromAi(a.repetir) ? " 🔁 " + repeatText({ ...repFromAi(a.repetir), start: a.fecha }) : "");
     if (a.tipo === "cumple") return tr("actBday", { n: a.nombre, d: dayMonth(Number(a.mes), Number(a.dia)) });
     if (a.tipo === "mover") return tr("actMove", { t: t.title, d: niceDate(a.fecha || t.date), h: clock(a.hora ? String(a.hora).padStart(5, "0") : t.time) });
@@ -3019,7 +3037,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   const inviteLink = (p) => location.origin + "/?invite=" + p.token;
   async function renderInvites() {
     let people = [];
-    try { people = (await call("/api/invite")).people || []; } catch { return; }
+    try { people = (await call("/api/invite")).people || []; } catch { $("inviteList").hidden = true; return; }
     $("inviteList").hidden = !people.length;
     $("inviteList").replaceChildren(...people.map((p) => el("div", { class: "row", style: "justify-content:space-between;padding:10px 16px" },
       el("b", {}, p.name),
@@ -3076,7 +3094,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("energy").value = energy();
     $("sound").checked = state.settings.sound !== false;
     $("datefmt").value = state.settings.datefmt || "es";
-    $("clock").value = state.settings.clock || "12";
+    $("clock").value = clockMode();
     $("theme").value = state.settings.theme || "system";
     $("lang").value = LANGS[state.settings.lang] ? state.settings.lang : "system";
     applyTheme();
@@ -3086,6 +3104,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("briefEOn").checked = b.eOn !== false; $("briefERow").hidden = b.eOn === false || !!anch; $("briefE").value = b.e || "21:00";
     $("briefAnch").hidden = !anch; $("briefAnch").textContent = anch ? tr("briefAnch", { m: clock(anch.m), e: clock(anch.e) }) : "";
     $("briefWOn").checked = b.wOn !== false;
+    $("briefFoot").textContent = tr("briefFoot", { t: clock("18:00") });
     const q = state.settings.quiet || {};
     $("quietOn").checked = !!q.on; $("quietRow").hidden = !q.on;
     $("quietFrom").value = q.from || "22:00"; $("quietTo").value = q.to || "07:00";
@@ -3258,6 +3277,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   }
   // Ajustes > Tu rutina: everything from the interview, editable. Repainted from the saved settings, except while
   // the person is typing a time there.
+  // "Quitar" under Trabajo or Sueño: a real button, and the hours come back with "Deshacer".
+  const clearBtn = (clear, msg, restore) => el("button", { type: "button", class: "btn small", style: "justify-self:start", onclick: () => {
+    const prev = clear(); notice(tr(msg), () => { restore(prev); syncSettings(); });
+  } }, tr("rtClear"));
   function paintRoutine(force) {
     const a = document.activeElement;
     if (!force && a && a.tagName === "INPUT" && a.type === "time" && $("routineGroup").contains(a)) return;
@@ -3265,21 +3288,21 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     const f = formPicker(state.settings.name, state.settings.form, (x) => { saveSettings({ form: x }); paintRoutine(true); });
     $("formBox").hidden = !f; $("formBox").replaceChildren(...(f ? [el("span", {}, tr("formL")), f] : []));
     const saveW = (patch) => { saveRoutine({ work: { ...w, ...patch } }); paintRoutine(true); };
-    $("workBox").replaceChildren(el("b", {}, tr("workH")),
+    $("workBox").replaceChildren(...[el("b", {}, tr("workH")),
       el("div", { class: "chips" }, ["fixed", "shifts", "none"].map((k) => el("button", { type: "button", class: "chip", "aria-pressed": String(w.kind === k), onclick: () => saveW({ kind: k }) }, tr("wk_" + k)))),
       ...(w.kind === "none" ? [el("span", { class: "muted" }, tr("q2bNone"))] : [
         qrow(tr("q2In"), timeIn(w.from, (v) => saveW({ from: v }))), qrow(tr("q2Out"), timeIn(w.to, (v) => saveW({ to: v }))),
         switchRow(tr("q2Lunch"), !!w.lunch, (on) => saveW({ lunch: on ? "13:00" : "" })),
         w.lunch ? qrow(tr("q2LunchAt"), timeIn(w.lunch, (v) => saveW({ lunch: v }))) : null,
         el("span", { class: "muted" }, tr("q2bDays")), dayChips(w.days, (x) => saveW({ days: w.days.includes(x) ? w.days.filter((y) => y !== x) : [...w.days, x] })),
-        w.from || w.to ? el("button", { type: "button", class: "link", style: "justify-self:start;padding-left:0", onclick: () => saveW({ from: "", to: "", lunch: "" }) }, tr("rtClear")) : null]));
+        w.from || w.to ? clearBtn(() => { const prev = clone(rt().work || null); saveW({ from: "", to: "", lunch: "" }); return prev; }, "rtWorkGone", (prev) => saveRoutine({ work: prev })) : null])].filter(Boolean));
     const saveS = (patch) => { saveRoutine({ sleep: { ...sl, ...patch } }); paintRoutine(true); };
     const we = sl.we || null;
-    $("sleepBox").replaceChildren(el("b", {}, tr("sleepH")),
+    $("sleepBox").replaceChildren(...[el("b", {}, tr("sleepH")),
       qrow(tr("stUp"), timeIn(sl.up, (v) => saveS({ up: v }))), qrow(tr("stBed"), timeIn(sl.bed, (v) => saveS({ bed: v }))),
       switchRow(tr("q3We"), !!we, (on) => saveS({ we: on ? { up: sl.up || "", bed: sl.bed || "" } : null })),
       ...(we ? [el("span", { class: "muted" }, tr("q3WeH")), qrow(tr("stUp"), timeIn(we.up, (v) => saveS({ we: { ...we, up: v } }))), qrow(tr("stBed"), timeIn(we.bed, (v) => saveS({ we: { ...we, bed: v } })))] : []),
-      sl.up || sl.bed ? el("button", { type: "button", class: "link", style: "justify-self:start;padding-left:0", onclick: () => { saveRoutine({ sleep: null }); paintRoutine(true); } }, tr("rtClear")) : null);
+      sl.up || sl.bed ? clearBtn(() => { const prev = clone(rt().sleep || null); saveRoutine({ sleep: null }); paintRoutine(true); return prev; }, "rtSleepGone", (prev) => saveRoutine({ sleep: prev })) : null].filter(Boolean));
     const fg = r.forget || [];
     $("forgetBox").replaceChildren(el("b", {}, tr("forgetL")), forgetChips(fg, (k) => { saveRoutine({ forget: fg.includes(k) ? fg.filter((x) => x !== k) : [...fg, k] }); paintRoutine(true); }));
     $("rtRedo").textContent = tr(r.done ? "rtRedo" : "rtCardTitle");
@@ -3449,13 +3472,13 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("bdAdd").onclick = () => { $("bdForm").hidden = !$("bdForm").hidden; if (!$("bdForm").hidden) $("bName").focus(); };
   $("bdCancel").onclick = () => { $("bdForm").reset(); $("bdForm").hidden = true; document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh()); };
   $("datefmt").onchange = () => { saveSettings({ datefmt: $("datefmt").value }); syncSettings(); render(); };
-  $("clock").onchange = () => { saveSettings({ clock: $("clock").value }); render(); };
+  $("clock").onchange = () => { saveSettings({ clock: $("clock").value }); syncSettings(); render(); };
   $("theme").onchange = () => { saveSettings({ theme: $("theme").value }); applyTheme(); };
   // Changing the language repaints every screen; the server keeps it (uiLang) for the notifications it sends.
   for (const [k, name] of Object.entries(LANGS)) $("lang").append(el("option", { value: k }, name));
   $("lang").onchange = () => {
     saveSettings({ lang: $("lang").value }); setLang(); saveSettings({ uiLang: lang });
-    applyLang(); syncSettings(); render(); renderChat(); renderSetup(); renderPush(); renderProposals();
+    applyLang(); syncSettings(); render(); renderSetup(); renderPush(); renderProposals(); renderChat();
   };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   ["briefMOn", "briefM", "briefEOn", "briefE", "briefWOn"].forEach((x) => { $(x).onchange = saveBrief; });
