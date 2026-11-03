@@ -6,13 +6,14 @@ const T = {
     bday2: "En 2 días cumple {n} 🎂", bday2Body: "¿Elegimos un regalo? Toca para ver ideas.",
     bday0: "Hoy cumple {n} 🎉", bday0Body: "Toca para ver un mensaje listo para enviarle.",
     testTitle: "Prueba de aviso", testBody: "Así te voy a avisar antes de cada cosa.",
-    snooze: "Posponer 10 min", done: "Hecho",
+    a_snooze: "Posponer…", a_go: "Voy ahora", a_start: "▶ Empezar", a_notnow: "Ahora no", a_yes: "✔ Ya está", a_finished: "✔ Ya terminé", a_more: "Sigo en eso · +15", a_notyet: "Todavía no",
+    askInstant: "¿Ya hiciste «{x}»?", askTimed: "¿Ya terminaste «{x}»?", askBody: "Toca para más respuestas.", groupTitle: "Tienes {n} cosas por confirmar",
     mTitle: "☀️ Buenos días", mOne: "Hoy tienes 1 cosa: {x}, a las {t}.", mMany: "Hoy tienes {n} cosas. La primera, a las {t}: {x}.", mNoTime: "Hoy tienes {n} cosas, sin hora fija.",
     mFree: "Hoy tienes el día libre. ¿Organizamos algo?", mStar: "⭐ No olvides: {x}.",
     eTitle: "🌙 Cierre del día", eOne: "Te queda 1 pendiente de hoy. ¿Lo paso a mañana?", eMany: "Te quedan {n} pendientes de hoy. ¿Los paso a mañana?",
     eDoneTitle: "🎉 ¡Día completo!", eDoneBody: "Hiciste todo lo de hoy. ¡A descansar!",
-    wTitle: "📊 Tu semana", wBody: "Hiciste {d} de {t} cosas. La próxima semana trae {n}. Toca para verla.",
-    dueNow: "Es ahora", lateStill: "Sigue pendiente", morningOpenLead: "Ayer quedó sin cerrar: {x}.",
+    wTitle: "📊 Tu semana", wBody: "Cerraste {d} de {t}. La próxima semana trae {n}. Toca para verla.", wBodyGood: "Cerraste {d} de {t}; salieron bien: {g}. La próxima semana trae {n}. Toca para verla.",
+    dueNow: "Es ahora", morningOpenLead: "Ayer quedó sin cerrar: {x}.",
   },
   en: {
     probeTitle: "🔔 Pendi test", probeBody: "Tap this reminder to confirm they reach you.", arrived: "It arrived",
@@ -20,13 +21,14 @@ const T = {
     bday2: "{n}'s birthday is in 2 days 🎂", bday2Body: "Shall we pick a gift? Tap to see ideas.",
     bday0: "It's {n}'s birthday today 🎉", bday0Body: "Tap to see a message ready to send.",
     testTitle: "Test notification", testBody: "This is how I'll remind you before each thing.",
-    snooze: "Snooze 10 min", done: "Done",
+    a_snooze: "Snooze…", a_go: "On my way", a_start: "▶ Start", a_notnow: "Not now", a_yes: "✔ Done it", a_finished: "✔ I'm done", a_more: "Still on it · +15", a_notyet: "Not yet",
+    askInstant: "Did you do “{x}”?", askTimed: "Have you finished “{x}”?", askBody: "Tap for more answers.", groupTitle: "You have {n} things to confirm",
     mTitle: "☀️ Good morning", mOne: "Today you have 1 thing: {x}, at {t}.", mMany: "Today you have {n} things. The first, at {t}: {x}.", mNoTime: "Today you have {n} things, no set times.",
     mFree: "Your day is free today. Shall we plan something?", mStar: "⭐ Don't forget: {x}.",
     eTitle: "🌙 End of the day", eOne: "1 thing is left from today. Move it to tomorrow?", eMany: "{n} things are left from today. Move them to tomorrow?",
     eDoneTitle: "🎉 Day complete!", eDoneBody: "You did everything today. Time to rest!",
-    wTitle: "📊 Your week", wBody: "You did {d} of {t} things. Next week brings {n}. Tap to see it.",
-    dueNow: "It's time", lateStill: "Still open", morningOpenLead: "Left open yesterday: {x}.",
+    wTitle: "📊 Your week", wBody: "You closed {d} of {t}. Next week brings {n}. Tap to see it.", wBodyGood: "You closed {d} of {t}; went well: {g}. Next week brings {n}. Tap to see it.",
+    dueNow: "It's time", morningOpenLead: "Left open yesterday: {x}.",
   },
   pt: {
     probeTitle: "🔔 Teste do Pendi", probeBody: "Toque neste aviso para confirmar que eles chegam.", arrived: "Chegou",
@@ -34,13 +36,14 @@ const T = {
     bday2: "Daqui a 2 dias é o aniversário de {n} 🎂", bday2Body: "Vamos escolher um presente? Toque para ver ideias.",
     bday0: "Hoje é o aniversário de {n} 🎉", bday0Body: "Toque para ver uma mensagem pronta para enviar.",
     testTitle: "Aviso de teste", testBody: "É assim que vou te avisar antes de cada coisa.",
-    snooze: "Adiar 10 min", done: "Feito",
+    a_snooze: "Adiar…", a_go: "Vou agora", a_start: "▶ Começar", a_notnow: "Agora não", a_yes: "✔ Já fiz", a_finished: "✔ Terminei", a_more: "Ainda fazendo · +15", a_notyet: "Ainda não",
+    askInstant: "Você já fez “{x}”?", askTimed: "Você já terminou “{x}”?", askBody: "Toque para mais respostas.", groupTitle: "Você tem {n} coisas para confirmar",
     mTitle: "☀️ Bom dia", mOne: "Hoje você tem 1 coisa: {x}, às {t}.", mMany: "Hoje você tem {n} coisas. A primeira, às {t}: {x}.", mNoTime: "Hoje você tem {n} coisas, sem hora fixa.",
     mFree: "Hoje seu dia está livre. Vamos organizar algo?", mStar: "⭐ Não esqueça: {x}.",
     eTitle: "🌙 Fim do dia", eOne: "Falta 1 coisa de hoje. Passo para amanhã?", eMany: "Faltam {n} coisas de hoje. Passo para amanhã?",
     eDoneTitle: "🎉 Dia completo!", eDoneBody: "Você fez tudo hoje. Hora de descansar!",
-    wTitle: "📊 Sua semana", wBody: "Você fez {d} de {t} coisas. A próxima semana traz {n}. Toque para ver.",
-    dueNow: "É agora", lateStill: "Ainda pendente", morningOpenLead: "Ficou em aberto ontem: {x}.",
+    wTitle: "📊 Sua semana", wBody: "Você fechou {d} de {t}. A próxima semana traz {n}. Toque para ver.", wBodyGood: "Você fechou {d} de {t}; deram certo: {g}. A próxima semana traz {n}. Toque para ver.",
+    dueNow: "É agora", morningOpenLead: "Ficou em aberto ontem: {x}.",
   },
   fr: {
     probeTitle: "🔔 Test de Pendi", probeBody: "Touche ce rappel pour confirmer qu'ils t'arrivent.", arrived: "Reçu",
@@ -48,13 +51,14 @@ const T = {
     bday2: "L'anniversaire de {n} est dans 2 jours 🎂", bday2Body: "On choisit un cadeau ? Touche pour voir des idées.",
     bday0: "C'est l'anniversaire de {n} aujourd'hui 🎉", bday0Body: "Touche pour voir un message prêt à envoyer.",
     testTitle: "Rappel de test", testBody: "C'est comme ça que je te préviendrai avant chaque chose.",
-    snooze: "Reporter 10 min", done: "Fait",
+    a_snooze: "Reporter…", a_go: "J'y vais", a_start: "▶ Commencer", a_notnow: "Pas maintenant", a_yes: "✔ C'est fait", a_finished: "✔ J'ai fini", a_more: "J'y suis encore · +15", a_notyet: "Pas encore",
+    askInstant: "Tu as fait « {x} » ?", askTimed: "Tu as fini « {x} » ?", askBody: "Touche pour plus de réponses.", groupTitle: "Tu as {n} choses à confirmer",
     mTitle: "☀️ Bonjour", mOne: "Aujourd'hui tu as 1 chose : {x}, à {t}.", mMany: "Aujourd'hui tu as {n} choses. La première, à {t} : {x}.", mNoTime: "Aujourd'hui tu as {n} choses, sans heure fixe.",
     mFree: "Ta journée est libre. On organise quelque chose ?", mStar: "⭐ N'oublie pas : {x}.",
     eTitle: "🌙 Fin de journée", eOne: "Il te reste 1 chose d'aujourd'hui. Je la passe à demain ?", eMany: "Il te reste {n} choses d'aujourd'hui. Je les passe à demain ?",
     eDoneTitle: "🎉 Journée complète !", eDoneBody: "Tu as tout fait aujourd'hui. Repos !",
-    wTitle: "📊 Ta semaine", wBody: "Tu as fait {d} choses sur {t}. La semaine prochaine en a {n}. Touche pour voir.",
-    dueNow: "C'est maintenant", lateStill: "Toujours en attente", morningOpenLead: "Resté ouvert hier : {x}.",
+    wTitle: "📊 Ta semaine", wBody: "Tu as clôturé {d} sur {t}. La semaine prochaine en a {n}. Touche pour voir.", wBodyGood: "Tu as clôturé {d} sur {t} ; bien passées : {g}. La semaine prochaine en a {n}. Touche pour voir.",
+    dueNow: "C'est maintenant", morningOpenLead: "Resté ouvert hier : {x}.",
   },
 };
 
@@ -62,5 +66,3 @@ export const texts = (lang) => {
   const d = T[lang] || T.es;
   return (key, vars = {}) => d[key].replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 };
-// Labels for the buttons on a task notification (read by sw.js).
-export const actionLabels = (lang) => { const tr = texts(lang); return { snoozeLabel: tr("snooze"), doneLabel: tr("done") }; };

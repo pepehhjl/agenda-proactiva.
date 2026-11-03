@@ -91,6 +91,16 @@ export async function sendToAll(sb, payload, owner = "main") {
   }
   return sent;
 }
+// A notification's buttons change that one task in the background, without the app or the password:
+// the push carries this signature of owner + task id, and /api/act checks it.
+export function actSig(owner, id) {
+  const secret = env("APP_PASSWORD") + "|" + (vapidKeys().priv || "");
+  return crypto.createHmac("sha256", secret).update(owner + "/" + id).digest("base64url").slice(0, 32);
+}
+export function actOk(owner, id, sig) {
+  const a = Buffer.from(actSig(owner, id)), b = Buffer.from(String(sig || ""));
+  return !!env("APP_PASSWORD") && a.length === b.length && crypto.timingSafeEqual(a, b);
+}
 // Sends one notification to one device (throws if the push service refuses it).
 export const sendOne = (sub, payload) => webpush.sendNotification(sub, JSON.stringify(payload), { TTL: payload.ttl || 3600, urgency: payload.urgency || "normal" });
 

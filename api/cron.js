@@ -1,9 +1,14 @@
-// Runs every minute (called by Supabase pg_cron). Sends reminders 60, 30 and 10 minutes before each task,
-// one at its exact time and one more 30 minutes later while it is still open,
+// Runs every minute (called by Supabase pg_cron). Sends reminders 60, 30 and 10 minutes before each task
+// (as chosen in Ajustes), one at its exact time, then the closing question with a strict budget (see flow.js):
+// instant tasks get the question 10 min later, timed ones a check-in when their time is up, each repeated once
+// at most; several questions at once go out as one grouped notification;
 // birthday notices 2 days before and on the day, at 9:00 in the user's time zone, and the morning, evening and
 // Sunday summaries at the times chosen in Ajustes > Resúmenes.
-import { authed, deny, supa, pushReady, sendToAll } from "./_lib.js";
-import { texts, actionLabels } from "./_i18n.js";
+import { authed, deny, supa, pushReady, sendToAll, actSig } from "./_lib.js";
+import { texts } from "./_i18n.js";
+import "../flow.js";
+
+const F = globalThis.PendiFlow;
 
 const THRESHOLDS = [60, 30, 10];
 const EMOJI = { trabajo: "💼", personal: "🙋", casa: "🏠", salud: "💪", creativo: "🎨", social: "🎉", otro: "📌" };
@@ -51,7 +56,14 @@ async function remind(sb, owner, items) {
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
   const tr = texts(settings.uiLang);
-  const labels = actionLabels(settings.uiLang);
+  // The buttons of a task notification (the service worker shows as many as the phone allows, in this order).
+  // Posponer and Ahora no open a small choice inside the installed app; the others work in the background.
+  const btn = (k, title) => ({ action: k, title: title || tr("a_" + k) });
+  const sign = (id) => ({ act: { o: owner, s: actSig(owner, id) } });
+  const remindBtns = (t) => (F.timed(t) ? [btn("start"), btn("notnow")] : [btn("snooze"), btn("go")]);
+  const askBtns = (t) => (F.timed(t) ? [btn("finished"), ...((Number(t.ext) || 0) < F.MAX_EXT ? [btn("more")] : [])] : [btn("yes", t.yes), btn("notyet")]);
+  const question = (t) => (F.timed(t) ? tr("askTimed", { x: t.title }) : t.q || tr("askInstant", { x: t.title }));
+  const asks = []; // closing questions due now: grouped if there are several
   // Which warnings the user wants (Ajustes > Avisos). Default: all three.
   const wanted = Array.isArray(settings.remind) && settings.remind.length ? THRESHOLDS.filter((x) => settings.remind.includes(x)) : THRESHOLDS;
   const hmNow = localHm(new Date(now), tz);
@@ -61,35 +73,40 @@ async function remind(sb, owner, items) {
   const dayKey = (off) => new Date(Date.UTC(lp0.y, lp0.m - 1, lp0.d + off)).toISOString().slice(0, 10);
   const todayK = dayKey(0);
   const tasks = items.filter((r) => r.kind === "task").map((r) => r.data);
-  const today = tasks.filter((t) => t.date === todayK), open = today.filter((t) => !t.done);
+  const today = tasks.filter((t) => t.date === todayK), open = today.filter((t) => !F.closed(t));
 
   const due = []; // {keys, payload}
   for (const r of items) {
     const t = r.data;
     // A reminder the user postponed with "Posponer".
-    if (r.kind === "task" && !t.done && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
+    const live = r.kind === "task" && !F.closed(t) && !t.startedAt;
+    if (live && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
       const key = `${r.id}@snooze@${t.snooze}`;
       const past = t.start && Date.parse(t.start) <= now;
       const body = t.anytime ? t.tip || "" : `${tr(past ? "wasAt" : "isAt", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`;
-      due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("reminder").toUpperCase()} · ${icon(t)} ${t.title}`, body, tag: r.id, taskId: r.id, urgency: "high", ...labels } });
+      due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("reminder").toUpperCase()} · ${icon(t)} ${t.title}`, body, tag: r.id, taskId: r.id, urgency: "high", actions: remindBtns(t), ...sign(r.id) } });
     }
-    // Escalation: at the task's exact time, and once more 30 min later if it is still open (2 at most).
-    // Not after "Posponer": the postponed reminder takes over. Each has a 10-minute window, so quiet hours skip it.
-    if (r.kind === "task" && !t.done && t.start && !t.anytime && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
+    // At the task's exact time: a reminder that informs and never closes it ("Es hora de…" with Posponer / Voy ahora,
+    // or ▶ Empezar / Ahora no for a timed task). Not after "Posponer": the postponed reminder takes over.
+    // A 10-minute window, so quiet hours skip it. The old "+30 min, still open" repeat is gone: the closing question replaces it.
+    if (live && t.start && !t.anytime && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
       const ago = (now - Date.parse(t.start)) / 60000;
-      const step = ago >= 0 && ago < 10 ? "due" : ago >= 30 && ago < 40 ? "late" : null;
-      if (step) {
-        const key = `${r.id}@${t.start}#${step}`, when = clock(t.time, settings.clock), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
-        due.push({
-          check: key, keys: [key],
-          payload: step === "due"
-            ? { title: `⏰ ${tr("dueNow").toUpperCase()} · ${name}`, body: `${tr("at", { t: when })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, urgency: "high", ...labels }
-            : { title: `⚠️ ${tr("lateStill").toUpperCase()} · ${name}`, body: tr("wasAt", { t: when }), tag: r.id, taskId: r.id, urgency: "high", ...labels },
-        });
+      if (ago >= 0 && ago < 10) {
+        const key = `${r.id}@${t.start}#due`, when = clock(t.time, settings.clock), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
+        due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("dueNow").toUpperCase()} · ${name}`, body: `${tr("at", { t: when })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, urgency: "high", actions: remindBtns(t), ...sign(r.id) } });
       }
     }
-    // Tasks without a time get no countdown reminders.
-    if (r.kind === "task" && !t.done && t.start && !t.anytime) {
+    // The closing question: once (ask), and once more at most (ask2). After that, silence: the task is
+    // "Sin confirmar" in the app. Only a task marked "insistir" keeps asking, every 30 min for up to 3 hours.
+    if (r.kind === "task" && !F.closed(t) && t.start && !t.anytime) {
+      const p = F.plan(t), win = F.WINDOW * 60000;
+      const step = now >= p.ask && now < p.ask + win ? "ask" : now >= p.ask2 && now < p.ask2 + win ? "ask2"
+        : t.critical && now >= p.until && now < p.until + 3 * 3600000 ? "crit" + Math.floor((now - p.until) / 1800000) : null;
+      // A started task is not asked while its time runs.
+      if (step && F.phase(t, now) !== "running") asks.push({ t, key: `${r.id}@${t.start}#${step}` });
+    }
+    // Tasks without a time (or already started) get no countdown reminders.
+    if (r.kind === "task" && !F.closed(t) && !t.startedAt && t.start && !t.anytime) {
       const mins = (Date.parse(t.start) - now) / 60000;
       if (mins <= 0 || mins > 60) continue;
       const hit = wanted.filter((th) => mins <= th);
@@ -102,7 +119,7 @@ async function remind(sb, owner, items) {
         check: `${r.id}@${t.start}#${smallest}`,
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
         // The time left in capitals after an alarm clock, so it stands out among other notifications.
-        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, ...labels },
+        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, actions: [btn("snooze")], ...sign(r.id) },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
@@ -123,6 +140,21 @@ async function remind(sb, owner, items) {
     }
   }
 
+  // One question: in the task's own words ("¿Ya te tomaste la pastilla?"). Several at once: one notification.
+  const fresh = [];
+  if (asks.length) {
+    const { data: was } = await sb.from("sent").select("key").in("key", asks.map((x) => (owner === "main" ? "" : owner + "/") + x.key));
+    const seen = new Set((was || []).map((x) => x.key.replace(owner + "/", "")));
+    fresh.push(...asks.filter((x) => !seen.has(x.key)));
+  }
+  if (fresh.length === 1) {
+    const { t } = fresh[0];
+    due.push({ check: fresh[0].key, keys: [fresh[0].key], payload: { title: `${icon(t)} ${question(t)}`, body: tr("askBody"), tag: t.id, taskId: t.id, urgency: "high", ask: true, actions: askBtns(t), ...sign(t.id) } });
+  } else if (fresh.length > 1) {
+    const keys = fresh.map((x) => x.key);
+    due.push({ check: keys[0], keys, payload: { title: tr("groupTitle", { n: fresh.length }), body: fresh.map((x) => `${icon(x.t)} ${x.t.title}`).join(" · "), tag: "confirm", url: "/?accion=confirm", urgency: "high" } });
+  }
+
   // Summaries, once a day each, within two hours of the chosen time (so quiet hours only delay them).
   const b = settings.brief || {};
   const within = (t) => hmNow >= t && hmNow < addMin(t, 120);
@@ -133,7 +165,7 @@ async function remind(sb, owner, items) {
     const body = !open.length ? tr("mFree")
       : (first ? tr(open.length === 1 ? "mOne" : "mMany", { n: open.length, t: clock(first.time, settings.clock), x: first.title }) : tr("mNoTime", { n: open.length })) + (star && star !== first ? " " + tr("mStar", { x: star.title }) : "");
     // First what yesterday left open (up to 5, with their time), then today.
-    const yday = tasks.filter((t) => t.date === dayKey(-1) && !t.done && !t.openSeen).sort((p, q) => (p.time || "99").localeCompare(q.time || "99"));
+    const yday = tasks.filter((t) => t.date === dayKey(-1) && !F.closed(t) && !t.openSeen).sort((p, q) => (p.time || "99").localeCompare(q.time || "99"));
     const lead = yday.length ? tr("morningOpenLead", { n: yday.length, x: yday.slice(0, 5).map((t) => t.title + (t.anytime || !t.time ? "" : ` (${clock(t.time, settings.clock)})`)).join(", ") + (yday.length > 5 ? "…" : "") }) + " " : "";
     brief(`brief@${todayK}@m`, { title: tr("mTitle"), body: lead + body, url: "/" });
   }
@@ -144,8 +176,9 @@ async function remind(sb, owner, items) {
   }
   if (b.wOn !== false && new Date(Date.UTC(lp0.y, lp0.m - 1, lp0.d)).getUTCDay() === 0 && within("18:00")) {
     const past = new Set([0, 1, 2, 3, 4, 5, 6].map((i) => dayKey(-i))), next = new Set([1, 2, 3, 4, 5, 6, 7].map(dayKey));
-    const week = tasks.filter((t) => past.has(t.date));
-    brief(`brief@${todayK}@w`, { title: tr("wTitle"), body: tr("wBody", { d: week.filter((t) => t.done).length, t: week.length, n: tasks.filter((t) => next.has(t.date)).length }), url: "/?accion=week" });
+    // "Cerraste 9 de 11; 6 salieron bien": a close is any confirmed answer (done, half, not done, skipped).
+    const week = tasks.filter((t) => past.has(t.date)), good = week.filter((t) => t.close && F.good(t.close.outcome)).length;
+    brief(`brief@${todayK}@w`, { title: tr("wTitle"), body: tr(good ? "wBodyGood" : "wBody", { d: week.filter(F.closed).length, t: week.length, g: good, n: tasks.filter((t) => next.has(t.date)).length }), url: "/?accion=week" });
   }
   // The number on the app icon: what is left for today.
   for (const x of due) x.payload.badge = open.length;
