@@ -52,8 +52,9 @@ self.addEventListener("push", (e) => {
     badge: "/icon-192.png",
     tag: d.tag,
     renotify: !!d.taskId,
-    data: { url: d.url || "/", taskId: d.taskId || null },
-    actions: d.taskId ? [{ action: "snooze", title: d.snoozeLabel || "Posponer 10 min" }, { action: "done", title: d.doneLabel || "Hecho" }] : [],
+    data: { url: d.url || "/", taskId: d.taskId || null, probe: d.probe || null },
+    actions: d.taskId ? [{ action: "snooze", title: d.snoozeLabel || "Posponer 10 min" }, { action: "done", title: d.doneLabel || "Hecho" }]
+      : d.probe ? [{ action: "arrived", title: d.arrivedLabel || "Llegó" }] : [],
   })];
   // The number on the app icon: what is left for today.
   if (typeof d.badge === "number" && self.navigator.setAppBadge) jobs.push((d.badge ? self.navigator.setAppBadge(d.badge) : self.navigator.clearAppBadge()).catch(() => {}));
@@ -62,7 +63,17 @@ self.addEventListener("push", (e) => {
 
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
-  const { url = "/", taskId } = e.notification.data || {};
+  const { url = "/", taskId, probe } = e.notification.data || {};
+  // The test reminder: tapping it (or "Llegó") is the proof it arrived. The open app is told right away; the proof is
+  // also kept in a cache, so the app finds it even if the message is lost, and a closed app opens with ?probe=.
+  if (probe) {
+    e.waitUntil(caches.open("pendi-share").then((c) => c.put("/probe-ok", new Response(probe))).catch(() => {})
+      .then(() => self.clients.matchAll({ type: "window", includeUncontrolled: true })).then((wins) => {
+        for (const w of wins) { w.postMessage({ probe }); if ("focus" in w) return w.focus().catch(() => {}); return; }
+        return self.clients.openWindow(url);
+      }));
+    return;
+  }
   const target = taskId ? `/?accion=${e.action || "open"}&id=${encodeURIComponent(taskId)}` : url;
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
     for (const w of wins) if ("navigate" in w) return w.navigate(target).then((c) => c && c.focus());

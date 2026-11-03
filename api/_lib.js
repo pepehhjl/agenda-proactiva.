@@ -83,7 +83,7 @@ export async function sendToAll(sb, payload, owner = "main") {
   let sent = 0;
   for (const row of subs || []) {
     try {
-      await webpush.sendNotification(row.sub, JSON.stringify(payload), { TTL: 3600, urgency: payload.urgency || "normal" });
+      await sendOne(row.sub, payload);
       sent++;
     } catch (e) {
       if (e.statusCode === 404 || e.statusCode === 410) await sb.from("push_subs").delete().eq("endpoint", row.endpoint);
@@ -91,6 +91,8 @@ export async function sendToAll(sb, payload, owner = "main") {
   }
   return sent;
 }
+// Sends one notification to one device (throws if the push service refuses it).
+export const sendOne = (sub, payload) => webpush.sendNotification(sub, JSON.stringify(payload), { TTL: payload.ttl || 3600, urgency: payload.urgency || "normal" });
 
 export async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
