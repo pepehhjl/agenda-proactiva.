@@ -1,5 +1,5 @@
 // Invite links (main agenda only). GET lists them; POST {name} makes one; POST {remove: id} deletes that
-// person's link, agenda and devices. Whoever opens a link gets their own empty agenda, without the password.
+// person's link, agenda, devices and reports. Whoever opens a link gets their own empty agenda, without the password.
 import crypto from "node:crypto";
 import { authed, deny, supa, readBody } from "./_lib.js";
 
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     if (remove) {
       const id = String(remove);
       for (const table of ["items", "push_subs"]) await sb.from(table).delete().eq("owner", id);
+      await sb.from("feedback").delete().eq("person_id", id); // their reports and ideas too (fine if the table isn't there yet)
       const { error } = await sb.from("people").delete().eq("id", id);
       if (error) return res.status(500).json({ error: "db_error", message: error.message });
       return res.json({ ok: true });
