@@ -535,6 +535,7 @@ html.kb .tabbar { display: none; }
         <div class="phead"><h2 data-i18n="tabBdays"></h2><button class="addbtn" id="bdAdd" data-i18n-aria="addBday"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
         <p class="muted" data-i18n="bdIntro"></p>
         <form id="bdForm" class="card" hidden>
+          <b id="bdFormTitle" hidden></b>
           <input id="bName" class="field" data-i18n-ph="name" required style="background:var(--group)">
           <div id="bDateBox"></div>
           <input id="bNotes" class="field" data-i18n-ph="likesPh" style="background:var(--group)">
@@ -1402,6 +1403,14 @@ html.kb .tabbar { display: none; }
       fbAdminFail: "Je n'ai pas pu charger la liste.", fbAdminNoTable: "Il faut encore créer la table « feedback » dans Supabase (supabase/feedback.sql)." },
   };
   for (const k of Object.keys(P13)) Object.assign(I18N[k], P13[k]);
+  // 0.15.1: editing a birthday, and a soft note when the AI takes longer than usual.
+  const P14 = {
+    es: { editBdayOf: "Editar el cumpleaños de {n}", aiSlow: "Está tardando más de lo normal; sigo intentando." },
+    en: { editBdayOf: "Edit {n}'s birthday", aiSlow: "This is taking longer than usual; I'm still trying." },
+    pt: { editBdayOf: "Editar o aniversário de {n}", aiSlow: "Está demorando mais que o normal; continuo tentando." },
+    fr: { editBdayOf: "Modifier l'anniversaire de {n}", aiSlow: "Ça prend plus de temps que d'habitude ; je continue d'essayer." },
+  };
+  for (const k of Object.keys(P14)) Object.assign(I18N[k], P14[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1513,10 +1522,23 @@ html.kb .tabbar { display: none; }
     if (!r.ok) { noteError(path.split("?")[0] + " → " + r.status + (j.error ? " " + j.error : "")); throw { status: r.status, ...j }; }
     return j;
   }
+  // The server always answers within ~30 s. After 20 s the screen says, softly, that it is taking longer
+  // (onSlow paints it in place; by default a short notice). After 45 s the wait ends with the usual AI error.
+  const AI_SLOW_MS = 20000, AI_CAP_MS = 45000;
+  function askAi(body, signal, onSlow) {
+    const ctl = new AbortController(), fwd = () => ctl.abort();
+    let late = false;
+    if (signal) { if (signal.aborted) ctl.abort(); else signal.addEventListener("abort", fwd, { once: true }); }
+    const slow = setTimeout(() => { try { (onSlow || (() => notice(tr("aiSlow"))))(); } catch {} }, AI_SLOW_MS);
+    const cap = setTimeout(() => { late = true; ctl.abort(); }, AI_CAP_MS);
+    return call("/api/ai", body, ctl.signal)
+      .catch((e) => { if (late && !(signal && signal.aborted)) { noteError("/api/ai → no answer in 45 s"); throw { status: 504, error: "timeout" }; } throw e; })
+      .finally(() => { clearTimeout(slow); clearTimeout(cap); if (signal) signal.removeEventListener("abort", fwd); });
+  }
   const ai = {
-    json: (input, search, signal) => call("/api/ai", { input, search: !!search }, signal).then((j) => j.data),
-    see: (input, image) => call("/api/ai", { input, image }).then((j) => j.data),
-    transcribe: (audio) => call("/api/ai", { audio }).then((j) => String((j.data && j.data.texto) || "")),
+    json: (input, search, signal, onSlow) => askAi({ input, search: !!search }, signal, onSlow).then((j) => j.data),
+    see: (input, image, onSlow) => askAi({ input, image }, null, onSlow).then((j) => j.data),
+    transcribe: (audio) => askAi({ audio }).then((j) => String((j.data && j.data.texto) || "")),
   };
   function errText(e) {
     if (e && e.error === "rate_limited") return tr("errRate");
@@ -1526,7 +1548,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.15.0";
+  const VERSION = "0.15.1";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -2201,7 +2223,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
       const w = norm(q.value.trim()); res.replaceChildren(); res.hidden = !w;
       if (!w) return;
       for (const b of state.bdays.filter((b) => norm(b.name + " " + (b.notes || "")).includes(w)).slice(0, 5))
-        res.append(el("button", { onclick: () => { closeSheet(); showTab("bdays"); } }, el("b", {}, "🎂 " + b.name), el("div", { class: "muted" }, dayMonth(b.month, b.day))));
+        res.append(el("button", { onclick: () => { closeSheet(); editBday(b); } }, el("b", {}, "🎂 " + b.name), el("div", { class: "muted" }, dayMonth(b.month, b.day) + " · ✏️ " + tr("edit"))));
       // A repeating task shows once: its next day.
       const seen = new Set();
       const hits = state.tasks.filter((t) => norm(t.title + " " + (t.tip || "")).includes(w)).sort((a, b) => order(a).localeCompare(order(b)))
@@ -2665,7 +2687,7 @@ Ordena las tareas en el orden recomendado.
 Responde solo JSON: {"resumen":"una frase con el orden sugerido","tareas":[{"titulo":"Ir al banco","original":"ir al banco","emoji":"🏦","categoria":"personal","fecha":"${date}","duracion":45,"opciones":["09:00","13:30","16:00"],"recomendada":0,"hora_dicha":null,"porque":"abre temprano y hay menos fila","consejo":"Lleva tu documento y revisa el horario.","felicitacion":"¡Banco conquistado! Una vuelta menos 🏦","pregunta":"¿Ya fuiste al banco?","si":"Ya fui","tipo":"otra"}]}
 "felicitacion" es una frase corta y alegre para cuando la termine, que hable de esa tarea. "original" son las palabras exactas de la persona para esa tarea, copiadas sin traducir. "hora_dicha" es la hora "HH:MM" si la persona dijo una para esa tarea (ponla también en "opciones"); si no, null. ${closeFields()}`;
     try {
-      const res = await ai.json(prompt);
+      const res = await ai.json(prompt, false, null, () => { $("dumpStatus").textContent = tr("thinkingDay") + " " + tr("aiSlow"); });
       const tareas = Array.isArray(res && res.tareas) ? res.tareas : [];
       if (!tareas.length) throw { error: "invalid_json" };
       const titles = ownTitles(tareas, text);
@@ -2758,7 +2780,7 @@ Las tareas marcadas con ⭐ son importantes.
 Si no hay acciones, usa "acciones":[]. Al crear: ${closeFields()}`;
     const turns = state.chat.filter((m) => !m.temp && !m.actions).slice(-8);
     try {
-      const res = await ai.json([{ role: "user", content: rules }, ...turns], false, ctl.signal);
+      const res = await ai.json([{ role: "user", content: rules }, ...turns], false, ctl.signal, () => { thinking.content = tr("thinking") + " " + tr("aiSlow"); renderChat(); });
       state.chat.splice(state.chat.indexOf(thinking), 1);
       let answer = String((res && res.respuesta) || tr("okDone"));
       // Asked about a day but the AI left the list out: add that day's real tasks.
@@ -2921,7 +2943,7 @@ ${onlyMsg ? "No hacen falta ideas de regalo (\"ideas\":[])." : `Busca qué regal
 Escribe también un mensaje de cumpleaños cálido y corto, listo para mandar por WhatsApp, con un emoji.
 Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos","porque":"están en tendencia y le gusta la música"}],"mensaje":"..."}`;
     try {
-      const r = await ai.json(prompt, !onlyMsg);
+      const r = await ai.json(prompt, !onlyMsg, null, () => { const m = out.querySelector(".muted"); if (m) m.textContent = tr(onlyMsg ? "writingMsg" : "searchingTrends") + " " + tr("aiSlow"); });
       const msg = String(r.mensaje || "");
       const ideas = (Array.isArray(r.ideas) ? r.ideas : []).slice(0, 6).map((x) => (typeof x === "string" ? { idea: x } : x || {}));
       const copy = el("button", { class: "btn small", onclick: async () => { try { await navigator.clipboard.writeText(msg); copy.textContent = tr("copied"); } catch { copy.textContent = tr("selectCopy"); } } }, tr("copyMsg"));
@@ -2943,13 +2965,31 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       const color = colors[[...b.name].reduce((h, c) => h + c.charCodeAt(0), 0) % colors.length];
       const age = b.year ? n.date.getFullYear() - b.year : null;
       const btn = el("button", { class: "btn small" + (n.days <= 2 ? " primary" : ""), onclick: () => giftIdeas(b, out, btn) }, tr("giftIdeasBtn"));
+      const edit = el("button", { class: "btn small", onclick: () => editBday(b) }, "✏️ " + tr("edit"));
       box.append(el("div", { class: "card" },
         el("div", { class: "person" },
           el("div", { class: "avatar", style: `--c: var(--c-${color})` }, initials || "?"),
           el("div", {}, el("b", {}, b.name), el("div", { class: "muted" }, dayMonth(b.month, b.day) + (age ? tr("turnsAge", { n: age }) : ""))),
           el("div", { class: "count" + (n.days <= 2 ? " soon" : "") }, n.days === 0 ? el("b", {}, "🎉") : el("b", {}, n.days), el("span", {}, tr(n.days === 0 ? "todayExcl" : n.days === 1 ? "dayOne" : "dayMany")))),
-        el("div", { class: "row" }, btn, el("button", { class: "btn small", onclick: () => { if (confirm(tr("confirmDelBday", { n: b.name }))) remove(b); } }, tr("del"))), out));
+        el("div", { class: "row" }, btn, edit, el("button", { class: "btn small", onclick: () => { if (confirm(tr("confirmDelBday", { n: b.name }))) remove(b); } }, tr("del"))), out));
     }
+  }
+  // The same form as "+", filled in; saving keeps the birthday's id (and anything else stored on it).
+  // A birthday without a year is shown on this year's date, which the form saves again without a year.
+  let editingBday = null;
+  function bdayFormTitle() { const h = $("bdFormTitle"); h.hidden = !editingBday; h.textContent = editingBday ? tr("editBdayOf", { n: editingBday.name }) : ""; }
+  function editBday(b) {
+    editingBday = b;
+    $("bName").value = b.name || "";
+    $("bDate").value = `${b.year || new Date().getFullYear()}-${String(b.month).padStart(2, "0")}-${String(b.day).padStart(2, "0")}`;
+    $("bNotes").value = b.notes || "";
+    document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh());
+    bdayFormTitle(); $("bdForm").hidden = false;
+    showTab("bdays"); $("bdForm").scrollIntoView({ block: "nearest", behavior: "smooth" }); $("bName").focus();
+  }
+  function closeBdayForm() {
+    editingBday = null; $("bdForm").reset(); $("bdForm").hidden = true; bdayFormTitle();
+    document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh());
   }
 
   // ---------- reminders inside the app ----------
@@ -3739,8 +3779,9 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   daySeg($("dumpDay"), dumpDate);
   const bDate = el("input", { id: "bDate", "aria-label": tr("bdayDate") });
   $("bDateBox").append(dateField(bDate, { block: true, placeholder: tr("bdayDate") }));
-  $("bdAdd").onclick = () => { $("bdForm").hidden = !$("bdForm").hidden; if (!$("bdForm").hidden) $("bName").focus(); };
-  $("bdCancel").onclick = () => { $("bdForm").reset(); $("bdForm").hidden = true; document.querySelectorAll(".datef").forEach((d) => d.refresh && d.refresh()); };
+  // "+" while editing starts a new, empty birthday instead of closing the form.
+  $("bdAdd").onclick = () => { if (editingBday || $("bdForm").hidden) { closeBdayForm(); $("bdForm").hidden = false; $("bName").focus(); } else closeBdayForm(); };
+  $("bdCancel").onclick = closeBdayForm;
   $("datefmt").onchange = () => { saveSettings({ datefmt: $("datefmt").value }); syncSettings(); render(); };
   $("clock").onchange = () => { saveSettings({ clock: $("clock").value }); syncSettings(); render(); };
   $("theme").onchange = () => { saveSettings({ theme: $("theme").value }); applyTheme(); };
@@ -3794,8 +3835,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (!bDate.value) { notice(tr("chooseBdayDate")); return; }
     const [y, m, d] = bDate.value.split("-").map(Number);
     // The year is kept only when it looks like a birth year, so "cumple 30" can be shown.
-    put({ id: uid("b"), kind: "bday", name: $("bName").value.trim(), month: m, day: d, year: y < new Date().getFullYear() ? y : null, notes: $("bNotes").value.trim() });
-    e.target.reset(); e.target.hidden = true; document.querySelectorAll(".datef").forEach((x) => x.refresh && x.refresh());
+    const was = editingBday && state.bdays.find((x) => x.id === editingBday.id);
+    put({ ...(was || {}), id: was ? was.id : uid("b"), kind: "bday", name: $("bName").value.trim(), month: m, day: d, year: y < new Date().getFullYear() ? y : null, notes: $("bNotes").value.trim() });
+    closeBdayForm();
+    if (was) notice(tr("edited"));
   };
   matchMedia("(max-width: 860px)").addEventListener("change", () => showTab(isPhone() ? "cal" : "organize"));
 
