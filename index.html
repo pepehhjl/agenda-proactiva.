@@ -534,46 +534,50 @@ html.kb .tabbar { display: none; }
 
       <div class="pane" data-pane="settings" hidden>
         <h2 data-i18n="tabSettings"></h2>
+        <div id="regroupNote" class="card" hidden style="display:flex;align-items:flex-start;gap:8px;padding:12px 8px 12px 16px">
+          <span style="flex:1" data-i18n="regroupNote"></span>
+          <button class="chev" id="regroupClose" data-i18n-aria="close" style="flex:none;width:32px;height:32px">✕</button>
+        </div>
         <div id="setupAlert"></div>
-        <h3 class="sub" data-i18n="routine"></h3>
-        <div class="group" id="routineGroup">
+        <h3 class="sub" data-i18n="youH"></h3>
+        <div class="group">
           <label style="display:grid;gap:8px"><span data-i18n="yourName"></span>
             <input class="field" id="myName" autocomplete="nickname" maxlength="40" style="background:var(--fill)" data-i18n-ph="yourNamePh"></label>
           <div id="formBox" style="display:grid;gap:8px"></div>
-          <div id="workBox" style="display:grid;gap:10px"></div>
-          <div id="sleepBox" style="display:grid;gap:10px"></div>
-          <div id="forgetBox" style="display:grid;gap:8px"></div>
-          <div id="energyBox" style="display:grid;gap:8px"></div>
-          <button class="link" id="rtRedo" style="font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
         </div>
         <p class="foot" data-i18n="nameFoot"></p>
-        <p class="foot" data-i18n="rtFoot"></p>
         <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
           <div style="display:grid;gap:8px"><span data-i18n="lvTitle"></span><div class="lvcards" id="levelCards" role="radiogroup"></div><span class="muted" data-i18n="lvFoot"></span></div>
+          <label class="toggle"><span data-i18n="sound"></span> <input type="checkbox" id="sound" checked></label>
+        </div>
+        <h3 class="sub" data-i18n="grpWhen"></h3>
+        <div class="group">
           <label class="toggle"><span data-i18n="quiet"></span> <input type="checkbox" id="quietOn"></label>
           <div id="quietRow" hidden style="display:grid;gap:10px">
             <label class="qrow"><span data-i18n="quietFromL"></span> <input type="time" id="quietFrom" value="22:00"></label>
             <label class="qrow"><span data-i18n="quietToL"></span> <input type="time" id="quietTo" value="07:00"></label>
             <div class="muted" id="quietSum"></div>
           </div>
-          <label class="toggle"><span data-i18n="sound"></span> <input type="checkbox" id="sound" checked></label>
-          <button class="link" id="testToast" style="font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
-        </div>
-        <p class="foot" data-i18n="quietFoot"></p>
-        <h3 class="sub" data-i18n="summaries"></h3>
-        <div class="group">
           <label class="toggle"><span data-i18n="morningBrief"></span> <input type="checkbox" id="briefMOn"></label>
           <div class="toggle" id="briefMRow"><span><span data-i18n="atTime"></span> <input type="time" id="briefM" value="08:00"></span></div>
           <label class="toggle"><span data-i18n="eveningBrief"></span> <input type="checkbox" id="briefEOn"></label>
           <div class="toggle" id="briefERow"><span><span data-i18n="atTime"></span> <input type="time" id="briefE" value="21:00"></span></div>
           <div class="muted" id="briefAnch" hidden></div>
           <label class="toggle"><span data-i18n="weeklyBrief"></span> <input type="checkbox" id="briefWOn"></label>
-          <button class="link" id="seeWeek" style="font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
         </div>
+        <p class="foot" data-i18n="quietFoot"></p>
         <p class="foot" id="briefFoot"></p>
-        <h3 class="sub" data-i18n="appearance"></h3>
+        <h3 class="sub" data-i18n="routine"></h3>
+        <div class="group" id="routineGroup">
+          <div id="workBox" style="display:grid;gap:10px"></div>
+          <div id="sleepBox" style="display:grid;gap:10px"></div>
+          <div id="forgetBox" style="display:grid;gap:8px"></div>
+          <div id="energyBox" style="display:grid;gap:8px"></div>
+        </div>
+        <p class="foot" data-i18n="rtFoot"></p>
+        <h3 class="sub" data-i18n="grpLook"></h3>
         <div class="group">
           <label class="toggle"><span data-i18n="theme"></span>
             <select id="theme"><option value="system" data-i18n="system"></option><option value="light" data-i18n="light"></option><option value="dark" data-i18n="dark"></option></select>
@@ -581,15 +585,18 @@ html.kb .tabbar { display: none; }
           <label class="toggle"><span data-i18n="language"></span>
             <select id="lang"><option value="system" data-i18n="system"></option></select>
           </label>
-        </div>
-        <h3 class="sub" data-i18n="format"></h3>
-        <div class="group">
           <label class="toggle"><span data-i18n="clock"></span>
             <select id="clock"><option value="12" data-i18n="clock12"></option><option value="24" data-i18n="clock24"></option></select>
           </label>
           <label class="toggle"><span data-i18n="dates"></span>
             <select id="datefmt"><option value="es" data-i18n="dmy"></option><option value="en" data-i18n="mdy"></option></select>
           </label>
+        </div>
+        <h3 class="sub" data-i18n="grpHelp"></h3>
+        <div class="group">
+          <button class="link" id="testToast" style="font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
+          <button class="link" id="seeWeek" style="font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
+          <button class="link" id="rtRedo" style="font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
         </div>
         <h3 class="sub" data-i18n="yourData"></h3>
         <div class="group">
@@ -599,7 +606,8 @@ html.kb .tabbar { display: none; }
         <input type="file" id="restoreFile" accept="application/json,.json" hidden>
         <p class="foot" data-i18n="backupFoot"></p>
         <div id="inviteBox" hidden style="display:grid;gap:10px">
-          <h3 class="sub" data-i18n="inviteH"></h3>
+          <h3 class="sub" data-i18n="grpShare"></h3>
+          <p style="margin:0 16px;font-weight:700" data-i18n="inviteH"></p>
           <p class="foot" data-i18n="inviteFoot"></p>
           <form id="inviteForm" class="row" style="flex-wrap:nowrap">
             <input class="field" id="inviteName" autocomplete="off" maxlength="60" style="flex:1" data-i18n-ph="inviteNamePh">
@@ -610,12 +618,12 @@ html.kb .tabbar { display: none; }
         <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
           <button class="link" id="logout" style="color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
+          <div class="version" id="version"></div>
         </div>
         <div id="adminBox" hidden style="display:grid;gap:14px">
           <h3 class="sub">Administrador</h3>
           <div id="setupBox" class="card"></div>
         </div>
-        <div class="version" id="version"></div>
       </div>
     </aside>
 
@@ -1249,6 +1257,18 @@ html.kb .tabbar { display: none; }
       logoutTitle: "Se déconnecter ?", logoutQ: "Tes tâches restent enregistrées. Pour revenir sur cet appareil, il te faudra le mot de passe.", logoutYes: "Se déconnecter" },
   };
   for (const k of Object.keys(P11)) Object.assign(I18N[k], P11[k]);
+  // 0.14.0: Ajustes in groups (same settings, same texts), plus a one-time note that says so.
+  const P12 = {
+    es: { grpWhen: "Cuándo te aviso", grpLook: "Apariencia e idioma", grpHelp: "Ayuda y pruebas", grpShare: "Compartir",
+      regroupNote: "Reordenamos los ajustes por secciones. No quitamos nada: todo sigue aquí." },
+    en: { grpWhen: "When I remind you", grpLook: "Appearance & language", grpHelp: "Help & tests", grpShare: "Share",
+      regroupNote: "We've reorganized the settings into sections. Nothing was removed: everything is still here." },
+    pt: { grpWhen: "Quando te aviso", grpLook: "Aparência e idioma", grpHelp: "Ajuda e testes", grpShare: "Compartilhar",
+      regroupNote: "Reorganizamos os ajustes por seções. Não tiramos nada: tudo continua aqui." },
+    fr: { grpWhen: "Quand je te préviens", grpLook: "Apparence et langue", grpHelp: "Aide et essais", grpShare: "Partager",
+      regroupNote: "Nous avons réorganisé les réglages par sections. Rien n'a été retiré : tout est encore là." },
+  };
+  for (const k of Object.keys(P12)) Object.assign(I18N[k], P12[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1362,7 +1382,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.13.2";
+  const VERSION = "0.14.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -1396,7 +1416,10 @@ html.kb .tabbar { display: none; }
     saveLocal();
     expandSeries();
     // Reminder level: accounts from before keep what their old warnings did (see flow.js); a new account starts at "mid".
+    // 0.14.0 note about the new Ajustes order: only for accounts that knew the old order (checked before anything is saved below).
+    const newAccount = !(state.settings.kind || state.tasks.length);
     if (!F.LEVELS.includes(state.settings.level)) saveSettings({ level: state.settings.kind || state.tasks.length ? F.fromRemind(state.settings.remind) : "mid" });
+    if (newAccount && state.settings.regroupSeen === undefined) saveSettings({ regroupSeen: true });
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (state.settings.tz !== tz) saveSettings({ tz });
     setLang(); applyLang();
@@ -3366,7 +3389,11 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     else if (name === "cal") return showTab("organize");
     $("fab").hidden = isPhone() && (name === "chat" || name === "settings");
     if (name === "chat") { const sc = $("chatScroll"); sc.scrollTop = sc.scrollHeight; }
+    // The one-time note: shown on the first visit to Ajustes after 0.14.0, then never again on this account.
+    if (name === "settings" && !state.settings.regroupSeen) { $("regroupNote").hidden = false; saveSettings({ regroupSeen: true }); }
+    else if (name !== "settings") $("regroupNote").hidden = true;
   }
+  $("regroupClose").onclick = () => { $("regroupNote").hidden = true; };
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
   // ---------- phone gestures ----------
   // The keyboard: the open pane shrinks to the space above it (the tab bar hides), so the last messages stay in view.
