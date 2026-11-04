@@ -145,6 +145,17 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .sheet .actions > * { background: var(--group); border: 0; padding: 13px 16px; text-align: left; font-size: 16px; color: var(--accent-text); cursor: pointer; text-decoration: none; }
 :root[data-theme="dark"] .sheet .actions > * { background: #2c2c2e; }
 .sheet .actions .danger { color: var(--red); }
+/* help center (0.15.0) */
+.faq { display: grid; gap: 1px; background: var(--sep); border-radius: 12px; overflow: hidden; }
+.faq details { background: var(--group); padding: 0 16px; }
+.faq summary { padding: 13px 0; font-weight: 600; cursor: pointer; }
+.faq details p { margin: 0 0 12px; line-height: 1.45; }
+.faq details .btn { margin: 0 0 14px; }
+.doc { display: grid; gap: 16px; }
+.doc section { display: grid; gap: 4px; justify-items: start; }
+.doc h3 { margin: 0; font-size: 16px; }
+.doc p { margin: 0; line-height: 1.45; }
+.doc .btn { margin-top: 6px; }
 
 /* iOS-style notification banner */
 .toasts { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: grid; gap: 8px; width: min(400px, calc(100vw - 16px)); z-index: 40; }
@@ -594,6 +605,10 @@ html.kb .tabbar { display: none; }
         </div>
         <h3 class="sub" data-i18n="grpHelp"></h3>
         <div class="group">
+          <button class="link" id="helpFaq" style="font-size:16px;padding:12px 16px" data-i18n="hcFaq"></button>
+          <button class="link" id="helpPriv" style="font-size:16px;padding:12px 16px" data-i18n="hcPriv"></button>
+          <button class="link" id="helpBug" style="font-size:16px;padding:12px 16px" data-i18n="hcBug"></button>
+          <button class="link" id="helpIdea" style="font-size:16px;padding:12px 16px" data-i18n="hcIdea"></button>
           <button class="link" id="testToast" style="font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
           <button class="link" id="seeWeek" style="font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
           <button class="link" id="rtRedo" style="font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
@@ -623,6 +638,8 @@ html.kb .tabbar { display: none; }
         <div id="adminBox" hidden style="display:grid;gap:14px">
           <h3 class="sub">Administrador</h3>
           <div id="setupBox" class="card"></div>
+          <h3 class="sub" data-i18n="fbAdminH"></h3>
+          <div id="fbList" class="group"></div>
         </div>
       </div>
     </aside>
@@ -1269,6 +1286,122 @@ html.kb .tabbar { display: none; }
       regroupNote: "Nous avons réorganisé les réglages par sections. Rien n'a été retiré : tout est encore là." },
   };
   for (const k of Object.keys(P12)) Object.assign(I18N[k], P12[k]);
+  // 0.15.0: help center (Ajustes → Ayuda y pruebas): questions, privacy, problem reports and ideas.
+  const P13 = {
+    es: { hcFaq: "Preguntas frecuentes", hcPriv: "Privacidad y tus datos", hcBug: "Reportar un problema", hcIdea: "Sugerir una idea",
+      f1q: "¿Cómo agrego algo a mi agenda?", f1a: "Escríbeme o háblame en el Chat, o toca el botón +. Por ejemplo: «Recuérdame mañana a las 9 llamar al banco». Yo lo acomodo y te digo lo que entendí.", f1b: "Abrir el Chat",
+      f2q: "¿Por qué me preguntas si ya terminé?", f2a: "Porque avisar no basta. Cada cosa se cierra cuando tú lo confirmas: hecha, pasada a otra hora o descartada. Nada se marca como hecho solo.",
+      f3q: "Me avisas demasiado, o muy poco.", f3a: "Ve a Ajustes → Avisos → Nivel de avisos y elige Baja, Media o Alta. También puedes cambiar el nivel de una sola tarea: ábrela y toca «⋯ Más opciones».", f3b: "Ir a Nivel de avisos",
+      f4q: "¿Funciona con la app cerrada?", f4a: "Sí: los avisos llegan como notificaciones. Para eso, agrégame a tu pantalla de inicio y permite los avisos. En Ajustes → Avisos te guío paso a paso.", f4b: "Ir a Avisos",
+      f5q: "¿Cómo agrego Pendi a mi pantalla de inicio?", f5a: "iPhone: en Safari toca Compartir (el cuadrito con la flecha; si no lo ves, está en el menú ⋯) y elige «Agregar a pantalla de inicio». Android: en Chrome toca el menú ⋮ → «Instalar app» (o «Agregar a la pantalla principal»). Pronto llega una guía con fotos.",
+      f6q: "¿Qué pasa si no respondo un aviso?", f6a: "La tarea queda «Sin confirmar» y te la muestro en el «Cierre del día», para que la cierres ahí. No se pierde: sigue en tu agenda.",
+      f7q: "¿Cómo paso algo a mañana rápido?", f7a: "Desliza la tarea hacia la izquierda. O ábrela y toca «⋯ Más opciones» → «Pasar a mañana»; con ✏️ Editar eliges otro día u hora.",
+      f8q: "¿Mis datos son privados?", f8a: "Sí. Tu agenda es tuya: no la vendo, no muestro anuncios y no te rastreo. Te lo explico todo, sin letra pequeña, en «Privacidad y tus datos».",
+      f9q: "Perdí mi teléfono o mi enlace.", f9a: "Tu agenda vive en la nube, no en el teléfono. En este piloto, pídele a quien te invitó que te vuelva a mandar tu enlace, o entra con tu contraseña si tienes una. Ojo: el enlace ES tu llave, no lo compartas.",
+      f10q: "¿Puedo usarla en otro teléfono a la vez?", f10a: "Sí, con tu mismo enlace o contraseña: tu agenda es la misma en todos lados. Los avisos se activan en cada teléfono, en Ajustes → Avisos.",
+      pvIntro: "Esto es todo lo que pasa con tus datos. No hay más letra que esta.",
+      pvWhatH: "Qué guarda Pendi", pvWhat: "Tus tareas, tus cumpleaños, tu rutina y tus ajustes (como tu nombre, idioma y zona horaria): lo que tú pones. Si activas los avisos, también la dirección técnica que tu teléfono da para recibirlos. Si mandas un reporte o una idea, tu mensaje con la versión de la app, la pantalla y el último error. La conversación del Chat no se guarda.",
+      pvWhereH: "Dónde", pvWhere: "En una base de datos en la nube (Supabase), para que tu agenda exista aunque pierdas el teléfono. Este teléfono guarda una copia para funcionar sin internet.",
+      pvKeyH: "Tu llave", pvKey: "Tu enlace personal o tu contraseña. Cuídalos como una llave: quien los tiene, ve y cambia tu agenda.",
+      pvAiH: "La IA", pvAi: "Para entender lo que me escribes, me dictas o me muestras en una foto, eso se procesa con un modelo de IA (Google Gemini; si está ocupado, Groq). Pendi no lo usa para entrenar modelos ni para publicidad. Esos servicios tienen sus propias reglas de privacidad.",
+      pvPushH: "Los avisos", pvPush: "Llegan a través del servicio de notificaciones de tu teléfono (Apple o Google) y llevan el nombre de la tarea.",
+      pvNeverH: "Lo que NUNCA hago", pvNever: "No vendo tus datos, no muestro anuncios y no te rastreo por otras apps o sitios.",
+      pvCopyH: "Tu copia", pvCopy: "Descárgala cuando quieras en Ajustes → Tus datos → Descargar una copia.",
+      pvDelH: "Borrar todo", pvDel: "Todavía no hay un botón para esto. Pídeselo a quien te invitó: con un toque borra tu agenda completa, tus avisos y tus reportes.",
+      pvPilotH: "Piloto", pvPilot: "Estás en un piloto cerrado y gratis. Si algo de esto cambia, te lo diré antes, dentro de la app.",
+      fbBugQ: "¿Qué pasó?", fbBugPh: "Cuéntame qué hiciste y qué salió mal.", fbIdeaQ: "¿Cuál es tu idea?", fbIdeaPh: "Cuéntame qué te gustaría que hiciera Pendi.",
+      fbAlso: "Con tu mensaje se envía solo esto:", fbVer: "Versión de la app: {v}", fbScreen: "Pantalla: {s}", fbErr: "Último error: {e}", fbNoErr: "Último error: ninguno",
+      fbNothingElse: "Nada más sale de tu teléfono.", fbSend: "Enviar", fbSending: "Enviando…", fbEmpty: "Escribe algo primero.",
+      fbThanksBug: "¡Gracias! Recibí tu reporte.", fbThanksIdea: "¡Gracias! Recibí tu idea.",
+      fbFail: "No se pudo enviar. Tu texto sigue aquí; inténtalo otra vez.", fbNoTable: "Todavía no puedo recibir mensajes: falta un paso en el servidor. Tu texto sigue aquí; inténtalo más tarde.",
+      fbAdminH: "Reportes e ideas", fbAdminNone: "Todavía no hay reportes ni ideas.", fbAdminBug: "🐞 Problema", fbAdminIdea: "💡 Idea",
+      fbAdminFail: "No pude cargar la lista.", fbAdminNoTable: "Falta crear la tabla «feedback» en Supabase (supabase/feedback.sql)." },
+    en: { hcFaq: "Frequently asked questions", hcPriv: "Privacy & your data", hcBug: "Report a problem", hcIdea: "Suggest an idea",
+      f1q: "How do I add something to my agenda?", f1a: "Write or talk to me in the Chat, or tap the + button. For example: “Remind me tomorrow at 9 to call the bank.” I'll fit it in and tell you what I understood.", f1b: "Open the Chat",
+      f2q: "Why do you ask me if I'm done?", f2a: "Because reminding isn't enough. Each thing closes when YOU confirm it: done, moved to another time, or dropped. Nothing gets marked done on its own.",
+      f3q: "You remind me too much, or too little.", f3a: "Go to Settings → Reminders → Reminder level and pick Low, Medium or High. You can also change the level of a single task: open it and tap “⋯ More options”.", f3b: "Go to Reminder level",
+      f4q: "Does it work with the app closed?", f4a: "Yes: reminders arrive as notifications. For that, add me to your home screen and allow reminders. In Settings → Reminders I'll walk you through it step by step.", f4b: "Go to Reminders",
+      f5q: "How do I add Pendi to my home screen?", f5a: "iPhone: in Safari tap Share (the square with the arrow; if you don't see it, it's in the ⋯ menu) and choose “Add to Home Screen”. Android: in Chrome tap the ⋮ menu → “Install app” (or “Add to Home screen”). A guide with pictures is coming soon.",
+      f6q: "What if I don't answer a reminder?", f6a: "The task stays “Not confirmed” and I show it to you in “End of the day”, so you can close it there. It isn't lost: it stays in your agenda.",
+      f7q: "How do I move something to tomorrow quickly?", f7a: "Swipe the task to the left. Or open it and tap “⋯ More options” → “Move to tomorrow”; with ✏️ Edit you pick another day or time.",
+      f8q: "Is my data private?", f8a: "Yes. Your agenda is yours: I don't sell it, I don't show ads and I don't track you. I explain it all, no fine print, in “Privacy & your data”.",
+      f9q: "I lost my phone or my link.", f9a: "Your agenda lives in the cloud, not on the phone. In this pilot, ask the person who invited you to send you your link again, or sign in with your password if you have one. Careful: the link IS your key, don't share it.",
+      f10q: "Can I use it on another phone at the same time?", f10a: "Yes, with the same link or password: your agenda is the same everywhere. Reminders are turned on separately on each phone, in Settings → Reminders.",
+      pvIntro: "This is everything that happens with your data. There's no other fine print.",
+      pvWhatH: "What Pendi keeps", pvWhat: "Your tasks, your birthdays, your routine and your settings (like your name, language and time zone): what you put in. If you turn on reminders, also the technical address your phone gives for receiving them. If you send a report or an idea, your message with the app version, the screen and the last error. Chat conversations aren't saved.",
+      pvWhereH: "Where", pvWhere: "In a cloud database (Supabase), so your agenda exists even if you lose your phone. This phone keeps a copy so it works without internet.",
+      pvKeyH: "Your key", pvKey: "Your personal link or your password. Look after them like a key: whoever has them can see and change your agenda.",
+      pvAiH: "The AI", pvAi: "To understand what you write, dictate or show me in a photo, it's processed by an AI model (Google Gemini; when it's busy, Groq). Pendi doesn't use it to train models or for advertising. Those services have their own privacy rules.",
+      pvPushH: "Reminders", pvPush: "They arrive through your phone's notification service (Apple or Google) and carry the task's name.",
+      pvNeverH: "What I NEVER do", pvNever: "I don't sell your data, I don't show ads and I don't track you across other apps or sites.",
+      pvCopyH: "Your copy", pvCopy: "Download it whenever you like in Settings → Your data → Download a backup.",
+      pvDelH: "Delete everything", pvDel: "There's no button for this yet. Ask the person who invited you: with one tap they delete your whole agenda, your reminders and your reports.",
+      pvPilotH: "Pilot", pvPilot: "You're in a closed, free pilot. If any of this changes, I'll tell you first, inside the app.",
+      fbBugQ: "What happened?", fbBugPh: "Tell me what you did and what went wrong.", fbIdeaQ: "What's your idea?", fbIdeaPh: "Tell me what you'd like Pendi to do.",
+      fbAlso: "Only this is sent with your message:", fbVer: "App version: {v}", fbScreen: "Screen: {s}", fbErr: "Last error: {e}", fbNoErr: "Last error: none",
+      fbNothingElse: "Nothing else leaves your phone.", fbSend: "Send", fbSending: "Sending…", fbEmpty: "Write something first.",
+      fbThanksBug: "Thanks! I got your report.", fbThanksIdea: "Thanks! I got your idea.",
+      fbFail: "It couldn't be sent. Your text is still here; try again.", fbNoTable: "I can't receive messages yet: a step is missing on the server. Your text is still here; try again later.",
+      fbAdminH: "Reports & ideas", fbAdminNone: "No reports or ideas yet.", fbAdminBug: "🐞 Problem", fbAdminIdea: "💡 Idea",
+      fbAdminFail: "I couldn't load the list.", fbAdminNoTable: "The “feedback” table still needs to be created in Supabase (supabase/feedback.sql)." },
+    pt: { hcFaq: "Perguntas frequentes", hcPriv: "Privacidade e seus dados", hcBug: "Relatar um problema", hcIdea: "Sugerir uma ideia",
+      f1q: "Como adiciono algo à minha agenda?", f1a: "Escreva ou fale comigo no Chat, ou toque no botão +. Por exemplo: “Me lembra amanhã às 9 de ligar para o banco”. Eu encaixo e te digo o que entendi.", f1b: "Abrir o Chat",
+      f2q: "Por que você pergunta se eu já terminei?", f2a: "Porque avisar não basta. Cada coisa fecha quando VOCÊ confirma: feita, passada para outro horário ou descartada. Nada é marcado como feito sozinho.",
+      f3q: "Você me avisa demais, ou de menos.", f3a: "Vá em Ajustes → Avisos → Nível de avisos e escolha Baixo, Médio ou Alto. Você também pode mudar o nível de uma só tarefa: abra-a e toque em “⋯ Mais opções”.", f3b: "Ir para Nível de avisos",
+      f4q: "Funciona com o app fechado?", f4a: "Sim: os avisos chegam como notificações. Para isso, me adicione à sua tela inicial e permita os avisos. Em Ajustes → Avisos eu te guio passo a passo.", f4b: "Ir para Avisos",
+      f5q: "Como adiciono o Pendi à minha tela inicial?", f5a: "iPhone: no Safari toque em Compartilhar (o quadradinho com a seta; se não aparecer, está no menu ⋯) e escolha “Adicionar à Tela de Início”. Android: no Chrome toque no menu ⋮ → “Instalar app” (ou “Adicionar à tela inicial”). Em breve chega um guia com fotos.",
+      f6q: "E se eu não responder um aviso?", f6a: "A tarefa fica “Sem confirmar” e eu te mostro no “Fim do dia”, para você fechá-la ali. Não se perde: continua na sua agenda.",
+      f7q: "Como passo algo para amanhã rapidinho?", f7a: "Deslize a tarefa para a esquerda. Ou abra-a e toque em “⋯ Mais opções” → “Passar para amanhã”; com ✏️ Editar você escolhe outro dia ou horário.",
+      f8q: "Meus dados são privados?", f8a: "Sim. Sua agenda é sua: não a vendo, não mostro anúncios e não te rastreio. Explico tudo, sem letras miúdas, em “Privacidade e seus dados”.",
+      f9q: "Perdi meu celular ou meu link.", f9a: "Sua agenda vive na nuvem, não no celular. Neste piloto, peça a quem te convidou para te mandar seu link de novo, ou entre com sua senha se tiver uma. Atenção: o link É a sua chave, não o compartilhe.",
+      f10q: "Posso usar em outro celular ao mesmo tempo?", f10a: "Sim, com o mesmo link ou senha: sua agenda é a mesma em todo lugar. Os avisos são ativados em cada celular, em Ajustes → Avisos.",
+      pvIntro: "Isto é tudo o que acontece com seus dados. Não há outras letras miúdas.",
+      pvWhatH: "O que o Pendi guarda", pvWhat: "Suas tarefas, seus aniversários, sua rotina e seus ajustes (como seu nome, idioma e fuso horário): o que você coloca. Se você ativa os avisos, também o endereço técnico que seu celular dá para recebê-los. Se você manda um relato ou uma ideia, sua mensagem com a versão do app, a tela e o último erro. A conversa do Chat não é guardada.",
+      pvWhereH: "Onde", pvWhere: "Em um banco de dados na nuvem (Supabase), para que sua agenda exista mesmo se você perder o celular. Este celular guarda uma cópia para funcionar sem internet.",
+      pvKeyH: "Sua chave", pvKey: "Seu link pessoal ou sua senha. Cuide deles como uma chave: quem os tem vê e muda sua agenda.",
+      pvAiH: "A IA", pvAi: "Para entender o que você me escreve, dita ou mostra numa foto, isso é processado por um modelo de IA (Google Gemini; se estiver ocupado, Groq). O Pendi não usa isso para treinar modelos nem para publicidade. Esses serviços têm suas próprias regras de privacidade.",
+      pvPushH: "Os avisos", pvPush: "Chegam pelo serviço de notificações do seu celular (Apple ou Google) e levam o nome da tarefa.",
+      pvNeverH: "O que eu NUNCA faço", pvNever: "Não vendo seus dados, não mostro anúncios e não te rastreio por outros apps ou sites.",
+      pvCopyH: "Sua cópia", pvCopy: "Baixe quando quiser em Ajustes → Seus dados → Baixar uma cópia.",
+      pvDelH: "Apagar tudo", pvDel: "Ainda não há um botão para isso. Peça a quem te convidou: com um toque essa pessoa apaga sua agenda inteira, seus avisos e seus relatos.",
+      pvPilotH: "Piloto", pvPilot: "Você está num piloto fechado e gratuito. Se algo disto mudar, eu te aviso antes, dentro do app.",
+      fbBugQ: "O que aconteceu?", fbBugPh: "Conte o que você fez e o que deu errado.", fbIdeaQ: "Qual é a sua ideia?", fbIdeaPh: "Conte o que você gostaria que o Pendi fizesse.",
+      fbAlso: "Com sua mensagem vai só isto:", fbVer: "Versão do app: {v}", fbScreen: "Tela: {s}", fbErr: "Último erro: {e}", fbNoErr: "Último erro: nenhum",
+      fbNothingElse: "Nada mais sai do seu celular.", fbSend: "Enviar", fbSending: "Enviando…", fbEmpty: "Escreva algo primeiro.",
+      fbThanksBug: "Obrigado! Recebi seu relato.", fbThanksIdea: "Obrigado! Recebi sua ideia.",
+      fbFail: "Não foi possível enviar. Seu texto continua aqui; tente de novo.", fbNoTable: "Ainda não consigo receber mensagens: falta um passo no servidor. Seu texto continua aqui; tente mais tarde.",
+      fbAdminH: "Relatos e ideias", fbAdminNone: "Ainda não há relatos nem ideias.", fbAdminBug: "🐞 Problema", fbAdminIdea: "💡 Ideia",
+      fbAdminFail: "Não consegui carregar a lista.", fbAdminNoTable: "Falta criar a tabela “feedback” no Supabase (supabase/feedback.sql)." },
+    fr: { hcFaq: "Questions fréquentes", hcPriv: "Confidentialité et tes données", hcBug: "Signaler un problème", hcIdea: "Proposer une idée",
+      f1q: "Comment j'ajoute quelque chose à mon agenda ?", f1a: "Écris-moi ou parle-moi dans le Chat, ou touche le bouton +. Par exemple : « Rappelle-moi demain à 9 h d'appeler la banque ». Je le place et je te dis ce que j'ai compris.", f1b: "Ouvrir le Chat",
+      f2q: "Pourquoi tu me demandes si j'ai fini ?", f2a: "Parce que prévenir ne suffit pas. Chaque chose se clôt quand TOI tu confirmes : faite, déplacée à une autre heure ou abandonnée. Rien n'est marqué fait tout seul.",
+      f3q: "Tu me préviens trop, ou pas assez.", f3a: "Va dans Réglages → Rappels → Niveau de rappels et choisis Bas, Moyen ou Élevé. Tu peux aussi changer le niveau d'une seule tâche : ouvre-la et touche « ⋯ Plus d'options ».", f3b: "Aller au niveau de rappels",
+      f4q: "Ça marche avec l'app fermée ?", f4a: "Oui : les rappels arrivent comme des notifications. Pour ça, ajoute-moi à ton écran d'accueil et autorise les rappels. Dans Réglages → Rappels, je te guide pas à pas.", f4b: "Aller aux rappels",
+      f5q: "Comment j'ajoute Pendi à mon écran d'accueil ?", f5a: "iPhone : dans Safari, touche Partager (le carré avec la flèche ; si tu ne le vois pas, il est dans le menu ⋯) et choisis « Sur l'écran d'accueil ». Android : dans Chrome, touche le menu ⋮ → « Installer l'appli » (ou « Ajouter à l'écran d'accueil »). Un guide avec photos arrive bientôt.",
+      f6q: "Et si je ne réponds pas à un rappel ?", f6a: "La tâche reste « Non confirmée » et je te la montre dans « Fin de journée », pour que tu la clôtures là. Elle ne se perd pas : elle reste dans ton agenda.",
+      f7q: "Comment je passe vite quelque chose à demain ?", f7a: "Glisse la tâche vers la gauche. Ou ouvre-la et touche « ⋯ Plus d'options » → « Passer à demain » ; avec ✏️ Modifier tu choisis un autre jour ou une autre heure.",
+      f8q: "Mes données sont-elles privées ?", f8a: "Oui. Ton agenda est à toi : je ne le vends pas, je ne montre pas de pub et je ne te piste pas. Je t'explique tout, sans petits caractères, dans « Confidentialité et tes données ».",
+      f9q: "J'ai perdu mon téléphone ou mon lien.", f9a: "Ton agenda vit dans le cloud, pas dans le téléphone. Pendant ce pilote, demande à la personne qui t'a invité·e de te renvoyer ton lien, ou entre avec ton mot de passe si tu en as un. Attention : le lien EST ta clé, ne le partage pas.",
+      f10q: "Je peux l'utiliser sur un autre téléphone en même temps ?", f10a: "Oui, avec le même lien ou mot de passe : ton agenda est le même partout. Les rappels s'activent sur chaque téléphone, dans Réglages → Rappels.",
+      pvIntro: "Voici tout ce qui se passe avec tes données. Il n'y a pas d'autres petits caractères.",
+      pvWhatH: "Ce que Pendi garde", pvWhat: "Tes tâches, tes anniversaires, ta routine et tes réglages (comme ton nom, ta langue et ton fuseau horaire) : ce que tu y mets. Si tu actives les rappels, aussi l'adresse technique que ton téléphone donne pour les recevoir. Si tu envoies un signalement ou une idée, ton message avec la version de l'app, l'écran et la dernière erreur. La conversation du Chat n'est pas enregistrée.",
+      pvWhereH: "Où", pvWhere: "Dans une base de données dans le cloud (Supabase), pour que ton agenda existe même si tu perds ton téléphone. Ce téléphone garde une copie pour marcher sans internet.",
+      pvKeyH: "Ta clé", pvKey: "Ton lien personnel ou ton mot de passe. Garde-les comme une clé : qui les a voit et modifie ton agenda.",
+      pvAiH: "L'IA", pvAi: "Pour comprendre ce que tu m'écris, me dictes ou me montres en photo, c'est traité par un modèle d'IA (Google Gemini ; s'il est occupé, Groq). Pendi ne s'en sert ni pour entraîner des modèles ni pour la publicité. Ces services ont leurs propres règles de confidentialité.",
+      pvPushH: "Les rappels", pvPush: "Ils passent par le service de notifications de ton téléphone (Apple ou Google) et portent le nom de la tâche.",
+      pvNeverH: "Ce que je ne fais JAMAIS", pvNever: "Je ne vends pas tes données, je ne montre pas de pub et je ne te piste pas sur d'autres apps ou sites.",
+      pvCopyH: "Ta copie", pvCopy: "Télécharge-la quand tu veux dans Réglages → Tes données → Télécharger une copie.",
+      pvDelH: "Tout effacer", pvDel: "Il n'y a pas encore de bouton pour ça. Demande à la personne qui t'a invité·e : d'un geste, elle efface tout ton agenda, tes rappels et tes signalements.",
+      pvPilotH: "Pilote", pvPilot: "Tu fais partie d'un pilote fermé et gratuit. Si quelque chose change ici, je te le dirai avant, dans l'app.",
+      fbBugQ: "Qu'est-ce qui s'est passé ?", fbBugPh: "Raconte-moi ce que tu as fait et ce qui n'a pas marché.", fbIdeaQ: "Quelle est ton idée ?", fbIdeaPh: "Raconte-moi ce que tu aimerais que Pendi fasse.",
+      fbAlso: "Avec ton message, seul ceci est envoyé :", fbVer: "Version de l'app : {v}", fbScreen: "Écran : {s}", fbErr: "Dernière erreur : {e}", fbNoErr: "Dernière erreur : aucune",
+      fbNothingElse: "Rien d'autre ne sort de ton téléphone.", fbSend: "Envoyer", fbSending: "Envoi…", fbEmpty: "Écris quelque chose d'abord.",
+      fbThanksBug: "Merci ! J'ai reçu ton signalement.", fbThanksIdea: "Merci ! J'ai reçu ton idée.",
+      fbFail: "Impossible d'envoyer. Ton texte est toujours là ; réessaie.", fbNoTable: "Je ne peux pas encore recevoir de messages : il manque une étape sur le serveur. Ton texte est toujours là ; réessaie plus tard.",
+      fbAdminH: "Signalements et idées", fbAdminNone: "Pas encore de signalements ni d'idées.", fbAdminBug: "🐞 Problème", fbAdminIdea: "💡 Idée",
+      fbAdminFail: "Je n'ai pas pu charger la liste.", fbAdminNoTable: "Il faut encore créer la table « feedback » dans Supabase (supabase/feedback.sql)." },
+  };
+  for (const k of Object.keys(P13)) Object.assign(I18N[k], P13[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1363,10 +1496,21 @@ html.kb .tabbar { display: none; }
     if (invite !== pass) { try { localStorage.clear(); } catch {} pass = invite; ls.set("pass", pass); }
     document.querySelector('link[rel="manifest"]').href = "/api/manifest?invite=" + encodeURIComponent(invite);
   }
+  // The last thing that went wrong (kept for a day), so a problem report can carry it. Only the error's text:
+  // links and long keys are cut out, and nothing that was on screen is included.
+  function noteError(msg) {
+    const m = String(msg || "").replace(/https?:\/\/\S+/g, "[url]").replace(/[A-Za-z0-9_-]{20,}/g, "[…]").slice(0, 300);
+    if (m) ls.set("lastError", { m, at: Date.now() });
+  }
+  const lastError = () => { const e = ls.get("lastError", null); return e && e.m && Date.now() - e.at < 86400000 ? e.m : ""; };
+  window.addEventListener("error", (e) => noteError((e.message || "error") + (e.filename ? " @ " + e.filename.split("/").pop().split("?")[0] + ":" + e.lineno : "")));
+  window.addEventListener("unhandledrejection", (e) => { const r = e.reason; if (r && r.status) return; noteError("promise: " + ((r && (r.message || r.error)) || r)); });
   async function call(path, body, signal) {
-    const r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined, signal });
+    let r;
+    try { r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined, signal }); }
+    catch (e) { if (!(e && e.name === "AbortError")) noteError(path.split("?")[0] + " → no connection"); throw e; }
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw { status: r.status, ...j };
+    if (!r.ok) { noteError(path.split("?")[0] + " → " + r.status + (j.error ? " " + j.error : "")); throw { status: r.status, ...j }; }
     return j;
   }
   const ai = {
@@ -1382,10 +1526,12 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.14.0";
+  const VERSION = "0.15.0";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
+  // The last tab used before Ajustes, for problem reports ("which screen").
+  let lastScreen = isPhone() ? "cal" : "organize";
 
   function examples() {
     const t = ymd(new Date()), m = ymd(addDays(new Date(), 1));
@@ -3107,6 +3253,82 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     finally { $("inviteGo").disabled = false; }
   };
 
+  // ---------- help center (0.15.0) ----------
+  const SCR = { cal: "agenda", organize: "tabOrganize", chat: "tabChat", bdays: "tabBdays", settings: "tabSettings" };
+  const helpSheet = (label, ...kids) => el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": label }, el("div", { class: "grabber" }), el("h2", {}, label), ...kids);
+  // Takes the person to one setting: closes the sheet, opens Ajustes and scrolls to it.
+  function goSetting(id) {
+    closeSheet(); showTab("settings");
+    requestAnimationFrame(() => $(id).scrollIntoView({ behavior: "smooth", block: "center" }));
+  }
+  // Questions with short answers; when the answer is a feature, a button goes straight to it.
+  function openFaq() {
+    const go = { 1: ["f1b", () => { closeSheet(); showTab("chat"); }], 3: ["f3b", () => goSetting("levelCards")], 4: ["f4b", () => goSetting("pushBox")], 8: ["hcPriv", openPrivacy] };
+    showSheet(helpSheet(tr("hcFaq"),
+      el("div", { class: "faq" }, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => el("details", {},
+        el("summary", {}, tr("f" + n + "q")), el("p", {}, tr("f" + n + "a")),
+        go[n] ? el("button", { type: "button", class: "btn small", onclick: go[n][1] }, tr(go[n][0])) : null))),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+  }
+  // Plain words, all of it on one page.
+  function openPrivacy() {
+    const sec = (k, extra) => el("section", {}, el("h3", {}, tr("pv" + k + "H")), el("p", {}, tr("pv" + k)), extra || null);
+    showSheet(helpSheet(tr("hcPriv"), el("p", { class: "muted", style: "margin:0" }, tr("pvIntro")),
+      el("div", { class: "doc" }, sec("What"), sec("Where"), sec("Key"), sec("Ai"), sec("Push"), sec("Never"),
+        sec("Copy", el("button", { type: "button", class: "btn small", onclick: () => { closeSheet(); backup(); } }, tr("backupDl"))),
+        sec("Del"), sec("Pilot")),
+      el("button", { class: "btn", onclick: closeSheet }, tr("close"))));
+  }
+  // One text field. With it goes only the app version, the screen and the last error, and the form shows exactly that.
+  function openFeedback(type) {
+    const k = type === "bug" ? "Bug" : "Idea", err = lastError(), from = lastScreen;
+    const box = el("textarea", { class: "field", id: "fbIn", rows: 5, maxlength: 2000, placeholder: tr("fb" + k + "Ph"), style: "background:var(--group)" });
+    const mic = el("button", { type: "button", class: "mic", "data-mic": "fbIn", "aria-label": tr("dictate"), onclick: () => toggleMic(mic) }, micSvg());
+    const status = el("div", { class: "status", role: "status" });
+    const send = el("button", { class: "btn primary" }, tr("fbSend"));
+    const form = el("form", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("hc" + k), onsubmit: async (e) => {
+        e.preventDefault();
+        if (dictating) { const d = dictating; dictating = null; await d.stop(); }
+        const message = box.value.trim();
+        if (!message) { status.textContent = tr("fbEmpty"); box.focus(); return; }
+        send.disabled = true; send.textContent = tr("fbSending"); status.textContent = "";
+        try {
+          await call("/api/feedback", { type, message, meta: { version: VERSION, screen: from + " > settings", lastError: err || null } });
+          closeSheet(); notice(tr("fbThanks" + k));
+          if (!$("adminBox").hidden) renderFeedback();
+        } catch (x) {
+          status.textContent = x && x.error === "no_table" ? tr("fbNoTable") : x && x.status === 401 ? tr("errAuth") : x && x.status ? tr("fbFail") : tr("errNet");
+          send.disabled = false; send.textContent = tr("fbSend");
+        }
+      } },
+      el("div", { class: "grabber" }), el("h2", {}, tr("hc" + k)),
+      el("label", { for: "fbIn", style: "font-weight:700" }, tr("fb" + k + "Q")),
+      el("div", { class: "dumpbox" }, box, mic),
+      el("div", { class: "tipbox", style: "display:grid;gap:2px" }, el("b", {}, tr("fbAlso")),
+        el("div", {}, "• " + tr("fbVer", { v: VERSION })),
+        el("div", {}, "• " + tr("fbScreen", { s: tr(SCR[from] || "tabSettings") + " → " + tr("tabSettings") })),
+        el("div", { style: "overflow-wrap:anywhere" }, "• " + (err ? tr("fbErr", { e: err }) : tr("fbNoErr"))),
+        el("div", { class: "muted" }, tr("fbNothingElse"))),
+      status,
+      el("div", { class: "row" }, send, el("button", { type: "button", class: "btn", onclick: closeSheet }, tr("cancel"))));
+    showSheet(form);
+  }
+  // Ajustes → Administrador: what people sent, newest first, read-only.
+  async function renderFeedback() {
+    const box = $("fbList");
+    let rows;
+    try { rows = (await call("/api/feedback")).feedback || []; }
+    catch (e) { box.replaceChildren(el("div", { class: "muted" }, tr(e && e.error === "no_table" ? "fbAdminNoTable" : "fbAdminFail"))); return; }
+    box.replaceChildren(...(rows.length ? rows.map((r) => {
+      const m = r.meta || {}, d = new Date(r.created_at);
+      return el("div", { style: "display:grid;gap:4px" },
+        el("div", { class: "row", style: "justify-content:space-between;gap:8px;flex-wrap:nowrap" }, el("b", {}, tr(r.type === "bug" ? "fbAdminBug" : "fbAdminIdea")),
+          el("span", { class: "muted", style: "font-size:13px" }, fmtDate(ymd(d)) + " " + clock(hm(d)) + (m.version ? " · v" + m.version : ""))),
+        el("div", { style: "white-space:pre-wrap;overflow-wrap:anywhere" }, r.message),
+        m.screen || m.lastError ? el("div", { class: "muted", style: "font-size:13px;overflow-wrap:anywhere" }, [m.screen, m.lastError].filter(Boolean).join(" · ")) : null);
+    }) : [el("div", { class: "muted" }, tr("fbAdminNone"))]));
+  }
+
   // ---------- setup checklist ----------
   function renderSetup() {
     const st = state.status, box = $("setupBox"); box.replaceChildren();
@@ -3114,6 +3336,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     $("setupAlert").replaceChildren(missing.length && !st.offline ? el("div", { class: "card" }, el("b", {}, tr("notReady")),
       el("div", { class: "muted" }, tr("missingX", { x: andList(missing) }))) : "");
     $("adminBox").hidden = !ls.get("admin", false) || !!st.guest;
+    if (!$("adminBox").hidden && st.db && !st.offline) renderFeedback(); else $("fbList").replaceChildren();
     $("inviteBox").hidden = !!st.guest || !st.db || !!st.offline;
     if (!$("inviteBox").hidden) renderInvites();
     $("version").textContent = tr("version") + " " + VERSION + (ls.get("admin", false) ? tr("adminSuffix") : "");
@@ -3382,6 +3605,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // ---------- tabs ----------
   function showTab(name) {
     if (dictating) { const d = dictating; dictating = null; d.stop(); }
+    if (name !== "settings") lastScreen = isPhone() || name !== "cal" ? name : "organize";
     document.querySelectorAll("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== name));
     document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
     document.querySelectorAll(".tabbar button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
@@ -3554,6 +3778,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("myName").onchange = () => { const v = $("myName").value.trim().slice(0, 40); $("myName").value = v; if (v !== (state.settings.name || "")) { saveSettings({ name: v }); paintRoutine(true); notice(tr("nameSaved")); } };
   $("myName").oninput = () => { const f = formPicker($("myName").value, state.settings.form, () => {}); if (f) $("formBox").querySelectorAll(".lvcard b").forEach((b, j) => { b.textContent = f.children[j].textContent; }); };
   $("rtRedo").onclick = () => interview();
+  $("helpFaq").onclick = openFaq;
+  $("helpPriv").onclick = openPrivacy;
+  $("helpBug").onclick = () => openFeedback("bug");
+  $("helpIdea").onclick = () => openFeedback("idea");
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
   $("logout").onclick = () => showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("logoutTitle") }, el("div", { class: "grabber" }),
