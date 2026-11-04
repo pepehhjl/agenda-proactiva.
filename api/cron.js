@@ -57,6 +57,8 @@ async function remind(sb, owner, items) {
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
   const tr = texts(settings.uiLang);
+  // The clock chosen in Ajustes; never touched: 24 h in French and Portuguese, 12 h otherwise (as in the app).
+  const clockMode = settings.clock || (["fr", "pt"].includes(String(settings.uiLang || "").slice(0, 2)) ? "24" : "12");
   // The buttons of a task notification (the service worker shows as many as the phone allows, in this order).
   // Posponer and Ahora no open a small choice inside the installed app; the others work in the background.
   const btn = (k, title) => ({ action: k, title: title || tr("a_" + k) });
@@ -86,7 +88,7 @@ async function remind(sb, owner, items) {
     if (live && t.snooze && Date.parse(t.snooze) <= now && now - Date.parse(t.snooze) < 30 * 60000) {
       const key = `${r.id}@snooze@${t.snooze}`;
       const past = t.start && Date.parse(t.start) <= now;
-      const body = t.anytime ? t.tip || "" : `${tr(past ? "wasAt" : "isAt", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`;
+      const body = t.anytime ? t.tip || "" : `${tr(past ? "wasAt" : "isAt", { t: clock(t.time, clockMode) })}${t.tip ? " · " + t.tip : ""}`;
       due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("reminder").toUpperCase()} · ${icon(t)} ${t.title}`, body, tag: r.id, taskId: r.id, urgency: "high", actions: remindBtns(t), ...sign(r.id) } });
     }
     // At the task's exact time: a reminder that informs and never closes it ("Es hora de…" with Posponer / Voy ahora,
@@ -95,7 +97,7 @@ async function remind(sb, owner, items) {
     if (live && t.start && !t.anytime && F.pushes(t, lvOf(t)).at && !(t.snooze && Date.parse(t.snooze) > Date.parse(t.start) - 3600000)) {
       const ago = (now - Date.parse(t.start)) / 60000;
       if (ago >= 0 && ago < 10) {
-        const key = `${r.id}@${t.start}#due`, when = clock(t.time, settings.clock), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
+        const key = `${r.id}@${t.start}#due`, when = clock(t.time, clockMode), name = `${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`;
         due.push({ check: key, keys: [key], payload: { title: `⏰ ${tr("dueNow").toUpperCase()} · ${name}`, body: `${tr("at", { t: when })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, urgency: "high", actions: remindBtns(t), ...sign(r.id) } });
       }
     }
@@ -127,7 +129,7 @@ async function remind(sb, owner, items) {
         keys: hit.map((th) => `${r.id}@${t.start}#${th}`),
         // The time left in capitals after an alarm clock, so it stands out among other notifications.
         // Below "high" this is the only reminder, so it carries the reminder's buttons (▶ Empezar temprano for a timed task).
-        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, settings.clock) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, actions: lv === "high" ? [btn("snooze")] : remindBtns(t), ...sign(r.id) },
+        payload: { title: `⏰ ${label.toUpperCase()} · ${t.star ? "⭐ " : ""}${icon(t)} ${t.title}`, urgency: "high", body: `${tr("at", { t: clock(t.time, clockMode) })}${t.tip ? " · " + t.tip : ""}`, tag: r.id, taskId: r.id, actions: lv === "high" ? [btn("snooze")] : remindBtns(t), ...sign(r.id) },
       });
     }
     if (r.kind === "bday" && t.month && t.day) {
@@ -172,10 +174,10 @@ async function remind(sb, owner, items) {
     const first = open.filter((t) => !t.anytime && t.time).sort((p, q) => p.time.localeCompare(q.time))[0];
     const star = open.find((t) => t.star);
     const body = !open.length ? tr("mFree")
-      : (first ? tr(open.length === 1 ? "mOne" : "mMany", { n: open.length, t: clock(first.time, settings.clock), x: first.title }) : tr("mNoTime", { n: open.length })) + (star && star !== first ? " " + tr("mStar", { x: star.title }) : "");
+      : (first ? tr(open.length === 1 ? "mOne" : "mMany", { n: open.length, t: clock(first.time, clockMode), x: first.title }) : tr("mNoTime", { n: open.length })) + (star && star !== first ? " " + tr("mStar", { x: star.title }) : "");
     // First what yesterday left open (up to 5, with their time), then today.
     const yday = tasks.filter((t) => t.date === dayKey(-1) && !F.closed(t) && !t.openSeen).sort((p, q) => (p.time || "99").localeCompare(q.time || "99"));
-    const lead = yday.length ? tr("morningOpenLead", { n: yday.length, x: yday.slice(0, 5).map((t) => t.title + (t.anytime || !t.time ? "" : ` (${clock(t.time, settings.clock)})`)).join(", ") + (yday.length > 5 ? "…" : "") }) + " " : "";
+    const lead = yday.length ? tr("morningOpenLead", { n: yday.length, x: yday.slice(0, 5).map((t) => t.title + (t.anytime || !t.time ? "" : ` (${clock(t.time, clockMode)})`)).join(", ") + (yday.length > 5 ? "…" : "") }) + " " : "";
     brief(`brief@${todayK}@m`, { title: tr("mTitle"), body: lead + body, url: "/" });
   }
   if (b.eOn !== false && within(b.e || "21:00") && today.length) {
