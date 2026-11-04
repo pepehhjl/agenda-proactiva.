@@ -258,6 +258,8 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .group { background: var(--cell); border-radius: 14px; overflow: hidden; display: grid; }
 .group > * { padding: 12px 16px; }
 .group > * + * { border-top: 1px solid var(--sep); }
+/* Buttons that are a row of their own: full width, so the separator above them is too. */
+.group > button.link { justify-self: stretch; text-align: left; }
 .group .toggle { min-height: 28px; }
 .group select, .group input[type="time"] { border: 0; background: var(--fill); border-radius: 8px; padding: 6px 10px; }
 .foot { font-size: 13px; color: var(--muted); margin: -6px 16px 0; }
@@ -541,10 +543,8 @@ html.kb .tabbar { display: none; }
           <div id="workBox" style="display:grid;gap:10px"></div>
           <div id="sleepBox" style="display:grid;gap:10px"></div>
           <div id="forgetBox" style="display:grid;gap:8px"></div>
-          <label class="toggle"><span data-i18n="bestAt"></span>
-            <select id="energy"><option value="mañana" data-i18n="morning"></option><option value="tarde" data-i18n="afternoon"></option><option value="noche" data-i18n="night"></option></select>
-          </label>
-          <button class="link" id="rtRedo" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
+          <div id="energyBox" style="display:grid;gap:8px"></div>
+          <button class="link" id="rtRedo" style="font-size:16px;padding:12px 16px" data-i18n="rtRedo"></button>
         </div>
         <p class="foot" data-i18n="nameFoot"></p>
         <p class="foot" data-i18n="rtFoot"></p>
@@ -559,7 +559,7 @@ html.kb .tabbar { display: none; }
             <div class="muted" id="quietSum"></div>
           </div>
           <label class="toggle"><span data-i18n="sound"></span> <input type="checkbox" id="sound" checked></label>
-          <button class="link" id="testToast" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
+          <button class="link" id="testToast" style="font-size:16px;padding:12px 16px" data-i18n="previewNotice"></button>
         </div>
         <p class="foot" data-i18n="quietFoot"></p>
         <h3 class="sub" data-i18n="summaries"></h3>
@@ -570,7 +570,7 @@ html.kb .tabbar { display: none; }
           <div class="toggle" id="briefERow"><span><span data-i18n="atTime"></span> <input type="time" id="briefE" value="21:00"></span></div>
           <div class="muted" id="briefAnch" hidden></div>
           <label class="toggle"><span data-i18n="weeklyBrief"></span> <input type="checkbox" id="briefWOn"></label>
-          <button class="link" id="seeWeek" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
+          <button class="link" id="seeWeek" style="font-size:16px;padding:12px 16px" data-i18n="seeWeek"></button>
         </div>
         <p class="foot" id="briefFoot"></p>
         <h3 class="sub" data-i18n="appearance"></h3>
@@ -593,8 +593,8 @@ html.kb .tabbar { display: none; }
         </div>
         <h3 class="sub" data-i18n="yourData"></h3>
         <div class="group">
-          <button class="link" id="backupBtn" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="backupDl"></button>
-          <button class="link" id="restoreBtn" style="justify-self:start;font-size:16px;padding:12px 16px" data-i18n="backupRestore"></button>
+          <button class="link" id="backupBtn" style="font-size:16px;padding:12px 16px" data-i18n="backupDl"></button>
+          <button class="link" id="restoreBtn" style="font-size:16px;padding:12px 16px" data-i18n="backupRestore"></button>
         </div>
         <input type="file" id="restoreFile" accept="application/json,.json" hidden>
         <p class="foot" data-i18n="backupFoot"></p>
@@ -609,7 +609,7 @@ html.kb .tabbar { display: none; }
         </div>
         <h3 class="sub" data-i18n="account"></h3>
         <div class="group">
-          <button class="link" id="logout" style="justify-self:start;color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
+          <button class="link" id="logout" style="color:var(--red);font-size:16px;padding:12px 16px" data-i18n="logout"></button>
         </div>
         <div id="adminBox" hidden style="display:grid;gap:14px">
           <h3 class="sub">Administrador</h3>
@@ -819,7 +819,7 @@ html.kb .tabbar { display: none; }
       reminder: "Lembrete", inHourCap: "Em 1 hora", inMinCap: "Em {n} min", previewTag: " · prévia", nowLower: "agora", atCap: "Às {t}", snooze10: "Adiar 10 min",
       stopDictation: "Parar ditado", listening: "Estou ouvindo... toque para terminar", noDictate: "Este navegador não permite ditar.", noMic: "Você não permitiu o microfone.", transcribing: "Transcrevendo...",
       pushClosed: "Avisos com o app fechado", pushNotReady: "Ainda não estão prontos no servidor.", pushNoBrowser: "Este navegador não permite avisos. Use o Chrome ou o Safari atualizados.",
-      pushOn: "✅ Avisos ativados", pushOnText: "Chegam mesmo com o app fechado. Os botões respondem sem abrir o app; ao tocar no aviso, o Pendi abre.",
+      pushOn: "✅ Avisos ativados", pushOnText: "Chegam mesmo com o app fechado. Os botões respondem sem abrir o app; ao tocar no aviso, a Pendi abre.",
       sending: "Enviando...", checkNotifs: "Pronto, confira suas notificações.", sendTest: "Mandar um aviso de teste", activating: "Ativando...",
       noPermission: "Você não deu permissão. Dá para ativar em Ajustes do celular > Notificações.", allowNotifs: "Permitir avisos", steps3: "Ative os avisos em 3 passos",
       step1: "Adicione à tela de início", step1Text: "No Safari toque em Compartilhar (o quadradinho com a seta) e escolha \"Adicionar à Tela de Início\".",
@@ -951,7 +951,7 @@ html.kb .tabbar { display: none; }
   });
   Object.assign(I18N.pt, {
     openCardTitle: "Em aberto de ontem", openCardOne: "Ontem ficou 1 coisa em aberto", openCardMany: "Ontem ficaram {n} coisas em aberto", openCardMoveAll: "Passar tudo para amanhã", openCardDismiss: "Tirar da lista", openCardDismissed: "{t}: fora da lista",
-    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções", inviteH: "Convidar alguém", inviteFoot: "Crie um link para uma pessoa. Ao abrir, ela entra direto, sem senha, na própria agenda vazia. Não vê a sua.", inviteNamePh: "Nome (ex: Ana)", inviteGo: "Criar link", inviteCopy: "Copiar link", inviteShare: "Enviar", inviteCopied: "Link copiado", inviteRemove: "Remover", inviteRemoveQ: "Remover {n}? A agenda dela é apagada e o link para de funcionar.", inviteRemoved: "Você removeu {n}", inviteMsg: "Experimente o Pendi, minha agenda com IA. Abra este link no Safari (iPhone) ou Chrome (Android) e depois adicione à tela de início:", guestNote: "Agenda de convidado", edit: "Editar", editTask: "Editar tarefa", nameLbl: "Nome", emojiLbl: "Ícone", durLbl: "Duração", minShort: "min", noteLbl: "Dica ou nota", applyAll: "Aplicar a todas as repetições", edited: "Alterações salvas",
+    search: "Buscar", searchPh: "Busque uma tarefa ou um aniversário", noResults: "Não encontrei nada", undo: "Desfazer", noHeard: "Não ouvi bem. Toque no microfone e tente de novo.", quietFromL: "Das", quietToL: "Até", quietSum: "Nenhum aviso das {a} às {b}.", stop: "Parar", stopped: "Parei. Pergunte outra coisa quando quiser.", errAi: "A IA não respondeu desta vez. Tente de novo.", schedAll: "Agendar tudo", schedSel: "Agendar {n} escolhidas", schedSel1: "Agendar a escolhida", discAll: "Descartar tudo", discSel: "Descartar {n} escolhidas", discSel1: "Descartar a escolhida", tapPick: "Toque nas sugestões para escolher só algumas.", moreOptions: "Mais opções", inviteH: "Convidar alguém", inviteFoot: "Crie um link para uma pessoa. Ao abrir, ela entra direto, sem senha, na própria agenda vazia. Não vê a sua.", inviteNamePh: "Nome (ex: Ana)", inviteGo: "Criar link", inviteCopy: "Copiar link", inviteShare: "Enviar", inviteCopied: "Link copiado", inviteRemove: "Remover", inviteRemoveQ: "Remover {n}? A agenda dela é apagada e o link para de funcionar.", inviteRemoved: "Você removeu {n}", inviteMsg: "Experimente a Pendi, minha agenda com IA. Abra este link no Safari (iPhone) ou Chrome (Android) e depois adicione à tela de início:", guestNote: "Agenda de convidado", edit: "Editar", editTask: "Editar tarefa", nameLbl: "Nome", emojiLbl: "Ícone", durLbl: "Duração", minShort: "min", noteLbl: "Dica ou nota", applyAll: "Aplicar a todas as repetições", edited: "Alterações salvas",
     deleted: "🗑️ {t}: apagada", deletedSeries: "🗑️ Apaguei esta e as seguintes", delOne: "Apagar só esta", delSeries: "Apagar esta e as seguintes",
     repeat: "Repetir", rep_none: "Não se repete", rep_daily: "Todos os dias", rep_weekdays: "De segunda a sexta", rep_weekly: "Toda semana", rep_monthly: "Todo mês",
     repEvery: "Toda {d}", repMonthDay: "Todo mês, no dia {n}", repeats: "Se repete",
@@ -972,7 +972,7 @@ html.kb .tabbar { display: none; }
     seeWeek: "Ver o resumo da semana", briefFoot: "Chegam como aviso. O da noite deixa você passar o que falta para amanhã; o de domingo chega às 18:00.",
     yourData: "Seus dados", backupDl: "Baixar uma cópia", backupRestore: "Recuperar uma cópia",
     backupFoot: "A cópia é um arquivo com todas as suas tarefas e aniversários. Guarde onde quiser.", backupDone: "Cópia baixada",
-    restoreConfirm: "Adiciono as {n} tarefas e aniversários desta cópia? O que você já tem continua.", restored: "Pronto: recuperei {n} itens", restoreBad: "Esse arquivo não é uma cópia do Pendi",
+    restoreConfirm: "Adiciono as {n} tarefas e aniversários desta cópia? O que você já tem continua.", restored: "Pronto: recuperei {n} itens", restoreBad: "Esse arquivo não é uma cópia da Pendi",
     offlineNote: "Sem internet: guardo tudo e envio quando voltar", backOnline: "Conexão de volta: tudo em dia",
   });
   Object.assign(I18N.fr, {
@@ -1020,10 +1020,10 @@ html.kb .tabbar { display: none; }
       probeResend: "Send again ({n})", probeLater: "I'll check later", pushUnconfirmed: "⚠️ Reminders not confirmed", pushUnconfirmedText: "The test reminder was never tapped on this phone. Send one and tap it when it arrives." },
     pt: { noTimeLower: "sem hora", planHint: "Foi isto que entendi. Toque em uma para tirá-la.", confirmN: "✔ Adicionar {n}", confirm1: "✔ Adicionar", readingShare: "Lendo o que você compartilhou...",
       probeSending: "Estou te mandando um aviso de teste...", probeWait: "Te mandei um aviso de teste. Quando chegar, toque nele.", probeWaitSub: "Assim eu sei que os avisos chegam de verdade neste celular.",
-      probeOk: "✅ Chegou! Seus avisos funcionam neste celular.", probeMiss: "Não chegou? Confira isto:", probeDenied: "Os avisos do Pendi estão bloqueados. Ative assim:",
-      probeAndroid1: "Tire a economia de bateria do Pendi:", probeAndroid2: "Ative «Permitir notificações»:", probeAndroidNote: "Se o Pendi não aparecer na lista, procure o Chrome e faça o mesmo.",
+      probeOk: "✅ Chegou! Seus avisos funcionam neste celular.", probeMiss: "Não chegou? Confira isto:", probeDenied: "Os avisos da Pendi estão bloqueados. Ative assim:",
+      probeAndroid1: "Tire a economia de bateria da Pendi:", probeAndroid2: "Ative «Permitir notificações»:", probeAndroidNote: "Se a Pendi não aparecer na lista, procure o Chrome e faça o mesmo.",
       probeIos: "Ative «Allow Notifications» em:", probeOther: "Confira se este navegador tem permissão para mostrar notificações.",
-      probeInstall: "No iPhone, os avisos só funcionam com o Pendi na tela de início: toque em Compartilhar ⬆️ > Adicionar à Tela de Início e abra pelo ícone.",
+      probeInstall: "No iPhone, os avisos só funcionam com a Pendi na tela de início: toque em Compartilhar ⬆️ > Adicionar à Tela de Início e abra pelo ícone.",
       probeResend: "Reenviar aviso ({n})", probeLater: "Vejo depois", pushUnconfirmed: "⚠️ Avisos sem confirmar", pushUnconfirmedText: "O aviso de teste nunca foi tocado neste celular. Mande um e toque nele quando chegar." },
     fr: { noTimeLower: "sans heure", planHint: "Voilà ce que j'ai compris. Touche une tâche pour l'enlever.", confirmN: "✔ Ajouter {n}", confirm1: "✔ Ajouter", readingShare: "Je lis ce que tu as partagé...",
       probeSending: "Je t'envoie un rappel de test...", probeWait: "Je t'ai envoyé un rappel de test. Quand il arrive, touche-le.", probeWaitSub: "Comme ça je sais que les rappels arrivent vraiment sur ce téléphone.",
@@ -1179,7 +1179,7 @@ html.kb .tabbar { display: none; }
       rwWork: "during your work hours ({f} to {t}) I'll only suggest short things", rwBrief: "your summaries arrive when you wake up and before bed", rwAnd: "and ", rwSep: "; ",
       rwNone: "All set, {a}. Whenever you like, tell me your routine in Settings → Your routine.", rwNone0: "All set. Whenever you like, tell me your routine in Settings → Your routine.", rwGo: "Create my first reminder", rwOk: "Got it",
       rtCardTitle: "Tell me your routine in 1 minute", rtCardText: "That way I won't schedule anything while you sleep, and I'll suggest better times.", rtCardGo: "Start",
-      formL: "How Pendi talks to you", workH: "Work", sleepH: "Sleep", stUp: "I get up", stBed: "I go to bed", forgetL: "What I forget the most", rtRedo: "Do the interview again", rtClear: "Remove",
+      formL: "How Pendi talks to you", workH: "Work", sleepH: "Sleep", stUp: "I get up", stBed: "I go to bed", forgetL: "What you forget the most", rtRedo: "Do the interview again", rtClear: "Remove",
       rtFoot: "Pendi uses your routine to suggest times and pick its tone. It never asks for personal data." },
     pt: { ivTitle: "Agora, vamos nos conhecer", ivPromise: "Cinco perguntas rapidinhas para te conhecer. Pule as que quiser.", ivStart: "Começar", ivLater: "Agora não", ivStep: "Pergunta {i} de {n}",
       q1Title: "Como você quer que eu te chame?", q1Ph: "Seu apelido", q1Form: "Como eu falo com você? Toque na que soa como você.",
@@ -1192,7 +1192,7 @@ html.kb .tabbar { display: none; }
       rwWork: "no seu horário de trabalho (das {f} às {t}) só te proponho coisas curtas", rwBrief: "seus resumos chegam quando você acorda e antes de dormir", rwAnd: "e ", rwSep: "; ",
       rwNone: "Pronto, {a}. Quando quiser, me conte sua rotina em Ajustes → Sua rotina.", rwNone0: "Pronto. Quando quiser, me conte sua rotina em Ajustes → Sua rotina.", rwGo: "Criar meu primeiro lembrete", rwOk: "Entendi",
       rtCardTitle: "Me conte sua rotina em 1 minuto", rtCardText: "Assim não marco nada enquanto você dorme e te proponho horários melhores.", rtCardGo: "Começar",
-      formL: "Como a Pendi fala com você", workH: "Trabalho", sleepH: "Sono", stUp: "Acordo", stBed: "Vou dormir", forgetL: "O que mais esqueço", rtRedo: "Refazer a entrevista", rtClear: "Tirar",
+      formL: "Como a Pendi fala com você", workH: "Trabalho", sleepH: "Sono", stUp: "Acordo", stBed: "Vou dormir", forgetL: "O que você mais esquece", rtRedo: "Refazer a entrevista", rtClear: "Tirar",
       rtFoot: "A Pendi usa sua rotina para propor horários e escolher o tom. Ela nunca pede dados pessoais." },
     fr: { ivTitle: "Maintenant, faisons connaissance", ivPromise: "Cinq petites questions pour te connaître. Tu peux passer celles que tu veux.", ivStart: "Commencer", ivLater: "Pas maintenant", ivStep: "Question {i} sur {n}",
       q1Title: "Comment veux-tu que je t'appelle ?", q1Ph: "Ton surnom", q1Form: "Comment je te parle ? Touche celle qui te ressemble.",
@@ -1205,7 +1205,7 @@ html.kb .tabbar { display: none; }
       rwWork: "pendant tes heures de travail (de {f} à {t}), je ne te propose que des choses courtes", rwBrief: "tes résumés arrivent à ton réveil et avant de dormir", rwAnd: "et ", rwSep: " ; ",
       rwNone: "C'est prêt, {a}. Quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.", rwNone0: "C'est prêt. Quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.", rwGo: "Créer mon premier rappel", rwOk: "Compris",
       rtCardTitle: "Raconte-moi ta routine en 1 minute", rtCardText: "Comme ça, je ne te programme rien pendant que tu dors et je te propose de meilleures heures.", rtCardGo: "Commencer",
-      formL: "Comment Pendi te parle", workH: "Travail", sleepH: "Sommeil", stUp: "Je me lève", stBed: "Je me couche", forgetL: "Ce que j'oublie le plus", rtRedo: "Refaire l'entretien", rtClear: "Retirer",
+      formL: "Comment Pendi te parle", workH: "Travail", sleepH: "Sommeil", stUp: "Je me lève", stBed: "Je me couche", forgetL: "Ce que tu oublies le plus", rtRedo: "Refaire l'entretien", rtClear: "Retirer",
       rtFoot: "Pendi utilise ta routine pour te proposer des heures et choisir son ton. Elle ne te demande jamais de données personnelles." },
   };
   for (const k of Object.keys(P8)) Object.assign(I18N[k], P8[k]);
@@ -1234,6 +1234,21 @@ html.kb .tabbar { display: none; }
       briefFoot: "Ils arrivent comme des rappels. Celui du soir te laisse passer le reste à demain ; celui du dimanche arrive à {t}.", goneTask: "une tâche qui n'existe plus" },
   };
   for (const k of Object.keys(P10)) Object.assign(I18N[k], P10[k]);
+  const P11 = {
+    es: { rwLead: "{a}, ", rwLead0: "", rwNone: "{a}, cuando quieras, me cuentas tu rutina en Ajustes → Tu rutina.", rwNone0: "Cuando quieras, me cuentas tu rutina en Ajustes → Tu rutina.",
+      briefAnchM: "Con tu rutina, el de la mañana llega al despertar ({m}).", briefAnchE: "Con tu rutina, el de la noche llega antes de dormir ({e}).",
+      logoutTitle: "¿Cerrar sesión?", logoutQ: "Tus tareas quedan guardadas. Para volver a entrar en este dispositivo vas a necesitar la contraseña.", logoutYes: "Cerrar sesión" },
+    en: { rwLead: "{a}, ", rwLead0: "", rwNone: "{a}, whenever you like, tell me your routine in Settings → Your routine.", rwNone0: "Whenever you like, tell me your routine in Settings → Your routine.",
+      briefAnchM: "With your routine, the morning one arrives when you wake up ({m}).", briefAnchE: "With your routine, the evening one arrives before bed ({e}).",
+      logoutTitle: "Sign out?", logoutQ: "Your tasks stay saved. To get back in on this device you'll need the password.", logoutYes: "Sign out" },
+    pt: { rwLead: "{a}, ", rwLead0: "", rwNone: "{a}, quando quiser, me conte sua rotina em Ajustes → Sua rotina.", rwNone0: "Quando quiser, me conte sua rotina em Ajustes → Sua rotina.",
+      briefAnchM: "Com sua rotina, o da manhã chega quando você acorda ({m}).", briefAnchE: "Com sua rotina, o da noite chega antes de dormir ({e}).",
+      logoutTitle: "Sair?", logoutQ: "Suas tarefas continuam salvas. Para entrar de novo neste dispositivo, você vai precisar da senha.", logoutYes: "Sair" },
+    fr: { rwLead: "{a}, ", rwLead0: "", rwNone: "{a}, quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.", rwNone0: "Quand tu veux, raconte-moi ta routine dans Réglages → Ta routine.",
+      briefAnchM: "Avec ta routine, celui du matin arrive à ton réveil ({m}).", briefAnchE: "Avec ta routine, celui du soir arrive avant de dormir ({e}).",
+      logoutTitle: "Se déconnecter ?", logoutQ: "Tes tâches restent enregistrées. Pour revenir sur cet appareil, il te faudra le mot de passe.", logoutYes: "Se déconnecter" },
+  };
+  for (const k of Object.keys(P11)) Object.assign(I18N[k], P11[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1288,7 +1303,8 @@ html.kb .tabbar { display: none; }
   // Short date in the format chosen in Ajustes (día/mes or mes/día).
   const fmtDate = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return (state.settings.datefmt === "en" ? `${m}/${d}` : `${d}/${m}`) + "/" + y; };
   // A "HH:MM" time in the clock chosen in Ajustes: "3:52 PM" (12 h, the default) or "15:52" (24 h).
-  const clockMode = () => state.settings.clock || "12";
+  // Never touched in Ajustes: 24 h in French and Portuguese (what is normal there), 12 h in Spanish and English.
+  const clockMode = () => state.settings.clock || (lang === "fr" || lang === "pt" ? "24" : "12");
   const clock = (s) => {
     if (!s || clockMode() === "24") return s || "";
     const [h, m] = s.split(":").map(Number);
@@ -1299,6 +1315,7 @@ html.kb .tabbar { display: none; }
   const clone = (x) => JSON.parse(JSON.stringify(x));
   // For search: lower case and without accents.
   const norm = (s) => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  const capFirst = (x) => x.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase());
   const timeOf = (t) => (t.anytime ? tr("anyTimeShort") : clock(t.time));
   const dur = (m) => (m >= 60 ? tr("durH", { h: Math.floor(m / 60), m: m % 60 ? " " + (m % 60) + " min" : "" }) : m + " min");
   function applyTheme() {
@@ -1887,11 +1904,10 @@ html.kb .tabbar { display: none; }
         el("div", {}, el("h2", {}, (t.star ? "⭐ " : "") + t.title), el("div", { class: "when" }, t.anytime ? niceDate(t.date) + " · " + tr("anyTimeShort") : tr("fromTo", { d: niceDate(t.date), a: clock(t.time), b: clock(hm(end)) })))),
       s ? el("div", { class: "muted" }, "🔁 " + repeatText(s)) : null,
       t.tip ? el("div", { class: "tipbox" }, t.tip) : null,
-      el("div", { class: "muted" }, t.example ? tr("exampleNote") : t.anytime ? "" : tr("lvNote_" + lvOf(t))),
+      t.example || !t.anytime ? el("div", { class: "muted" }, t.example ? tr("exampleNote") : tr("lvNote_" + lvOf(t))) : null,
       real && stateText(t) ? el("div", { class: "tipbox" }, stateText(t)) : null,
       real && hasSteps ? stepsBox(t) : real && !t.done ? split : null,
       el("details", { class: "more" }, el("summary", {}, "⋯ " + tr("moreOptions")), el("div", { class: "actions" },
-        real ? el("button", { onclick: then(() => openEdit(t)) }, "✏️ " + tr("edit")) : null,
         real && t.anytime && !t.done ? el("button", { onclick: then(() => placeAnytime(t)) }, tr("findSlot")) : null,
         real ? el("button", { onclick: then(() => change(t, { ...F.fresh(t), date: ymd(addDays(fromYmd(t.date), 1)) }, tr("movedTomorrow", { t: t.title }))) }, tr("moveTomorrow")) : null,
         real ? el("button", { onclick: then(() => change(t, { star: !t.star }, t.star ? null : tr("starOn", { t: t.title }))) }, tr(t.star ? "unstar" : "star")) : null,
@@ -1916,7 +1932,7 @@ html.kb .tabbar { display: none; }
     const s = t.series && state.series.find((x) => x.id === t.series);
     const title = el("input", { class: "field", id: "editIn", value: t.title, maxlength: 120, autocomplete: "off", style: "background:var(--group);flex:1" });
     const mic = el("button", { type: "button", class: "mic", "data-mic": "editIn", "aria-label": tr("dictate"), onclick: () => toggleMic(mic) }, micSvg());
-    const emo = el("input", { class: "field", value: t.emoji || "", maxlength: 8, "aria-label": tr("emojiLbl"), style: "background:var(--group);width:3.2em;text-align:center;font-size:1.3em;padding:6px" });
+    const emo = el("input", { class: "field", value: t.emoji || "", placeholder: icon(t), maxlength: 8, "aria-label": tr("emojiLbl"), style: "background:var(--group);width:3.2em;text-align:center;font-size:1.3em;padding:6px" });
     const day = el("input", { id: "editDate" }); day.value = t.date;
     const seg = el("div", { class: "seg" });
     const time = el("input", { type: "time", class: "field", style: "background:var(--group);width:auto" }); time.value = t.anytime ? "" : t.time;
@@ -2075,12 +2091,13 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     if (ph === "asking" || ph === "unconfirmed" || ph === "running") return openCheck(t);
     if (ph === "closed") return openSheet(t);
     const left = Math.round((at(t.date, t.time) - Date.now()) / 60000);
-    const when = t.anytime ? niceDate(t.date) : left > 0 ? (left >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: left })) : left > -(t.dur || 30) ? tr("isNow") : tr("wasAt", { t: clock(t.time) });
+    const late = !t.anytime && left <= -(t.dur || 30);
+    const when = t.anytime ? niceDate(t.date) : left > 0 ? (left >= 90 ? (t.date === ymd(new Date()) ? tr("todayLower") : niceDate(t.date)) : tr("inN", { n: left })) : late ? tr("wasAt", { t: clock(t.time) }) : tr("isNow");
     const then = (fn) => () => { closeSheet(); fn(); };
     const timed = F.timed(t) && !t.anytime;
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": t.title, style: `--c: var(--c-${cat(t.cat)})` },
       el("div", { class: "grabber" }),
-      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, `${timeOf(t)} · ${when}`))),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, t.title), el("div", { class: "when" }, late ? capFirst(when) : `${timeOf(t)} · ${when}`))),
       t.tip ? el("div", { class: "tipbox" }, "💡 " + t.tip) : null,
       timed
         ? el("div", { class: "qa" },
@@ -2127,7 +2144,7 @@ Responde solo JSON: {"pasos":[{"paso":"Hacer el boceto","minutos":20}]}`);
     const timed = F.timed(t), ph = phaseOf(t, Date.now()), go = (a) => () => { closeSheet(); answer(t, a); };
     const q = timed ? tr("askTimed", { t: t.title }) : t.q || tr("askInstant", { t: t.title });
     showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": q, style: `--c: var(--c-${cat(t.cat)})` }, el("div", { class: "grabber" }),
-      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, q), el("div", { class: "when" }, `${timeOf(t)} · ${stateText(t) || t.title}`))),
+      el("div", { class: "qhead" }, el("div", { class: "em" }, icon(t)), el("div", {}, el("h2", {}, q), el("div", { class: "when" }, timeOf(t) + (stateText(t) ? " · " + stateText(t) : "")))),
       el("div", { class: "qa" },
         el("button", { class: "big", onclick: go(timed ? "finished" : "yes") }, timed ? tr("finished") : "✔ " + (t.yes || tr("yesDefault"))),
         timed ? el("button", { onclick: go("half") }, tr("half")) : null,
@@ -3091,7 +3108,6 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   function syncSettings() {
     if (document.activeElement !== $("myName")) $("myName").value = state.settings.name || "";
     paintRoutine();
-    $("energy").value = energy();
     $("sound").checked = state.settings.sound !== false;
     $("datefmt").value = state.settings.datefmt || "es";
     $("clock").value = clockMode();
@@ -3102,7 +3118,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     // With sleep hours (Tu rutina) the summaries follow them, so their own time pickers step aside.
     $("briefMOn").checked = b.mOn !== false; $("briefMRow").hidden = b.mOn === false || !!anch; $("briefM").value = b.m || "08:00";
     $("briefEOn").checked = b.eOn !== false; $("briefERow").hidden = b.eOn === false || !!anch; $("briefE").value = b.e || "21:00";
-    $("briefAnch").hidden = !anch; $("briefAnch").textContent = anch ? tr("briefAnch", { m: clock(anch.m), e: clock(anch.e) }) : "";
+    const anchKey = !anch ? "" : b.mOn !== false && b.eOn !== false ? "briefAnch" : b.mOn !== false ? "briefAnchM" : b.eOn !== false ? "briefAnchE" : "";
+    $("briefAnch").hidden = !anchKey; $("briefAnch").textContent = anchKey ? tr(anchKey, { m: clock(anch.m), e: clock(anch.e) }) : "";
     $("briefWOn").checked = b.wOn !== false;
     $("briefFoot").textContent = tr("briefFoot", { t: clock("18:00") });
     const q = state.settings.quiet || {};
@@ -3145,10 +3162,10 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   // forget: [...], done}. Nothing asks for a legal name, health, income or gender.
   const FORMS = { es: ["tu", "usted", "vos"], pt: ["voce", "tu"], fr: ["tu", "vous"], en: [] };
   const FORGET = ["meds", "appts", "pay", "bdays", "work"];
+  const ENERGY = [["mañana", "morningE"], ["tarde", "afternoonE"], ["noche", "nightE"]];
   const WEEK = [1, 2, 3, 4, 5, 6, 0];
   const rt = () => state.settings.routine || {};
   const saveRoutine = (patch) => saveSettings({ routine: { ...rt(), ...patch } });
-  const capFirst = (x) => x.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase());
   const formLine = (f, nick) => capFirst(tr("fm_" + f, { a: nick ? nick + ", " : "" }));
   // The same nickname said each way; the person taps the one that sounds like them.
   function formPicker(nick, cur, onPick) {
@@ -3171,7 +3188,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (sl) parts.push(tr("rwBrief"));
     if (!parts.length) return nick ? tr("rwNone", { a: nick }) : tr("rwNone0");
     if (parts.length > 1) parts[parts.length - 1] = tr("rwAnd") + parts[parts.length - 1];
-    return (nick ? tr("rwLead", { a: nick }) : tr("rwLead0")) + parts.join(tr("rwSep")) + ".";
+    return capFirst((nick ? tr("rwLead", { a: nick }) : tr("rwLead0")) + parts.join(tr("rwSep")) + ".");
   }
   // Five short questions, one per screen, every one can be skipped; each answer is saved when the person goes on.
   // From the welcome (right after the reminders step), from the card on the day screen, or from Ajustes > Tu rutina.
@@ -3208,8 +3225,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       () => {
         const from = timeIn(d.work.from), to = timeIn(d.work.to), lunch = timeIn(d.work.lunch || "13:00");
         const lunchRow = qrow(tr("q2LunchAt"), lunch); lunchRow.hidden = !lunchOn;
-        const chip = el("button", { type: "button", class: "chip", "aria-pressed": String(lunchOn), onclick: () => { lunchOn = !lunchOn; chip.setAttribute("aria-pressed", String(lunchOn)); lunchRow.hidden = !lunchOn; } }, tr("q2Lunch"));
-        return [el("h2", {}, tr("q2Title")), panel(qrow(tr("q2In"), from), qrow(tr("q2Out"), to), el("div", { class: "chips" }, chip), lunchRow), nav(() => {
+        const lunchSw = switchRow(tr("q2Lunch"), lunchOn, (on) => { lunchOn = on; lunchRow.hidden = !on; });
+        return [el("h2", {}, tr("q2Title")), panel(qrow(tr("q2In"), from), qrow(tr("q2Out"), to), lunchSw, lunchRow), nav(() => {
           if (!from.value || !to.value || from.value === to.value) return;
           d.work = { ...d.work, from: from.value, to: to.value, lunch: lunchOn ? lunch.value : "" }; saveRoutine({ work: d.work });
         })];
@@ -3305,6 +3322,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
       sl.up || sl.bed ? clearBtn(() => { const prev = clone(rt().sleep || null); saveRoutine({ sleep: null }); paintRoutine(true); return prev; }, "rtSleepGone", (prev) => saveRoutine({ sleep: prev })) : null].filter(Boolean));
     const fg = r.forget || [];
     $("forgetBox").replaceChildren(el("b", {}, tr("forgetL")), forgetChips(fg, (k) => { saveRoutine({ forget: fg.includes(k) ? fg.filter((x) => x !== k) : [...fg, k] }); paintRoutine(true); }));
+    // The same chips as in the welcome.
+    $("energyBox").replaceChildren(el("b", {}, tr("ob2Title")), el("div", { class: "chips" }, ENERGY.map(([e, k]) => el("button", { type: "button", class: "chip", "aria-pressed": String(energy() === e), onclick: () => { saveSettings({ energy: e }); paintRoutine(true); } }, tr(k)))));
     $("rtRedo").textContent = tr(r.done ? "rtRedo" : "rtCardTitle");
   }
 
@@ -3505,13 +3524,16 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (dictating) { const d = dictating; dictating = null; await d.stop(); }
     const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v);
   };
-  $("energy").onchange = () => saveSettings({ energy: $("energy").value });
   $("myName").onchange = () => { const v = $("myName").value.trim().slice(0, 40); $("myName").value = v; if (v !== (state.settings.name || "")) { saveSettings({ name: v }); paintRoutine(true); notice(tr("nameSaved")); } };
   $("myName").oninput = () => { const f = formPicker($("myName").value, state.settings.form, () => {}); if (f) $("formBox").querySelectorAll(".lvcard b").forEach((b, j) => { b.textContent = f.children[j].textContent; }); };
   $("rtRedo").onclick = () => interview();
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
-  $("logout").onclick = () => { ls.set("pass", ""); pass = ""; location.reload(); };
+  $("logout").onclick = () => showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("logoutTitle") }, el("div", { class: "grabber" }),
+    el("h2", {}, tr("logoutTitle")), el("p", {}, tr("logoutQ")),
+    el("div", { class: "row" },
+      el("button", { class: "btn primary", style: "background:var(--red);border-color:var(--red)", onclick: () => { ls.set("pass", ""); pass = ""; location.reload(); } }, tr("logoutYes")),
+      el("button", { class: "btn", onclick: closeSheet }, tr("cancel")))));
   $("bdForm").onsubmit = (e) => {
     e.preventDefault();
     if (!bDate.value) { notice(tr("chooseBdayDate")); return; }

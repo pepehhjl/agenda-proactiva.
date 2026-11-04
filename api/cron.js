@@ -57,7 +57,8 @@ async function remind(sb, owner, items) {
   const settings = (items.find((r) => r.kind === "settings") || {}).data || {};
   const tz = settings.tz || "UTC";
   const tr = texts(settings.uiLang);
-  const clockMode = settings.clock || "12";
+  // The clock chosen in Ajustes; never touched: 24 h in French and Portuguese, 12 h otherwise (as in the app).
+  const clockMode = settings.clock || (["fr", "pt"].includes(String(settings.uiLang || "").slice(0, 2)) ? "24" : "12");
   // The buttons of a task notification (the service worker shows as many as the phone allows, in this order).
   // Posponer and Ahora no open a small choice inside the installed app; the others work in the background.
   const btn = (k, title) => ({ action: k, title: title || tr("a_" + k) });
