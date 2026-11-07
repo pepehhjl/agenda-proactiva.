@@ -7,11 +7,12 @@ export const env = (k) => (process.env[k] || "").trim();
 
 // Every route except /api/status needs a key: the app password (set APP_PASSWORD in Vercel) opens the
 // main agenda; an invite link's key opens that person's own agenda. who() says whose agenda it is, or null.
+// The key comes in the x-app-password header, the ?key= query, or the pendi_key cookie that /api/enter leaves.
 const guests = new Map(); // key -> { owner, at }
 export async function who(req) {
   const pass = env("APP_PASSWORD");
   if (!pass) return null;
-  const given = String(req.headers["x-app-password"] || (req.query && req.query.key) || "");
+  const given = String(req.headers["x-app-password"] || (req.query && req.query.key) || cookieKey(req) || "");
   if (!given) return null;
   if (given === pass) return "main";
   if (!/^[A-Za-z0-9_-]{20,64}$/.test(given)) return null;
@@ -23,6 +24,11 @@ export async function who(req) {
   const owner = data ? data.id : null;
   guests.set(given, { owner, at: Date.now() });
   return owner;
+}
+function cookieKey(req) {
+  const m = String(req.headers.cookie || "").match(/(?:^|;\s*)pendi_key=([^;]*)/);
+  if (!m) return "";
+  try { return decodeURIComponent(m[1]); } catch { return ""; }
 }
 export const authed = async (req) => (await who(req)) === "main";
 
