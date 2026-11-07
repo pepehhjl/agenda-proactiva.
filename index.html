@@ -302,6 +302,10 @@ code.key { display: block; font-size: 12px; word-break: break-all; background: v
 .onboard .slide .group { width: 100%; text-align: left; }
 .onboard .slide .chips { justify-content: center; } .onboard .slide .group .chips { justify-content: flex-start; }
 .onboard .slide .reward { color: var(--ink); font-size: 18px; line-height: 1.45; }
+.onboard .tuphoto { width: 100%; max-height: 42vh; object-fit: contain; border-radius: 14px; background: var(--fill); }
+.onboard .tuph { width: 100%; height: 160px; border-radius: 14px; border: 2px dashed var(--sep); display: grid; place-items: center; color: var(--muted); font-size: 16px; }
+.onboard .tustep { color: var(--muted); font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.testtag { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 6px; background: var(--red); color: #fff; font-size: 12px; letter-spacing: .06em; }
 .onboard .ivx { position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--fill); color: var(--ink); font-size: 17px; font-weight: 700; cursor: pointer; }
 .ivprog { width: 100%; display: grid; gap: 6px; justify-items: center; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .ivprog .bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
@@ -558,6 +562,21 @@ html.kb .tabbar { display: none; }
           <div id="formBox" style="display:grid;gap:8px"></div>
         </div>
         <p class="foot" data-i18n="nameFoot"></p>
+        <h3 class="sub" data-i18n="ownAiH"></h3>
+        <div class="group" id="ownAiBox">
+          <span class="muted" data-i18n="ownAiIntro"></span>
+          <label class="toggle"><span data-i18n="ownAiProvider"></span>
+            <select id="aiProvider"><option value="openai">OpenAI (ChatGPT)</option></select>
+          </label>
+          <div id="aiSavedRow" hidden style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="flex:1"><span data-i18n="ownAiSaved"></span> <code id="aiMasked"></code></span>
+            <button class="link" id="aiRemove" style="color:var(--red)" data-i18n="ownAiRemove"></button>
+          </div>
+          <input class="field" id="aiKeyIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" style="background:var(--fill)" data-i18n-ph="ownAiKeyPh">
+          <button class="btn primary" id="aiSave" data-i18n="ownAiSave"></button>
+          <button class="link" id="aiHow" style="font-size:16px;padding:8px 0" data-i18n="ownAiHow"></button>
+          <div class="muted" id="aiMsg" aria-live="polite"></div>
+        </div>
         <h3 class="sub" data-i18n="setNotices"></h3>
         <div class="group">
           <div id="pushBox" style="display:grid;gap:10px"></div>
@@ -1411,6 +1430,43 @@ html.kb .tabbar { display: none; }
     fr: { editBdayOf: "Modifier l'anniversaire de {n}", aiSlow: "Ça prend plus de temps que d'habitude ; je continue d'essayer." },
   };
   for (const k of Object.keys(P14)) Object.assign(I18N[k], P14[k]);
+  // 0.16.0-prueba: "Tu propia IA" (the person's own AI key) and its 8-step tutorial. Spanish and English;
+  // Portuguese and French show the Spanish text (tr falls back to es).
+  const P15 = {
+    es: { ownAiH: "Tu propia IA", ownAiIntro: "Conecta tu propia cuenta de inteligencia artificial y Pendi la usa para todo: el chat, organizar tu día y leer fotos. Tu clave se guarda solo en este dispositivo; Pendi la usa para hablar con tu IA y no la guarda en ningún servidor.",
+      ownAiProvider: "Proveedor", ownAiKeyPh: "Pega aquí tu clave (empieza con sk-)", ownAiSave: "Guardar mi clave", ownAiHow: "Cómo conseguir mi clave",
+      ownAiSaved: "Clave guardada:", ownAiRemove: "Quitar mi clave", ownAiRemoved: "Listo, quitaste tu clave. Pendi vuelve a usar su IA de siempre.",
+      ownAiChecking: "Probando tu clave...", ownAiEmpty: "Primero pega tu clave.", ownAiOk: "¡Listo! Ya estás usando tu propia IA.",
+      errUserKey: "Tu clave de OpenAI no funcionó. Revísala con el tutorial y pégala de nuevo.",
+      errUserCredit: "Tu cuenta de OpenAI no tiene saldo o llegó a su límite. Agrégale saldo y vuelve a intentarlo.",
+      tuTitle: "Conecta tu IA en 8 pasos", tuStep: "Paso {n} de 8", tuNext: "Siguiente", tuBack: "Atrás", tuNotNow: "Ahora no", tuPhoto: "(foto en camino)",
+      tuOpen: "Abrir platform.openai.com", tuConnect: "Conectar mi IA",
+      tu1T: "Pendi usa TU inteligencia artificial", tu1B: "Pendi se conecta con TU cuenta de OpenAI, la misma con la que entras a ChatGPT. Pendi le pregunta a tu IA y tu IA le responde. El uso lo cobra OpenAI a tu cuenta: por cada conversación son centavos.",
+      tu2T: "Entra a la página de OpenAI", tu2B: "Toca el botón y entra con tu correo y tu contraseña, los mismos de ChatGPT. La página se llama platform.openai.com.",
+      tu3T: "Busca API keys", tu3B: "Ya dentro de la página, busca en el menú la opción API keys y tócala.",
+      tu4T: "Crea tu clave", tu4B: "Toca el botón Create new secret key.",
+      tu5T: "Ponle nombre", tu5B: "Donde dice el nombre escribe Pendi, y toca Create secret key.",
+      tu6T: "Copia la clave", tu6B: "Toca el botón de copiar. Guárdala bien: la clave completa no se vuelve a ver. Si la pierdes, creas otra.",
+      tu7T: "Revisa tu saldo", tu7B: "La clave necesita saldo para poder responder. En Billing agregas tu forma de pago o compras crédito. Con 5 dólares tienes para muchísimas conversaciones.",
+      tu8T: "Pega tu clave aquí", tu8B: "Vuelve a Pendi y pega tu clave en el cuadro. Se guarda solo en este teléfono." },
+    en: { ownAiH: "Your own AI", ownAiIntro: "Connect your own artificial intelligence account and Pendi uses it for everything: the chat, planning your day and reading photos. Your key is saved only on this device; Pendi uses it to talk to your AI and never stores it on any server.",
+      ownAiProvider: "Provider", ownAiKeyPh: "Paste your key here (it starts with sk-)", ownAiSave: "Save my key", ownAiHow: "How to get my key",
+      ownAiSaved: "Saved key:", ownAiRemove: "Remove my key", ownAiRemoved: "Done, your key is removed. Pendi is back to its usual AI.",
+      ownAiChecking: "Testing your key...", ownAiEmpty: "Paste your key first.", ownAiOk: "All set! You're now using your own AI.",
+      errUserKey: "Your OpenAI key didn't work. Check it with the tutorial and paste it again.",
+      errUserCredit: "Your OpenAI account has no credit or reached its limit. Add credit and try again.",
+      tuTitle: "Connect your AI in 8 steps", tuStep: "Step {n} of 8", tuNext: "Next", tuBack: "Back", tuNotNow: "Not now", tuPhoto: "(photo coming soon)",
+      tuOpen: "Open platform.openai.com", tuConnect: "Connect my AI",
+      tu1T: "Pendi uses YOUR artificial intelligence", tu1B: "Pendi connects to YOUR OpenAI account, the same one you use for ChatGPT. Pendi asks your AI and your AI answers. OpenAI bills the usage to your account: each conversation costs cents.",
+      tu2T: "Go to the OpenAI website", tu2B: "Tap the button and sign in with your email and password, the same ones as ChatGPT. The site is called platform.openai.com.",
+      tu3T: "Find API keys", tu3B: "Once you're in, look for the API keys option in the menu and tap it.",
+      tu4T: "Create your key", tu4B: "Tap the Create new secret key button.",
+      tu5T: "Give it a name", tu5B: "Where it asks for a name, type Pendi, and tap Create secret key.",
+      tu6T: "Copy the key", tu6B: "Tap the copy button. Keep it safe: the full key is never shown again. If you lose it, you create another one.",
+      tu7T: "Check your credit", tu7B: "The key needs credit to answer. In Billing you add a payment method or buy credit. 5 dollars is enough for a great many conversations.",
+      tu8T: "Paste your key here", tu8B: "Come back to Pendi and paste your key in the box. It's saved only on this phone." },
+  };
+  for (const k of Object.keys(P15)) Object.assign(I18N[k], P15[k]);
   // The language in use: the one chosen in Ajustes, else the phone's (the first of its languages we have), else English.
   function detectLang() {
     for (const l of navigator.languages || [navigator.language || ""]) { const k = String(l).slice(0, 2).toLowerCase(); if (LANGS[k]) return k; }
@@ -1518,9 +1574,17 @@ html.kb .tabbar { display: none; }
   const lastError = () => { const e = ls.get("lastError", null); return e && e.m && Date.now() - e.at < 86400000 ? e.m : ""; };
   window.addEventListener("error", (e) => noteError((e.message || "error") + (e.filename ? " @ " + e.filename.split("/").pop().split("?")[0] + ":" + e.lineno : "")));
   window.addEventListener("unhandledrejection", (e) => { const r = e.reason; if (r && r.status) return; noteError("promise: " + ((r && (r.message || r.error)) || r)); });
-  async function call(path, body, signal) {
+  // 0.16.0-prueba: the person's own AI key, kept only on this device ({ provider, key }), or null.
+  // To add Gemini or Claude later, add them to AI_PROVIDERS (and to PROVIDERS in api/ai.js).
+  const AI_PROVIDERS = { openai: { label: "OpenAI (ChatGPT)", site: "https://platform.openai.com" } };
+  const userAi = () => { const u = ls.get("userAi", null); return u && u.key && AI_PROVIDERS[u.provider] ? u : null; };
+  async function call(path, body, signal, aiKey) {
     let r;
-    try { r = await fetch(path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-app-password": pass }, body: body ? JSON.stringify(body) : undefined, signal }); }
+    const headers = { "content-type": "application/json", "x-app-password": pass };
+    // Only /api/ai gets the key, in two headers; the server uses it for that one call and never keeps it.
+    const mine = path === "/api/ai" ? aiKey || userAi() : null;
+    if (mine) { headers["x-user-ai-key"] = mine.key; headers["x-user-ai-provider"] = mine.provider; }
+    try { r = await fetch(path, { method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined, signal }); }
     catch (e) { if (!(e && e.name === "AbortError")) noteError(path.split("?")[0] + " → no connection"); throw e; }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { noteError(path.split("?")[0] + " → " + r.status + (j.error ? " " + j.error : "")); throw { status: r.status, ...j }; }
@@ -1529,13 +1593,13 @@ html.kb .tabbar { display: none; }
   // The server always answers within ~30 s. After 20 s the screen says, softly, that it is taking longer
   // (onSlow paints it in place; by default a short notice). After 45 s the wait ends with the usual AI error.
   const AI_SLOW_MS = 20000, AI_CAP_MS = 45000;
-  function askAi(body, signal, onSlow) {
+  function askAi(body, signal, onSlow, aiKey) {
     const ctl = new AbortController(), fwd = () => ctl.abort();
     let late = false;
     if (signal) { if (signal.aborted) ctl.abort(); else signal.addEventListener("abort", fwd, { once: true }); }
     const slow = setTimeout(() => { try { (onSlow || (() => notice(tr("aiSlow"))))(); } catch {} }, AI_SLOW_MS);
     const cap = setTimeout(() => { late = true; ctl.abort(); }, AI_CAP_MS);
-    return call("/api/ai", body, ctl.signal)
+    return call("/api/ai", body, ctl.signal, aiKey)
       .catch((e) => { if (late && !(signal && signal.aborted)) { noteError("/api/ai → no answer in 45 s"); throw { status: 504, error: "timeout" }; } throw e; })
       .finally(() => { clearTimeout(slow); clearTimeout(cap); if (signal) signal.removeEventListener("abort", fwd); });
   }
@@ -1545,6 +1609,8 @@ html.kb .tabbar { display: none; }
     transcribe: (audio) => askAi({ audio }).then((j) => String((j.data && j.data.texto) || "")),
   };
   function errText(e) {
+    if (e && e.error === "user_key_invalid") return tr("errUserKey");
+    if (e && e.error === "user_key_no_credit") return tr("errUserCredit");
     if (e && e.error === "rate_limited") return tr("errRate");
     if (e && e.error === "no_ai") return tr("errNoAi");
     if (e && e.error === "invalid_json") return tr("errJson");
@@ -1552,7 +1618,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.15.2";
+  const VERSION = "0.16.0-prueba";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -3383,7 +3449,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     if (!$("adminBox").hidden && st.db && !st.offline) renderFeedback(); else $("fbList").replaceChildren();
     $("inviteBox").hidden = !!st.guest || !st.db || !!st.offline;
     if (!$("inviteBox").hidden) renderInvites();
-    $("version").textContent = tr("version") + " " + VERSION + (ls.get("admin", false) ? tr("adminSuffix") : "");
+    $("version").replaceChildren(tr("version") + " " + VERSION + (ls.get("admin", false) ? tr("adminSuffix") : "") + " ", el("b", { class: "testtag" }, "PRUEBA"));
     const item = (ok, label, help) => el("div", { class: "check" }, el("span", { class: ok ? "ok" : "no" }, ok ? "✓" : "✗"), el("div", {}, el("b", {}, label), ok ? null : help));
     box.append(
       item(true, "Contraseña de la app"),
@@ -3657,6 +3723,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     else if (name === "cal") return showTab("organize");
     $("fab").hidden = isPhone() && (name === "chat" || name === "settings");
     if (name === "chat") { const sc = $("chatScroll"); sc.scrollTop = sc.scrollHeight; }
+    // 0.16.0-prueba: a guest without their own AI key sees the tutorial on the first visit to the chat (once per session).
+    if (name === "chat" && state.status.guest && !userAi() && !sessionGet("tuShown") && $("onboard").hidden) { sessionSet("tuShown"); aiTutorial(); }
     // The one-time note: shown on the first visit to Ajustes after 0.14.0, then never again on this account.
     if (name === "settings" && !state.settings.regroupSeen) { $("regroupNote").hidden = false; saveSettings({ regroupSeen: true }); }
     else if (name !== "settings") $("regroupNote").hidden = true;
@@ -3829,6 +3897,85 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("helpPriv").onclick = openPrivacy;
   $("helpBug").onclick = () => openFeedback("bug");
   $("helpIdea").onclick = () => openFeedback("idea");
+  // ---------- your own AI (0.16.0-prueba) ----------
+  // The key is saved only in this device's storage. Before saving, one tiny question goes to the person's AI,
+  // so a wrong key is caught right away with a clear message.
+  const masked = (k) => "••••••••" + String(k).slice(-4);
+  function paintOwnAi() {
+    const u = userAi();
+    $("aiSavedRow").hidden = !u;
+    $("aiMasked").textContent = u ? masked(u.key) : "";
+    if (u) $("aiProvider").value = u.provider;
+  }
+  // Tests the key and saves it. Returns "" when it worked, or the text to show.
+  async function connectAi(raw, provider) {
+    const key = String(raw || "").trim().replace(/\s+/g, "");
+    if (!key) return tr("ownAiEmpty");
+    const cand = { provider: AI_PROVIDERS[provider] ? provider : "openai", key };
+    try {
+      await askAi({ input: 'Responde solo este JSON: {"ok":true}' }, null, () => {}, cand);
+      ls.set("userAi", cand); paintOwnAi(); return "";
+    } catch (e) {
+      // A key without credit is still the right key: it stays saved, and the message says what to do.
+      if (e && e.error === "user_key_no_credit") { ls.set("userAi", cand); paintOwnAi(); }
+      return errText(e);
+    }
+  }
+  $("aiSave").onclick = async () => {
+    const b = $("aiSave"); if (b.disabled) return;
+    b.disabled = true; $("aiMsg").textContent = tr("ownAiChecking");
+    const err = await connectAi($("aiKeyIn").value, $("aiProvider").value);
+    b.disabled = false;
+    $("aiMsg").textContent = err || tr("ownAiOk");
+    if (!err) $("aiKeyIn").value = "";
+  };
+  $("aiRemove").onclick = () => { try { localStorage.removeItem("userAi"); } catch {} paintOwnAi(); $("aiMsg").textContent = tr("ownAiRemoved"); };
+  $("aiHow").onclick = () => aiTutorial();
+  paintOwnAi();
+  // Session-only flags (the tutorial shows once per session for a guest without a key).
+  function sessionGet(k) { try { return sessionStorage.getItem(k) === "1"; } catch { return false; } }
+  function sessionSet(k) { try { sessionStorage.setItem(k, "1"); } catch {} }
+  // "Conecta tu IA en 8 pasos": one screen per step. Steps 2–7 show /tutorial/paso-N.jpg when that file exists,
+  // otherwise a box that says the photo is on its way.
+  function aiTutorial() {
+    const box = $("onboard"), N = 8; let i = 0;
+    const end = () => { box.hidden = true; box.classList.remove("iv"); box.replaceChildren(); };
+    const photo = (n) => {
+      const ph = el("div", { class: "tuph" }, tr("tuPhoto"));
+      const img = el("img", { class: "tuphoto", alt: "", src: "/tutorial/paso-" + n + ".jpg" });
+      img.hidden = true;
+      img.onload = () => { img.hidden = false; ph.remove(); };
+      img.onerror = () => img.remove();
+      return [img, ph];
+    };
+    const paint = () => {
+      const n = i + 1, kids = [el("div", { class: "tustep" }, tr("tuTitle") + " · " + tr("tuStep", { n })), el("h2", {}, tr("tu" + n + "T")), el("p", {}, tr("tu" + n + "B"))];
+      if (n === 1) kids.unshift(el("div", { class: "big" }, "🔑"));
+      if (n >= 2 && n <= 7) kids.push(...photo(n));
+      if (n === 2) kids.push(el("a", { class: "btn", href: AI_PROVIDERS.openai.site, target: "_blank", rel: "noopener noreferrer", style: "width:100%;text-align:center;text-decoration:none" }, tr("tuOpen")));
+      let foot;
+      if (n === N) {
+        const input = el("input", { class: "field", type: "password", autocomplete: "off", autocapitalize: "off", spellcheck: "false", placeholder: tr("ownAiKeyPh"), style: "background:var(--cell);width:100%" });
+        const msg = el("div", { class: "muted", "aria-live": "polite" });
+        const go = el("button", { class: "btn primary", style: "width:100%" }, tr("tuConnect"));
+        go.onclick = async () => {
+          if (go.disabled) return;
+          go.disabled = true; msg.textContent = tr("ownAiChecking");
+          const err = await connectAi(input.value, "openai");
+          go.disabled = false;
+          if (err) { msg.textContent = err; return; }
+          end(); notice(tr("ownAiOk")); $("aiMsg").textContent = tr("ownAiOk");
+        };
+        kids.push(input, go, msg);
+      } else foot = el("button", { class: "btn primary", style: "width:100%", onclick: () => { i++; paint(); } }, tr("tuNext"));
+      kids.push(el("div", { style: "display:grid;gap:4px;width:100%;justify-items:center" }, foot || null,
+        i > 0 ? el("button", { class: "link", onclick: () => { i--; paint(); } }, tr("tuBack")) : null,
+        el("button", { class: "link", onclick: end }, tr("tuNotNow"))));
+      box.replaceChildren(el("div", { class: "slide", role: "dialog", "aria-modal": "true", "aria-label": tr("tuTitle") }, ...kids));
+      box.scrollTop = 0;
+    };
+    box.classList.add("iv"); box.hidden = false; paint();
+  }
   $("sound").onchange = () => saveSettings({ sound: $("sound").checked });
   $("testToast").onclick = () => toast({ title: tr("ex1Title"), time: "10:00", cat: "creativo", tip: tr("ex1Tip") }, 30, true);
   $("logout").onclick = () => showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("logoutTitle") }, el("div", { class: "grabber" }),

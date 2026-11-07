@@ -1,4 +1,4 @@
-// Asks Gemini. Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
+// Asks Gemini (or, in 0.16.0-prueba, the person's own AI account: see "Your own AI" below). Body: {input} for a JSON answer, {input, search:true} to let it search Google first,
 // {input, image:{mime, data}} to read a photo (a flyer, an appointment, a screenshot),
 // or {audio:{mime, data}} (base64) to transcribe a voice note. Returns {data}.
 import { env, who, deny, readBody } from "./_lib.js";
@@ -98,9 +98,76 @@ function parseJson(text) {
   return JSON.parse(m ? m[0] : "");
 }
 
+// ---------- Your own AI (0.16.0-prueba) ----------
+// The person can connect their own AI account in Ajustes. The key lives only on their device; the app sends it
+// in x-user-ai-key (and the provider in x-user-ai-provider) with each request, and it is used for that one call only:
+// never stored, logged or sent back. The prompt and the JSON reply are the same ones Gemini gets, so the app reads
+// the answer exactly as before. To add Gemini or Claude later, add an entry to PROVIDERS with the same shape.
+const USER_MSG = {
+  invalid: "Tu clave de OpenAI no funcionó. Revísala con el tutorial y pégala de nuevo.",
+  credit: "Tu cuenta de OpenAI no tiene saldo o llegó a su límite. Agrégale saldo y vuelve a intentarlo.",
+};
+const CREDIT_CODES = new Set(["insufficient_quota", "billing_hard_limit_reached", "billing_not_active"]);
+
+// OpenAI chat completions. Returns { ok, text } or { ok:false, kind:"invalid"|"credit"|"other" }.
+// OpenAI's own error text is never passed on: on a bad key it repeats part of the key.
+async function openai(key, { turns, image, input }, until) {
+  const messages = image && image.data && typeof input === "string"
+    ? [{ role: "user", content: [
+      { type: "image_url", image_url: { url: `data:${String(image.mime || "image/jpeg").split(";")[0]};base64,${image.data}` } },
+      { type: "text", text: input.slice(0, 20000) },
+    ] }]
+    : turns.slice(-12).map((t) => ({ role: t.role === "assistant" ? "assistant" : "user", content: String(t.content).slice(0, 20000) }));
+  // JSON mode needs the word "json" somewhere in the messages; the app's prompts say it, but a reply is still read without it.
+  const json = /json/i.test(JSON.stringify(messages.map((m) => (typeof m.content === "string" ? m.content : m.content[1].text))));
+  const got = await fetchJson("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+    body: JSON.stringify({ model: "gpt-4o-mini", messages, temperature: 0.6, ...(json ? { response_format: { type: "json_object" } } : {}) }),
+  }, left(until));
+  if (!got) return { ok: false, kind: "other" };
+  const { r, data } = got, code = data && data.error && (data.error.code || data.error.type);
+  if (r.status === 401) return { ok: false, kind: "invalid" };
+  if (r.status === 429 || CREDIT_CODES.has(code)) return { ok: false, kind: "credit" };
+  if (!r.ok) return { ok: false, kind: "other" };
+  return { ok: true, text: data.choices?.[0]?.message?.content || "" };
+}
+const PROVIDERS = { openai };
+
+// The person's key and provider from the headers, or null. Only printable characters, so nothing odd reaches a header.
+function userAi(req) {
+  const key = String(req.headers["x-user-ai-key"] || "").trim();
+  if (!key) return null;
+  const provider = String(req.headers["x-user-ai-provider"] || "openai").trim().toLowerCase();
+  return { key, provider, ok: /^[\x21-\x7e]{8,300}$/.test(key) && !!PROVIDERS[provider] };
+}
+
+async function ownAi(res, mine, body) {
+  if (!mine.ok) return res.status(400).json({ error: "user_key_invalid", message: USER_MSG.invalid });
+  const until = Date.now() + BUDGET_MS;
+  const out = await PROVIDERS[mine.provider](mine.key, body, until);
+  if (!out.ok) {
+    if (out.kind === "invalid") return res.status(400).json({ error: "user_key_invalid", message: USER_MSG.invalid });
+    if (out.kind === "credit") return res.status(402).json({ error: "user_key_no_credit", message: USER_MSG.credit });
+    return res.status(502).json({ error: "ai_error", message: "Error de la IA." });
+  }
+  try { res.json({ data: parseJson(out.text) }); }
+  catch { res.status(502).json({ error: "invalid_json", message: "La IA respondió algo que no entendí.", text: out.text }); }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   if (!(await who(req))) return deny(res);
+  // The person's own AI answers everything but voice notes (those stay with Whisper/Gemini, as before).
+  const mine = userAi(req);
+  if (mine) {
+    const b = await readBody(req);
+    if (!(b.audio && b.audio.data)) {
+      const turns = typeof b.input === "string" ? [{ role: "user", content: b.input }] : Array.isArray(b.input) ? b.input : [];
+      if (!turns.length) return res.status(400).json({ error: "bad_request" });
+      return ownAi(res, mine, { turns, image: b.image, input: b.input });
+    }
+  }
   const key = env("GEMINI_API_KEY");
   if (!key) return res.status(503).json({ error: "no_ai", message: "Falta configurar GEMINI_API_KEY en Vercel." });
   const { input, search, audio, image } = await readBody(req);
