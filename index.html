@@ -1500,10 +1500,14 @@ html.kb .tabbar { display: none; }
   let pass = ls.get("pass", "");
   // An invite link (?invite=…) opens that person's own agenda without the password. A new key starts
   // from a clean phone copy, so two agendas never mix. The installed app keeps the key in its start page.
+  // 0.15.2: the page then goes once through /api/enter, which also leaves the key in a cookie (so the person gets in
+  // where this storage is empty) and comes back to "/" without ?invite=, so it never repeats.
   const invite = new URLSearchParams(location.search).get("invite");
-  if (invite && /^[A-Za-z0-9_-]{20,64}$/.test(invite)) {
+  const entering = !!invite && /^[A-Za-z0-9_-]{20,64}$/.test(invite);
+  if (entering) {
     if (invite !== pass) { try { localStorage.clear(); } catch {} pass = invite; ls.set("pass", pass); }
     document.querySelector('link[rel="manifest"]').href = "/api/manifest?invite=" + encodeURIComponent(invite);
+    location.replace("/api/enter?invite=" + encodeURIComponent(invite));
   }
   // The last thing that went wrong (kept for a day), so a problem report can carry it. Only the error's text:
   // links and long keys are cut out, and nothing that was on screen is included.
@@ -1548,7 +1552,7 @@ html.kb .tabbar { display: none; }
     return tr(e && e.status ? "errAi" : "errNet");
   }
 
-  const VERSION = "0.15.1";
+  const VERSION = "0.15.2";
   // ---------- state ----------
   const state = { status: {}, tasks: [], bdays: [], series: [], settings: {}, anchor: new Date(), proposals: null, chat: [] };
   const fired = new Set(ls.get("fired", []));
@@ -3752,6 +3756,8 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
     catch { state.status = { password: true, authed: true, offline: true }; }
     if (!state.status.password) return showGate("nopass");
     if (!state.status.authed) return showGate("login", pass ? tr("wrongPw") : "");
+    // A guest back on "/" (after /api/enter) still adds the app to the home screen with their own start page.
+    if (state.status.guest && /^[A-Za-z0-9_-]{20,64}$/.test(pass)) document.querySelector('link[rel="manifest"]').href = "/api/manifest?invite=" + encodeURIComponent(pass);
     $("gate").hidden = true; $("app").hidden = false;
     await loadData();
     syncSettings();
@@ -3828,7 +3834,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   $("logout").onclick = () => showSheet(el("div", { class: "sheet", role: "dialog", "aria-modal": "true", "aria-label": tr("logoutTitle") }, el("div", { class: "grabber" }),
     el("h2", {}, tr("logoutTitle")), el("p", {}, tr("logoutQ")),
     el("div", { class: "row" },
-      el("button", { class: "btn primary", style: "background:var(--red);border-color:var(--red)", onclick: () => { ls.set("pass", ""); pass = ""; location.reload(); } }, tr("logoutYes")),
+      el("button", { class: "btn primary", style: "background:var(--red);border-color:var(--red)", onclick: () => { ls.set("pass", ""); pass = ""; location.replace("/api/enter?out=1"); } }, tr("logoutYes")),
       el("button", { class: "btn", onclick: closeSheet }, tr("cancel")))));
   $("bdForm").onsubmit = (e) => {
     e.preventDefault();
@@ -3847,7 +3853,7 @@ Responde solo JSON: {"ideas":[{"emoji":"🎧","idea":"Audífonos inalámbricos",
   setInterval(() => { if (!document.hidden && bar && bar.isConnected) paintBar(); }, 1000);
   setInterval(() => { if (expandSeries()) render(); else if (!document.hidden) renderCal(); }, 60000);
   applyLang();
-  boot();
+  if (!entering) boot();
 })();
 </script>
 </body>

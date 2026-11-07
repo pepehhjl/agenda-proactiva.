@@ -14,6 +14,9 @@ self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => 
 self.addEventListener("fetch", (e) => {
   const req = e.request, url = new URL(req.url);
   if (req.method === "POST" && url.pathname === "/share") return e.respondWith(shared(req));
+  // The invite way in (/api/enter, the installed guest app's start page) always goes to the server, never to a
+  // saved copy; only without internet does it go on to "/" (the saved app) instead of an error page.
+  if (req.method === "GET" && req.mode === "navigate" && url.pathname === "/api/enter") return e.respondWith(fetch(req).catch(() => Response.redirect(new URL("/", self.location.origin).href, 302)));
   if (req.method !== "GET" || url.pathname.startsWith("/api/")) return;
   // The phone reads the icons and the manifest straight from the server when the app is added to the home screen.
   if (/\.(png|webmanifest)$/.test(url.pathname)) return;

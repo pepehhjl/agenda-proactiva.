@@ -1,5 +1,6 @@
 // The app manifest for an invite link: the same as manifest.webmanifest, but the installed app opens the
-// person's own agenda (start_url keeps their key), since an iPhone app does not share Safari's storage.
+// person's own agenda, since an iPhone app does not share Safari's storage: its start page is /api/enter with
+// their key, which plants the key cookie again on every open and then shows the app.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -13,7 +14,7 @@ catch {
 export default function handler(req, res) {
   const key = String((req.query && req.query.invite) || "");
   const m = { ...base };
-  if (/^[A-Za-z0-9_-]{20,64}$/.test(key)) m.start_url = "/?invite=" + key;
+  if (/^[A-Za-z0-9_-]{20,64}$/.test(key)) m.start_url = "/api/enter?invite=" + key;
   res.setHeader("content-type", "application/manifest+json");
   res.setHeader("cache-control", "no-store");
   res.end(JSON.stringify(m));
